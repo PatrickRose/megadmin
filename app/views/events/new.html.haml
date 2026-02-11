@@ -1,0 +1,31 @@
+-# frozen_string_literal: true
+
+.row.justify-content-center
+  .form-box
+    %h1 New Event
+    %hr
+    %br
+
+    = simple_form_for(@event) do |form|
+      .card-body
+        = form.input :name, label: 'Name:'
+        .form-group
+          = form.label :description, label: 'Description:'
+          = form.rich_text_area :description
+        = form.input :rulebook, label: 'Rulebook:'
+        = form.input :location, label: 'Location:'
+        = form.input :google_maps_link, label: 'Google Maps Link ⓘ:', label_html: {class: 'tooltip-label', title: 'Once you have found the venue location on Google Maps: click "Share", "Embed a map" and "COPY HTML". Paste that text here.'}
+        = form.input :date, as: :string, input_html: { type: 'datetime-local'}, label: 'Date and Time:'
+        .form-group
+          = form.label :timetable, label: 'Timetable:'
+          = form.rich_text_area :timetable
+        %br
+        = form.input :additional_info, label: 'Additional Information:'
+        = form.hidden_field :organiser_id, value: current_organiser.id
+        .form-group
+          = form.input :additional_documents, label: 'Additional Documents:', input_html: { multiple: true }
+        .form-actions
+          = button_tag "Create Event", type: "submit", name: "draft", value: "false", class: "btn generic-button-success"
+          = button_tag "Save as Draft", type: "submit", name: "draft", value: "true", class: "btn generic-button"
+          %br
+          = link_to 'Back to events', events_path

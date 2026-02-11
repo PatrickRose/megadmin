@@ -1,0 +1,33 @@
+default: &default
+    adapter: postgresql
+    encoding: unicode
+    pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+
+development:
+    <<: *default
+    database: team12_dev
+
+test:
+    <<: *default
+    database: team12_test
+    username: <%= ENV.fetch("POSTGRES_USER", "postgres") %>
+    password: <%= ENV.fetch("POSTGRES_PASSWORD", "") %>
+    host: <%= ENV.fetch("POSTGRES_HOST", "localhost") %>
+
+production:
+    primary: &primary_production
+        <<: *default
+        database: team12_production
+        username: team12
+        password: <%= ENV["MIGRATION_TEST_DATABASE_PASSWORD"] %>
+    cable:
+        <<: *primary_production
+        database: team12_production_cable
+        migrations_paths: db/cable_migrate
+
+demo:
+    <<: *default
+    database: team12_demo
+    username: team12
+    password: <%= ENV["MIGRATION_TEST_DATABASE_PASSWORD"] %>
+    host: <%= ENV.fetch("POSTGRES_HOST", "localhost") %>

@@ -1,0 +1,53 @@
+#dark-screen
+#warning-popup-modal{ style: "display:none;" }
+  .modal-content.centered
+    %h2#popup-title
+    %hr
+    %br
+    %a(id="delete-button" class="btn generic-button-danger")Delete
+    %button#cancel-button.btn.generic-button(type='button')Cancel
+
+.row.justify-content-center
+  .col-sm-8.mw-75.event-manager
+    %h1 Organisers
+    %b Control Team can only add other control team members to events and view the event's details and players
+    %table.table.table-striped
+      %thead
+        %tr
+          %th{ scope: 'col' } Name
+          %th{ scope: 'col' } Email
+          %th{ scope: 'col' } Type
+          %th{ scope: 'col' } Description
+          - unless @control_team
+            %th{ scope: 'col' } Actions
+      %tbody
+        - @organisers_to_events.each do |i|
+          - email_field = i.organiser.email == current_organiser.email ? "(You) #{i.organiser.email}" : i.organiser.email
+          %tr
+            %td{ scope: 'row' }
+              = i.organiser.name
+            %td{ scope: 'row' }
+              = email_field
+            %td{ scope: 'row' }
+              - if i.read_only
+                = "Control team"
+              - else
+                = "Organiser"
+            %td{ scope: 'row' }
+              = i.description
+            - unless @control_team
+              %td{ scope: 'row' }
+                = link_to edit_event_event_organiser_path(event_id: @params[:event_id], id: i.id), class: 'btn p-1 mx-1 generic-button-recommended', title: 'Edit Organiser' do
+                  %img{ src: '/images/icons/edit-button.svg', width: '20' }
+                .btn.generic-button-danger.delete-initial.p-1{
+                  title: "Delete Organiser",
+                  data: {
+                    event_id: "#{@params[:event_id]}",
+                    specific_id: "#{i.id}",
+                    specific_name: "#{i.organiser.email}"
+                  }
+                }
+                  %img{ width: '20', height: '20', src: "/images/icons/rubbish-bin-white.svg" }
+
+    %span.btn-row-centered.text-center
+      = link_to 'Add Organisers', new_event_event_organiser_path(@event.id), class: "btn generic-button-recommended m-1"

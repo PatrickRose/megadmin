@@ -1,0 +1,95 @@
+/* Styles the player view page + has different layouts for mobile/desktop view */
+
+$spacer: 1rem;
+$formBG:#fefdfb;
+$formShadow:#b6b4af;
+$navBarBG: #ffcb96;
+
+
+.player-page {
+    text-align:center;
+    h1 {
+        font-family:'Lilita One';
+        margin:10px 0 25px 0;
+        font-size:36px;
+    }
+    h2 {
+        font-family:'Lilita One';
+        margin:10px 0 25px 0;
+        font-size:24px;
+    }
+    h3 {
+        font-family:'Lilita One';
+        margin:10px 0 25px 0;
+        font-size:20px;
+    }
+    .description {
+        left:0;
+        right:0;
+        display:inline-block;
+        position:relative;
+        background-color:$formBG;
+        padding:20px;
+        box-shadow:$formShadow 0 5px 10px;
+        border-radius:10px;
+    }
+    embed {
+        overflow:scroll;
+    }
+}
+
+@media (min-width:768px) { // 'Desktop' view adds a sidebar to the page
+    .sidebar {
+        position:fixed;
+        text-align:center;
+        right:0;
+        top:0;
+        width:25vw;
+        height:100%;
+        padding-top:75px;
+        overflow-y:auto;
+        background-color:$navBarBG;
+    }
+    .player-page { 
+        width:70vw; // Shrinks the main page to fit in the page header
+    }
+}
+
+
+.cast-list{
+    main{
+        margin: $spacer;
+    }
+    h2{
+        font-size: 4.5rem;
+        font-weight: 300;
+        line-height: 1.2;
+    }
+    table{
+        width: 100%;
+        margin-bottom: 1rem;
+        color: #212529;
+        vertical-align: top;
+        border-color: #dee2e6;
+        border-collapse: collapse;
+        padding: 0.5rem;
+        background-color: transparent;
+    }
+
+    thead, tbody{
+        border-bottom: 1px solid #dee2e6;
+        vertical-align: auto;
+    }
+    tbody tr:nth-child(odd){
+        color: black;
+        background-color: #6d6d6d;
+    }
+    .square{
+        width: 20px;
+        height: 20px;
+        border: 2px solid rgb(33, 37, 41);
+        padding: $spacer * .25;
+        display: inline-block;
+        vertical-align: middle;
+    }
+}

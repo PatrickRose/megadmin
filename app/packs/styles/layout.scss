@@ -1,0 +1,236 @@
+@import "bootstrap";
+
+$mainText: #1f1404;
+$textHover: #432b09;
+$lightBG: #fdf8f2;
+$navBarBG: #ffcb96;
+$headerBG: #f8b878;
+$footerBG: #e29950;
+$link: #6aa6e2;
+$linkHover: #4891db;
+$button: #f0eee9;
+$buttonHover: #f2f1ec;
+$buttonSuccess: #a0f59c;
+$buttonRecommended: #5ba4fc;
+$buttonDanger: #f14040;
+$formShadow: #b6b4af;
+
+html {
+    min-height: 100%;
+}
+
+body {
+    min-height: 100vh;
+    background-color: $lightBG;
+    color: $mainText;
+    font-family: "Fira Sans";
+    display: flex;
+    flex-direction: column;
+
+    header {
+        background-color: $headerBG;
+        padding: 20px 0 20px 0;
+        color: $mainText;
+        font-family: "Lilita One";
+        font-size: 48px;
+        text-align: center;
+        z-index: 1; // Interferes with the sidebar on the player view page
+        a {
+            text-decoration: none;
+            color: $mainText;
+        }
+        a:hover {
+            color: $mainText;
+        }
+    }
+    .big-font {
+        font-family: "Lilita One";
+    }
+
+    #nav-bar {
+        position: sticky;
+        top: 0;
+        z-index: 1;
+        background-color: $navBarBG;
+        font-family: "Lilita One";
+        font-size: 30px;
+        overflow: visible;
+
+        #main-buttons {
+            float: right;
+        }
+
+        ul {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+            // overflow: hidden;
+        }
+
+        li {
+            float: left;
+            position: relative;
+        }
+
+        li a {
+            display: block;
+            color: $mainText;
+            text-align: center;
+            padding: 14px 16px;
+            text-decoration: none;
+        }
+
+        li a:hover,
+        .drop-down:hover {
+            background-color: $headerBG;
+        }
+
+        li.drop-down {
+            position: relative;
+        }
+
+        .drop-down-items {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background-color: $navBarBG;
+            min-width: 160px;
+            box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+            z-index: 99;
+            cursor: pointer;
+        }
+
+        .drop-down-items > * {
+            padding: 12px 16px;
+        }
+
+        .drop-down-items > a {
+            color: $mainText;
+            text-decoration: none;
+            display: block;
+            text-align: left;
+        }
+
+        .drop-down-items a:hover {
+            background-color: $headerBG;
+        }
+
+        .drop-down:hover .drop-down-items {
+            display: block;
+        }
+    }
+
+    hr {
+        width: 95%;
+        left: 0;
+        right: 0;
+        margin: auto;
+    }
+
+    .card-header {
+        font-weight: 500;
+    }
+
+    footer {
+        height: 100px;
+        background-color: $footerBG;
+        text-align: center;
+        color: $mainText;
+        font-family: "Fira Sans";
+        font-size: 20px;
+        padding: 10px 0 0 0;
+        margin-top: auto;
+        z-index: 1; // Interferes with the sidebar on the player view page
+
+        a {
+            text-decoration: none;
+            color: $mainText;
+            font-weight: 600;
+        }
+        a:hover {
+            color: $textHover;
+        }
+    }
+    a {
+        color: $link;
+    }
+    a:hover {
+        color: $linkHover;
+    }
+    .centered {
+        text-align: center;
+    }
+    .dropdown-item:active {
+        // changing bootstrap's background colour to match our blue
+        background-color: $buttonRecommended;
+        color: $mainText;
+    }
+
+    // Function that can create button variants using custom button attributes
+    @mixin generic-button-variant(
+        $colour,
+        $hover: null,
+        $active: null,
+        $text: null
+    ) {
+        @include button-variant(
+            $color: if($text != null, $text, color-contrast($colour)),
+            $background: $colour,
+            $border: $colour,
+
+            // Background and border all same colour
+            $hover-background: if($hover != null, $hover, lighten($colour, 5%)),
+            $hover-border: if($hover != null, $hover, lighten($colour, 5%)),
+            $active-background: if(
+                    $active != null,
+                    $active,
+                    darken($colour, 5%)
+                ),
+            $active-border: if($active != null, $active, darken($colour, 5%))
+        );
+
+        box-shadow: $formShadow 0 1px 5px;
+        font-weight: 500;
+    }
+
+    .generic-button {
+        @include generic-button-variant($button, $buttonHover);
+    }
+
+    .generic-button-success {
+        @include generic-button-variant($buttonSuccess);
+    }
+
+    .generic-button-recommended {
+        @include generic-button-variant($buttonRecommended);
+    }
+
+    .generic-button-danger {
+        @include generic-button-variant(
+            $buttonDanger,
+            $hover: darken($buttonDanger, 15%),
+            $active: darken($buttonDanger, 20%),
+            $text: white
+        );
+    }
+}
+
+@media (max-width: 767px) {
+    embed {
+        width: 85vw;
+        height: 115vw;
+    }
+    .event-manager embed {
+        width: 85%;
+    }
+}
+@media (min-width: 768px) {
+    embed {
+        width: 85vh;
+        height: 115vh;
+    }
+    .event-manager embed {
+        width: 85%;
+    }
+}

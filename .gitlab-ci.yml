@@ -1,0 +1,69 @@
+image: ruby:3.3
+
+services:
+  - docker:dind
+  - postgres:14.3
+  - redis:latest
+
+cache:
+  paths: [vendor/]
+
+variables:
+  POSTGRES_DB: team12_test
+  POSTGRES_USER: "postgres"
+  POSTGRES_PASSWORD: "postgres"
+  POSTGRES_HOST: "postgres"
+  RAILS_ENV: "test"
+  POSTGRES_HOST_AUTH_METHOD: "trust"
+  REDIS_URL: "redis://redis:6379"
+
+before_script:
+  # bundle setup
+  - bundle config set path vendor/bundle
+  - bundle install
+
+  # node
+  # - apt install zip unzip
+  # - apk add zip unzip
+  - curl -fsSL https://fnm.vercel.app/install | bash
+  - source ~/.bashrc
+  - fnm install 20
+  - fnm default 20
+  - node -v
+  
+  # yarn
+  - curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | gpg --dearmor -o /etc/apt/trusted.gpg.d/yarn.gpg
+  - echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list
+  - apt update
+  - apt install -y yarn
+  - yarn -v
+  
+  # chrome
+  - wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+  - apt install -y ./google-chrome-stable_current_amd64.deb
+
+  # chrome library for Grover
+  # - apt install -y libnss3
+
+  - apt-get install libvips -y
+
+  # pandoc
+  - apt-get install pandoc texlive -y
+
+  # project setup
+  - bin/setup
+
+rspec:
+  script:
+    # - echo $POSTGRES_DB
+    # - echo $POSTGRES_USER
+    # - echo $POSTGRES_PASSWORD
+    # - echo $POSTGRES_HOST
+    - bundle exec rspec spec
+
+
+# ruby_syntax_check:
+#   stage: check
+#   script:
+#     - bundle exec rubocop --fail-level E
+#   allow_failure: false

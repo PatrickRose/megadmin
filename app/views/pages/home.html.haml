@@ -1,0 +1,15 @@
+.row.justify-content-center.align-items-center.mt-5
+  .col-sm-8.col-lg-6.text-center
+    .card.card-light
+      .card-header.display-2.big-font Welcome to Megagames!
+
+      .card-body
+        - if current_organiser.nil?
+          .mb-3
+            %h2 New here?
+            = link_to 'Sign up', new_organiser_registration_path, class: 'btn generic-button-recommended btn-lg'
+
+          .text-muted Already have an account?
+          = link_to 'Log in', new_organiser_session_path, class: 'btn generic-button'
+        - else
+          = link_to 'Manage events', events_path, class: 'btn generic-button-recommended'

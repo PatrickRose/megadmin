@@ -1,0 +1,112 @@
+#publish-popup-modal{ style: "display:none;" }
+  .modal-content.centered
+    %h2 Are you sure you want to publish this event?
+    %br
+    = link_to 'Publish', publish_event_path(@event), method: :patch, class: 'btn btn-primary mb-1', id: 'publish-button'
+    %button#close-publish-popup.btn.btn-secondary(type='button') Cancel
+#popup-modal{ style: "display:none;" }
+  .modal-content
+  - missing = []
+  - missingBrief = []
+  - @event.event_signups.each do |signup|
+    - if (signup.team.blank? || signup.role.blank?)
+      - missing << signup.name
+    - elsif (!signup.role.brief.attached? || !signup.role.team.brief.attached?)
+      - missingBrief << signup.name
+  - if missing.size == 1
+    .alert.alert-danger Player "#{missing.join(', ')}" is missing a team or role
+  - elsif missing.size > 1
+    .alert.alert-danger Players "#{missing.join(', ')}" are missing teams or roles
+  - elsif missing.empty?
+    - if missingBrief.size == 1
+      .alert.alert-warning Player "#{missingBrief.join(', ')}" is missing a team or role brief, are you sure you want to continue?
+    - elsif missingBrief.size > 1
+      .alert.alert-warning Players "#{missingBrief.join(', ')}" are missing team or role briefs, are you sure you want to continue?
+  .card.my-2
+    .card-header
+      %h2 Add additional email note
+    .card-body
+      = form_tag(email_event_path(id: @event.id), method: :post, id: 'email-note-form') do
+        %textarea#optional-text{name: 'email_note', rows: 4, cols: 40, placeholder: "Add an optional note in the email to players here" }
+        %br/
+        - if missing.size == 0
+          %button#send-button.btn.generic-button-recommended(type='submit') Send brief email to all players
+        %button#close-popup.btn.generic-button(type='button') Close
+
+.row.justify-content-center
+  .col-sm-8.mw-75.event-manager
+    %h1 Event Details
+    - if @event.draft
+      .alert.alert-warning This event is a draft.
+    .card
+      .card-header Name
+      .card-body
+        = @event.name || 'There is no name.'
+    .card
+      .card-header Description
+      .card-body
+        = @event.description || 'There is no description.'
+    .card
+      .card-header Rulebook
+      .card-body
+        -if @event.rulebook.attached?
+          - if @event.rulebook.content_type == 'application/pdf'
+            .centered
+              %embed{ src: rails_blob_path(@event.rulebook).to_s, id: 'rulebook-preview' }
+          - else
+            %p The rulebook is not a .pdf file and cannot be previewed.
+          .btn-row-centered
+            = link_to 'Download rulebook', rails_blob_path(@event.rulebook, disposition: 'attachment'), class: 'btn generic-button-recommended'
+        -else
+          = 'There is no rulebook.'
+    .card
+      .card-header Location
+      .card-body
+        = @event.location || 'There is no location.'
+    .card
+      .card-header Google Maps Link
+      .card-body
+        - if @just_link.nil?
+          %p (No link provided)
+        - else
+          %iframe{src: @just_link, style: "border:0;"}
+    .card
+      .card-header Date and Time
+      .card-body
+        = @event.date.strftime("%A #{@event.date.day.ordinalize} %B %Y at %H:%M") || 'There is no date.'
+    .card
+      .card-header
+        Additional Info
+      .card-body
+        = @event.additional_info || 'There is no additional info.'
+    .card
+      .card-header
+        Timetable
+      .card-body
+        = @event.timetable || 'There is no timetable'
+    .card
+      .card-header
+        Additional Documents
+      .card-body
+        - if @event.additional_documents.each do |doc|
+          %p
+            = doc.filename.to_s
+          - if doc.content_type == 'application/pdf'
+            .centered
+              %embed{:src => "#{rails_blob_path(doc)}", :id => 'doc-preview'}
+          - else
+            %p This document is not a .pdf file and cannot be previewed.
+          .btn-row-centered
+            = link_to "Download", rails_blob_path(doc, disposition: "attachment"), class: 'btn generic-button-recommended'
+        - end.empty?
+          %p There are no additional documents.
+
+    %span.btn-row-centered.text-center
+      - if !@control_team
+        = link_to 'Edit Event', edit_event_path(id: @event.id), class: "btn generic-button-recommended m-1"
+        - if @event.draft
+          %button#publish-event.btn.generic-button-recommended Publish Event
+        - else
+          = link_to "Convert .docx to .pdf", event_pdf_path(event_id: @event.id), class: "btn generic-button-recommended m-1"
+          %button#open-popup.btn.generic-button-recommended Send emails to all players
+    %br

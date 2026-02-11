@@ -1,0 +1,40 @@
+/* Styles the many information-displaying pages that a given event will have */
+
+body {
+    .event-manager { // All tables of events inside this box, top parent element
+        h1 {
+            font-family:'Lilita One';
+            text-align:center;
+            margin:10px 0 25px 0;
+        }
+        h4 {
+            font-family:'Lilita One';
+        }
+        h2 {
+            font-family:'Lilita One';
+        }
+        table{
+            margin: 3% 0;
+        }
+        .btn-row-centered {
+            display:block;
+            margin:auto;
+            width:fit-content;
+        }
+        .card {
+            margin:10px auto 10px auto;
+        }
+    }
+}
+
+// Makes event pages take up more width on mobile views
+@media (max-width: 767px) {
+    .event-manager {
+      width:85vw;
+    }
+}
+@media (min-width:768px) {
+    .event-manager {
+      width:60vw;
+    }
+}

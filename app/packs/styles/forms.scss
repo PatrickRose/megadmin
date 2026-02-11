@@ -1,0 +1,97 @@
+/* Used to style the many forms on the website */
+
+$formBG:#fefdfb;
+$formShadow:#b6b4af;
+$button:#f1eee9;
+$buttonHover:#f3f1ec;
+$mainText:#1f1404;
+
+body {
+    .form-box { // All form elements to be kept inside this, as the top parent element
+        text-align:center;
+        background-color:$formBG;
+        border-radius:10px;
+        left:0;
+        right:0;
+        margin:50px auto 50px auto;
+        padding: 20px 100px 20px 100px;
+        box-shadow:$formShadow 0 5px 10px;
+
+        .form-group label { // form-group is generally a subelement to form-box, holding a single field for example
+            width:fit-content;
+            font-weight:500;
+        }
+        label:has(+ textarea) { // Labels with a text area after them are centered
+            display:block;
+            width:100% !important;
+        }
+        .form-control {
+            width:80%;
+            display:inline;
+            margin:20px 10px 20px 10px;
+        }
+        .text-muted::before { // Adds line break
+            content:"\A";
+            white-space:pre;
+        }
+        .text-muted {
+            display:none;
+        }
+        .form-control:focus + .text-muted { // When password field focused, show hint
+            display:inline;
+        }
+        abbr {
+            text-decoration:none;
+        }
+        .form-check {
+            display:block;
+            float:none;
+            width:150px;
+            left:0;
+            right:0;
+            margin:auto;
+        }
+        .form-actions .text-muted {
+            display:inline;
+        }
+        .form-control-file {
+            width:250px;
+            display:inline;
+            margin:20px 10px 20px 10px;
+        }
+        a:not(#teamButton a) { // Turn shared links into smaller 'buttons'
+            width:120px;
+            display:inline-block;
+            color:$mainText;
+            text-decoration:none;
+            padding:6px;
+            font-size:12px;
+            margin:30px 10px 0 10px;
+            background-color:$button;
+            border-radius:var(--bs-border-radius);
+            box-shadow:$formShadow 0 1px 5px;
+        }
+        a:hover:not(#teamButton a) {
+            background-color:$buttonHover;
+        }
+        .trix-content {
+            min-height:200px;
+        }
+        textarea {
+            min-height:150px;
+        }
+    }
+}
+
+// Makes forms take up more width on mobile views
+@media (max-width: 767px) {
+    .form-box {
+      width:85vw;
+      padding: 20px 30px 20px 30px !important;
+    }
+}
+@media (min-width:768px) {
+    .form-box {
+      width:60vw;
+    }
+}

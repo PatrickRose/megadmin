@@ -1,0 +1,105 @@
+!!!
+%html{ lang: 'en-GB' }
+  %head
+    %meta{ 'http-equiv': 'content-type', content: 'text/html; charset=utf-8' }
+    %meta{ 'http-equiv': 'X-UA-Compatible', content: 'IE=edge' }
+    %meta{ name: 'viewport', content: 'width=device-width, initial-scale=1.0, shrink-to-fit=no' }
+
+    %link{ rel: 'preconnect', href: 'https://fonts.googleapis.com' }
+    %link{ rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' }
+    %link{ href: 'https://fonts.googleapis.com/css2?family=Fira+Sans:wght@400;500;700&family=Lilita+One&display=swap', rel: 'stylesheet' }
+
+    - if content_for(:description)
+      %meta{ content: content_for(:description), name: 'description' }
+
+    %title
+      = content_for?(:title) ? yield(:title) : 'Megagames'
+
+    = csrf_meta_tags
+    = csp_meta_tag
+
+    = stylesheet_pack_tag 'styles', media: 'all'
+    = javascript_pack_tag 'application'
+
+  %body
+    .container-fluid.px-0
+      %header.position-relative.d-flex.align-items-center
+        %div.position-absolute.start-50.translate-middle-x
+          = link_to 'MEGAGAMES', root_path
+          - # only show login/logout navbar item if on organiser pages
+        %nav.navbar-nav.ms-2
+          .nav-item.dropdown
+            - if organiser_signed_in?
+              = link_to current_organiser.email, '#', class: 'nav-link dropdown-toggle', role: 'button', style: 'font-size: 0.8rem;', data: { bs_toggle: 'dropdown' }, aria: { expanded: 'false' }
+              %nav.dropdown-menu.dropdown-menu-md-end
+                = link_to 'Log out', destroy_organiser_session_path, class: 'dropdown-item', method: :delete
+                = link_to 'Account Settings', edit_organiser_registration_path, class: 'dropdown-item'
+            - else
+              = link_to 'Log in', new_organiser_session_path, class: 'nav-link', style: 'font-size: 1rem;'
+
+    - if request.path =~ %r{\A/organise/events/\d+}
+      #dark-screen
+      #warning-popup-modal{ style: "display:none;" }
+        .modal-content.centered
+          %h2#popup-title
+          %hr
+          %br
+          %a(id="delete-button" class="btn generic-button-danger")Delete
+          %button#cancel-button.btn.generic-button(type='button')Cancel
+
+      #nav-bar
+        - begin
+          - @event = Event.find(params[:event_id])
+        - rescue # sometimes event_id param is just id
+          - @event = Event.find(params[:id])
+        - @ct = OrganiserToEvent.where(organiser_id: current_organiser.id, event_id: @event.id).first
+        - @control_team = @ct.read_only
+        %ul
+          %li= link_to 'All Events', events_path
+          %li.drop-down
+            = link_to @event.name, event_path(id: @event.id)
+            - unless @control_team
+              .drop-down-items
+                = link_to 'Edit', edit_event_path(id: @event.id)
+                .bg-danger.delete-initial.d-flex.align-items-center.text-white{
+                  title: "Delete Event",
+                  data: { event_id: @event.id, specific_id: @event.id, specific_name: @event.name },
+                  style: "width: auto; height: auto;"
+                }
+                  %img{ width: 30, height: 30, class: "me-2", src: "/images/icons/rubbish-bin-white.svg"}
+                  %span.mb-0 Delete
+
+          #main-buttons
+            %li.drop-down
+              = link_to 'Manage Organisers', event_event_organisers_path(@event.id)
+              .drop-down-items
+                = link_to 'Add Organisers', new_event_event_organiser_path(@event.id)
+            %li.drop-down
+              = link_to 'Manage Teams',  event_teams_path(@event.id)
+              - unless @control_team
+                .drop-down-items
+                  = link_to 'New Team',  new_event_team_path(@event)
+                  = link_to 'New Role',  new_event_role_path(@event)
+            %li.drop-down
+              = link_to "Manage Players", event_event_signups_path(@event.id)
+              - unless @control_team
+                .drop-down-items
+                  = link_to 'New Player',  new_event_event_signup_path(event_id: @event.id)
+
+    - if flash.present?
+      .container-fluid.flash-messages
+        - flash.each do |message_type, message|
+          - next unless %w[alert notice].include?(message_type)
+          .alert{ class: "alert-#{message_type == 'notice' ? 'success' : 'danger'}" }= message
+
+    %main
+      .container-fluid
+        = content_for?(:content) ? yield(:content) : yield
+
+    %footer
+      .container-fluid
+        %p
+          %a{ href: legal_path } Legal
+          |
+          %a{ href: accessibility_path } Accessibility
+        %p &copy; 2025 Team 12

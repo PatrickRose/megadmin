@@ -1,0 +1,112 @@
+.player-page
+    %h1= @play_event.name
+    %h1 Game brief for #{@single_event_signup.name}
+    %p (#{@single_event_signup.email})
+    %h2 Event Description
+   
+
+    .description
+        = @play_event.description || 'There is no description.'
+    %br
+    %br
+    - if @teams.find_by(id: @single_event_signup.team_id).nil? or @roles.find_by(id: @single_event_signup.role_id).nil?
+        %h2 Your team and role haven't yet been assigned
+    - else
+        %h2 You'll be on the team '#{@teams.find_by(id: @single_event_signup.team_id).name}'
+        - if !@teams.find_by(id: @single_event_signup.team).nil? and @teams.find_by(id: @single_event_signup.team).brief.attached?
+            %p Team brief:
+            - if @single_event_signup.team.brief.content_type == 'application/pdf'
+                .centered
+                    %embed{:src => "#{rails_blob_path(@teams.find_by(id: @single_event_signup.team).brief)}", :id => 'brief-preview'}
+            - else
+                %p The team brief is not a .pdf file and cannot be previewed.
+            = link_to "Download team brief", rails_blob_path(@single_event_signup.team.brief, disposition: "attachment")
+        %br
+        %br
+
+        %h2 Your individual role will be '#{@roles.find_by(id: @single_event_signup.role_id).name}'
+        - if !@roles.find_by(id: @single_event_signup.role_id).nil? and @roles.find_by(id: @single_event_signup.role_id).brief.attached?
+            %p Role brief:
+            - if @single_event_signup.role.brief.content_type == 'application/pdf'
+                .centered
+                    %embed{ src: rails_blob_path(@roles.find_by(id: @single_event_signup.role_id).brief).to_s, id: 'brief-preview' }
+            - else
+                %p The role brief is not a .pdf file and cannot be previewed.
+            = link_to "Download role brief", rails_blob_path(@single_event_signup.role.brief, disposition: "attachment")
+
+    %br
+    %br
+
+    %h2 #{@play_event.name} Rulebook
+    - if !@play_event.rulebook.nil? and @play_event.rulebook.attached?
+        - if @play_event.rulebook.content_type == 'application/pdf'
+            .centered
+                %embed{ src: rails_blob_path(@play_event.rulebook).to_s, id: 'brief-preview' }
+        - else
+            %p The rulebook is not a .pdf file and cannot be previewed.
+        = link_to "Download rulebook", rails_blob_path(@play_event.rulebook, disposition: "attachment")
+    %br
+    %br
+    %h2 Additional Documents
+    - if @play_event.additional_documents.each do |doc|
+        %p
+        = doc.filename.to_s
+        - if doc.content_type == 'application/pdf'
+            .centered
+                %embed{:src => "#{rails_blob_path(doc)}", :id => 'doc-preview'}
+        -else
+            %p This document is not a .pdf file and cannot be previewed.
+        %p
+        = link_to "Download", rails_blob_path(doc, disposition: "attachment")
+    - end.empty?
+        %p There are no additional documents.
+    %br
+    %br
+    %h2 Click below to download all of your files as a single .zip file
+    = link_to "Download .zip", download_path(@single_event_signup), class: 'btn generic-button-recommended'
+    %br
+    %br
+
+    %h2 Cast List
+    = @cast_list
+
+    %br
+    %br
+    .sidebar
+        %h2 Timetable
+        .description
+            = @play_event.timetable || 'There is no timetable'
+        %br
+
+        %h2 Date
+        %p= @play_event.date.strftime("%A #{@play_event.date.day.ordinalize} %B %Y")
+
+
+        -if @number.positive?
+            %p The event is in #{@number} days!
+        - elsif @number.negative?
+            %p The event was #{@number.to_s[1..@number.to_s.length]} days ago.
+        - else
+            %p The event is today!
+        %br
+
+
+        %h2 Location
+        %p= @play_event.location || 'There is no location.'
+        -unless @just_link.blank?
+            %iframe{ src: @just_link, style: 'border:0;' }
+        -else
+            .text-muted
+                (no map link provided)
+        %br
+        %br
+
+    -unless @play_event.additional_info.blank?
+        
+        %h2 Additional Information
+        %p= @play_event.additional_info
+
+    .alert.alert-warning
+        If you're under 18 and signed up for this event, please get in touch with me at
+        = succeed '.' do
+            %strong= @organiser_email

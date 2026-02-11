@@ -1,0 +1,21 @@
+.row.justify-content-center
+  .col-sm-8.mw-75
+    - unless @error
+      .card
+        %h1.card-header
+          = "Editing Team #{@team.name}" 
+        = simple_form_for @team, url: :event_team, method: :put do |form|
+          .card-body
+            = form.input :name
+            %p
+            = form.input :image, label: "Icon", error: "The file must be an image"
+            %p
+            = form.input :brief
+            %p Note: the brief and image will be overridden. Please reupload them to keep them.
+          .card-footer.d-flex
+            = form.button :submit, "Save", class: 'btn generic-button-success', method: :get
+    - else
+      %h2
+        Error!
+      %p
+        = @error

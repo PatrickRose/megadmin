@@ -1,0 +1,11 @@
+.row.justify-content-center
+  .form-box
+    %h1 Edit Organiser
+    %hr
+
+    = simple_form_for(@organiser_to_event, url: event_event_organiser_path(event_id: params[:event_id], id: @organiser_to_event.id)) do |form|
+      %br
+      = form.input :description, label: 'Role description'
+      = form.input :read_only, label: 'Control Team (read only)'
+      .form-actions
+        = form.button :submit, class: 'btn generic-button-success mt-3', value: 'Update organiser'

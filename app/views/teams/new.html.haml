@@ -1,0 +1,22 @@
+.row.justify-content-center
+  .form-box
+    - unless @error
+      %h1 Create a Team
+      %hr
+      %br
+      = simple_form_for @team, url: :event_teams do |form|
+        .my-2
+          = form.input :name, label: 'Name:'
+        .my-2
+          = form.input :image, label: "Icon", error: "The file must be an image"
+        .my-2
+          = form.input :brief
+
+        .form-actions
+          = form.button :submit, class: 'btn generic-button-success'
+
+    - else
+      %h2
+        Error!
+      %p
+        = @error

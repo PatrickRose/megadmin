@@ -1,0 +1,27 @@
+-# frozen_string_literal: true
+
+.row.justify-content-center
+  .form-box
+    %h2 Edit Event
+    %hr
+
+    = simple_form_for(@event) do |form|
+      .card-body
+        = form.input :name, label: 'Name:'
+        .form-group
+          = form.label :description
+          = form.rich_text_area :description
+        -# For some reason, if you use "label:" on the checkbox, it floats to the right instead of the left.
+        = form.input :rulebook, label: 'Rulebook:'
+        = form.input :location, label: 'Location:'
+        = form.input :google_maps_link, label: 'Google Maps Link ⓘ:', label_html: {class: 'tooltip-label', title: 'Once you have found the venue location on Google Maps: click "Share", "Embed a map" and "COPY HTML". Paste that text here.' }
+        = form.input :date, as: :string, input_html: { type: 'datetime-local', value: @event.date.strftime('%Y-%m-%dT%H:%M') }, label: 'Date and Time:'
+        .form-group
+          = form.label :timetable
+          = form.rich_text_area :timetable
+        = form.input :additional_info, label: 'Additional Information:'
+        .form-group
+          = form.input :additional_documents, label: 'Additional Documents:', input_html: { multiple: true }
+          %p Note: all the current additional documents will be overridden. Please reupload any additional documents you would like to keep.
+        .form-actions
+          = form.button :submit, class: 'btn generic-button-success'

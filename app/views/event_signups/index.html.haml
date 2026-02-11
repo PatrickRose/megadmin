@@ -1,0 +1,148 @@
+#dark-screen
+#warning-popup-modal{ style: "display:none;" }
+  .modal-content.centered
+    %h2#popup-title
+    %hr
+    %br
+    %a(id="delete-button" class="btn btn-danger")Remove
+    %button#cancel-button.btn.btn-secondary(type='button')Cancel
+#popup-modal{ style: "display:none;" }
+  .modal-content
+  - missing = []
+  - missingBrief = []
+  - @event_signups.each do |signup|
+    - if (signup.team.blank? || signup.role.blank?)
+      - missing << signup.name
+    - elsif (!signup.role.brief.attached? || !signup.role.team.brief.attached?)
+      - missingBrief << signup.name
+  - if missing.size == 1
+    .alert.alert-danger Player "#{missing.join(', ')}" is missing a team or role
+  - elsif missing.size > 1
+    .alert.alert-danger Players "#{missing.join(', ')}" are missing teams or roles
+  - elsif missing.empty?
+    - if missingBrief.size > 0
+      .alert.alert-warning
+        The following elements are missing briefs:
+        - missingRoleBrief = []
+        - missingTeamBrief = []
+        - @event_signups.each do |signup|
+          - if !signup.role.blank?
+            - if !signup.role.brief.attached?
+              - missingRoleBrief << signup
+          - if !signup.team.blank?
+            - if !signup.role.team.brief.attached?
+              - missingTeamBrief << signup.role.team
+        - missingRoleBrief.uniq.each do |missing|
+          %li
+            = missing.role.team.name + ' - ' + missing.role.name + ' - ' + missing.email
+        - missingTeamBrief.uniq.each do |missing|
+          %li
+            = missing.name
+
+
+
+  .card.my-2
+    .card-header
+      %h2 Add additional email note
+    .card-body
+      = form_tag(email_event_event_signups_path(event_id: @event.id), method: :post, id: 'email-note-form') do
+        %textarea#optional-text{name: 'email_note', rows: 4, cols: 40, placeholder: "Add an optional note in the email to players here" }
+        %br/
+        %button#send-button.btn.generic-button-recommended(type='submit') Send brief email to all players
+        %button#close-popup.btn.generic-button(type='button') Close
+
+- missing_teams_and_roles = flash[:missing_teams_and_roles]
+- unless missing_teams_and_roles.nil? || missing_teams_and_roles.empty?
+  .alert.alert-warning
+    The following teams and roles were missing from the event, and were not created when uploading.
+
+    %ul.mb-0
+      - missing_teams_and_roles.each do |team, roles|
+        %li
+          = team
+          - unless roles.nil? || roles.empty?
+            %ul
+              - roles.each do |role|
+                %li= role
+
+.row.justify-content-center
+  .col-sm-8.mw-75.event-manager
+    %h1 Players
+    %table.table.table-striped
+      %thead
+        %tr
+          %th{ scope: 'col' } Name
+          %th{ scope: 'col' } Email
+          %th{ scope: 'col' } Team
+          %th{ scope: 'col' } Role
+          - unless @control_team
+            %th{ scope: 'col' } Actions
+      %tbody
+        - if @event_signups.each do |event_signup|
+          %tr
+            %td{ scope: 'row' }
+              = event_signup.name || 'No name.'
+            %td{ scope: 'row' }
+              = event_signup.email || 'No email.'
+            %td{ scope: 'row' }
+              - if event_signup.team
+                = link_to event_signup.team.name, event_team_path(event_id: @event.id, id: event_signup.team.id)
+              - else
+                No team.
+            %td{ scope: 'row' }
+              - if event_signup.role
+                = link_to event_signup.role.name, event_role_path(event_id: @event.id, id: event_signup.role.id)
+              - else
+                No role.
+            - unless @control_team
+              %td{ scope: 'row' }
+                = link_to edit_event_event_signup_path(event_id: @event.id, id: event_signup.id), class: 'btn generic-button-recommended p-1 mx-1', title: 'Edit Player' do
+                  %img{ src: '/images/icons/edit-button.svg', width: '20', height: '20' }
+                .btn.generic-button-danger.delete-initial.p-1{
+                  title: "Delete Player",
+                  data: {
+                    event_id: "#{@event.id}",
+                    specific_id: "#{event_signup.id}",
+                    specific_name: "#{event_signup.name}"
+                  }
+                }
+                  %img{ width: '20', height: '20', src: "/images/icons/rubbish-bin-white.svg" }
+        - end.empty?
+          %tr
+            %td{ scope: 'row', colspan: '5' } There are no players.
+
+    - unless @control_team
+      .btn-row-centered
+        = link_to 'New Player',  new_event_event_signup_path(event_id: @event.id), class: 'btn generic-button-recommended'
+        = link_to 'Download cast list', organiser_cast_list_event_event_signups_path(event_id: @event.id), class: 'btn generic-button-recommended'
+        - if @event.draft
+          %button#open-popup.btn.generic-button-recommended.disabled Create email for all signups
+          %br
+          The event must be published before you can send email briefs to players
+        - else
+          %button#open-popup.btn.generic-button-recommended Send emails to all players
+
+    - unless @control_team
+      %br
+      %h4.centered Upload players through CSV
+      .text-muted.centered
+        .mb-2 Upload a CSV file with 'name', 'email', 'team' and 'role' column headers, in any order.
+        .mb-2
+          = link_to 'Download', '/example.csv', download: 'example.csv'
+          an example CSV.
+        %strong.mb-2 OR
+        %p
+          = link_to 'Generate', generate_template_event_event_signups_path(@event)
+          a template CSV containing all unassigned roles from your event.
+      = form_with url: player_csv_event_event_signups_path(event_id: @event.id), multipart: true do |form|
+        .d-flex.justify-content-center
+          = form.file_field :player_csv, accept: '.csv', class: 'form-control'
+          = form.submit 'Upload', class: 'btn generic-button-success'
+        .container
+          = form.check_box :create_new_teams
+          = form.label :create_new_teams, "Allow upload to create new teams?"
+
+        .container
+          = form.check_box :create_new_roles
+          = form.label :create_new_teams, "Allow upload to create new roles?"
+    %br

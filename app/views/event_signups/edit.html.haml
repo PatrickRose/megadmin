@@ -1,0 +1,42 @@
+#dark-screen
+#popup-modal{ style: "display:none;" }
+  .modal-content
+  - if @event_signup.team.blank? || @event_signup.role.blank?
+    .alert.alert-danger This player is missing a team or role
+  - elsif !@event_signup.role.brief.attached? || !@event_signup.role.team.brief.attached?
+    .alert.alert-warning This player is missing a team or role brief, are you sure you want to continue?
+  .card.my-2
+    .card-header
+      %h2 Add additional email note
+    .card-body
+      = form_tag(email_single_event_event_signups_path(id: @event_signup.id), method: :post, id: 'email-note-form') do
+        %textarea#optional-text{name: 'email_note', rows: 4, cols: 40, placeholder: "Add an optional note in the email to players here" }
+        %br/
+        %button#send-button.btn.generic-button-recommended(type='submit') Send brief email to single player
+        %button#close-popup.btn.generic-button(type='button') Close
+
+-# frozen_string_literal: true
+
+.row.justify-content-center
+  .col-sm-8.mw-75
+    %h2.card-header Edit player
+    = simple_form_for(@event_signup, url: event_event_signup_path(event_id: params[:event_id], id: @event_signup.id)) do |form|
+      .card-body
+        .my-1
+          = form.input :name
+        .my-1
+          = form.input :email
+        .my-1
+          = form.input :team_id, prompt: "Select team", as: :select, collection: @teams
+        .my-1
+          = form.input :role_id, prompt: "Select role", as: :select, collection: @roles
+      .card-footer.d-flex
+        = form.button :submit, class: 'btn generic-button-success mt-3', value: 'Update player'
+    %br
+    - if @event.draft
+      %button#open-popup.btn.generic-button-recommended.disabled Email this player their brief email
+      %br
+      The event must be published before you can send email briefs to players
+    - else
+      - unless @organiser
+        %button#open-popup.btn.generic-button-recommended Email this player their brief email

@@ -1,0 +1,22 @@
+%div{style: "background-color:#f8b878; font-size: 36px; padding:1px 10px; color:#1f1404; font-family:'Lilita One', sans-serif; text-align:center;"}
+    %h1 MEGAGAMES
+
+
+%div{style: "padding: 0 30%; font-family:'Fira Sans'; font-size: 26px"}
+    %p Hello #{@user.name}!
+
+    %p We hope you're excited for #{@event.name}!
+    %p The link below will take you to a page containing more information about the event including the rulebook, your team and role.
+
+    = link_to 'View your briefs', play_url(@user.uuid), method: :get
+
+    %p= @email_note
+
+    %p See you on #{@event.date.strftime("%A")}!
+    %p Pennine Megagames
+
+%div{style: "background-color:#e29950; font-size: 26px; padding:10px 10px; color:#1f1404; font-family:'Fira Sans';"}
+    %p 
+        %b Why am I receiving this?
+        You're currently signed up for a Pennine Megagames event.
+    %p If you think you have received this email by mistake please contact #{@organiser.email}

@@ -1,0 +1,36 @@
+.row.justify-content-center
+  .col-sm-8.mw-75.event-manager
+    %h1
+      = "Role #{@role.name}"
+    .card
+      .card-header
+        Team
+      .card-body
+        = link_to @role.team.name, event_team_path(@event ,@role.team)
+    .card
+      .card-header
+        Brief
+      .card-body
+        - if @role.brief.attached?
+          - if @role.brief.content_type == 'application/pdf'
+            .centered
+              %embed{ src: rails_blob_path(@role.brief).to_s, id: 'brief-preview' }
+          - else
+            %p The brief is not a .pdf file and cannot be previewed.
+          %p
+            = link_to 'Download brief', rails_blob_path(@role.brief, disposition: 'attachment')
+        - else
+          = 'No brief uploaded'
+    -unless @organiser
+      .d-flex.gap-1.mt-1.btn-row-centered
+        - # Default role or team passed to form
+        = button_to "Add player to this role", new_event_event_signup_path(@event), method: :get, params: {default_role: @role, default_team: @team}, class: 'btn generic-button-success'
+        = button_to "New role for this team", new_event_role_path(@event), method: :get, params: {default_team: @team}, class: 'btn generic-button-success'
+        = link_to 'Convert .docx to .pdf', event_role_pdf_path(event_id: @event.id, role_id: @role.id), class: 'btn generic-button-recommended'
+        = link_to edit_event_role_path(@event, @role), class: 'btn generic-button-recommended p-1', title: 'Edit the role.' do
+          %img{ src: '/images/icons/edit-button.svg', width: '20', height: '20' }
+
+        = link_to event_role_path(@event, @role), class: 'btn generic-button-danger p-1', title: 'Delete the role.', method: :delete do
+          %img{ width: '20', height: '20', src: "/images/icons/rubbish-bin-white.svg" }
+    %br
+    %br

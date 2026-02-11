@@ -1,0 +1,24 @@
+.row.justify-content-center
+  .form-box
+    - unless @error
+      %h1 Create a Role
+      %hr
+      %br
+
+      = simple_form_for @role, url: :event_roles do |form|
+        .my-2
+          = form.input :name, label: "Name:"
+        .my-2
+          - # selected pre-fills form with selected team
+          #teamButton
+            = form.association :team, collection: @event.teams, include_blank: false, label: link_to("Team:", event_teams_path), error: "Team must be selected", selected: params[:default_team]
+        .my-2
+          = form.input :brief, label: "Brief:"
+        .form-actions
+          = form.button :submit, class: 'btn generic-button-success'
+
+    - else
+      %h2
+        Error!
+      %p
+        = @error

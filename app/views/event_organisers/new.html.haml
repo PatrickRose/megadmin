@@ -1,0 +1,31 @@
+.row.justify-content-center
+  .form-box
+    %h1 Add New Organiser
+    %hr
+
+    = form_with url: event_event_organisers_path(event_id: params[:event_id]) do |form|
+      %br
+      .form-group
+        = form.label :email, 'Organiser Email:'
+        = form.text_field :email, class: 'form-control'
+      %br
+      .form-group
+        = form.label :description, 'Role description:'
+        = form.text_field :description, class: 'form-control'
+      %br
+        - # Control team can only add other control team
+        - if @control_team
+          .form-group
+            = form.label :read_only, 'Control Team (read only):'
+            = form.check_box :read_only, { checked: true, disabled: true }
+            = form.hidden_field :read_only, value: true
+        - else
+          .form-group
+            = form.label :read_only, 'Control Team (read only):'
+            = form.check_box :read_only
+      .form-actions
+        %p.text-muted
+          Please double check before you submit, if the email is already connected to an organiser account they'll be added, otherwise an account will be created and that email will be sent the details.
+        %br
+        %br
+        = form.submit 'Add Organiser', class: 'btn generic-button-success'

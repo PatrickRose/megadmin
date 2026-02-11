@@ -1,0 +1,11 @@
+/tmp
+/log/development.log
+/.idea
+/node_modules
+/storage
+/coverage
+/log
+/.vscode
+/public/packs
+/public/packs-test
+/spec/examples.txt

@@ -1,0 +1,77 @@
+#dark-screen
+#warning-popup-modal{ style: "display:none;" }
+  .modal-content.centered
+    %h2#popup-title
+    %hr
+    %br
+    %a(id="delete-button" class="btn generic-button-danger")Delete
+    %button#cancel-button.btn.generic-button(type='button')Cancel
+
+.row.justify-content-center
+  .col-sm-8.mw-75.event-manager
+    %h1
+      Teams
+    / TODO: Add game name and return to game dashboard buttons
+
+    - unless @error
+      - if @teams.any?
+        %table.table
+          %thead
+            %tr
+              %th
+                Team
+              - unless @organiser
+                %th
+                  Actions
+          - @teams.each do |team|
+            %tr
+              %td
+                = link_to team.name, event_team_path(@event, team), class: 'fs-2'
+                - unless team.brief.attached?
+                  .alert.alert-warning No brief attached.
+
+                - unless team.roles.empty?
+                  %table.table.table-striped
+                    %tr
+                      %th Roles
+                      %th Actions
+
+                    - team.roles.each do |role|
+                      %tr
+                        %td
+                          = link_to role.name_brief, event_role_path(@event, role)
+                        %td.d-flexs
+                          - unless @organiser
+                            = link_to edit_event_role_path(@event, role), class: 'btn generic-button-recommended p-1 mx-1', title: 'Edit the role.' do
+                              %img{ src: '/images/icons/edit-button.svg', width: '20', height: '20' }
+                            = link_to event_role_path(@event, role), method: :delete, class: 'btn generic-button-danger p-1 mx-1', title: 'Delete the role.' do
+                              %img{ src: '/images/icons/rubbish-bin-white.svg', width: '20', height: '20' }
+                - else
+                  %p No roles have been assigned to this team.
+
+                = button_to "New role", new_event_role_path(@event), method: :get, params: {default_team: team}, class: 'btn generic-button-success my-1'
+                %br
+
+              -unless @organiser
+                %td
+                  = link_to edit_event_team_path(@event, team), class: 'btn generic-button-recommended p-1 mx-1 h-100', title: 'Edit the team.' do
+                    %img{ src: '/images/icons/edit-button.svg', width: '20', height: '20' }
+                  - # adds selected team to params to autofill role form
+                  .btn.generic-button-danger.delete-initial.p-1{
+                    title: "Delete Team",
+                    data: {
+                      event_id: "#{@event.id}",
+                      specific_id: "#{team.id}",
+                      specific_name: "#{team.name}"
+                    }
+                  }
+                    %img{ width: '20', height: '20', src: "/images/icons/rubbish-bin-white.svg" }
+
+      - else
+        %h2
+          No teams found for the game
+    - else
+      %h2
+        Error!
+      %p
+        = @error

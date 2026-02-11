@@ -1,0 +1,65 @@
+- content_for :title, "#{@event.formatted_name} Cast List"
+
+%main.m-3
+  %h2.display-2
+    = @event.formatted_name
+
+  %h3 Owner
+  %h4
+    = @owner.name
+
+  - unless @organisers.empty?
+    %h3 Organisers
+
+    %table.table.table-striped
+      %thead
+        %tr
+          %th{ scope: 'col' } Name
+          %th{ scope: 'col' } Description
+      %tbody
+        - @organisers.each do |organiser|
+          %tr
+            %td{ scope: 'row' } 
+              = organiser.organiser.name
+            %td{ scope: 'row' } 
+              = organiser.description
+
+  - unless @control_team.empty?
+    %h3 Control Team
+
+    %table.table.table-striped
+      %thead
+        %tr
+          %th{ scope: 'col' } Name
+          %th{ scope: 'col' } Description
+      %tbody
+        - @control_team.each do |control_team|
+          %tr
+            %td{ scope: 'row' } 
+              = control_team.organiser.name
+            %td{ scope: 'row' } 
+              = control_team.description
+
+  - if @grouped_event_signups.each do |team, signups|
+    %h3
+      = team&.name || "Unassigned Team"
+
+    %table.table.table-striped
+      %thead
+        %tr
+          %th{ scope: 'col' } Name
+          %th{ scope: 'col' } Role
+          %th{ scope: 'col' } Present
+      %tbody
+        - if signups.each do |signup|
+          %tr
+            %td{ scope: 'row' } 
+              = signup.name
+            %td{ scope: 'row' } 
+              = signup.role&.name || 'Unassigned Role'
+            %td{ scope: 'row' }
+              .border.border-dark.p-1{style: 'width: 20px; height: 20px;'}
+        - end.empty?
+          %p There are no players in this team.
+  - end.empty?
+    %p There are no players in this event.

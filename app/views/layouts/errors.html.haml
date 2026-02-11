@@ -1,0 +1,17 @@
+- content_for :title, "Error #{@error_code}"
+- content_for :content do
+  .row.justify-content-center
+    .col-sm-8.col-lg-6
+      %div
+        %h1.display-1
+          = "Error #{@error_code}"
+
+      %h1.mb-4
+        = @error_message
+
+      %div
+        If you believe this is an error, please contact me at
+        = succeed '.' do
+          %strong pjr0911025@googlemail.com
+
+= render template: 'layouts/application'

@@ -1,0 +1,89 @@
+#dark-screen
+#warning-popup-modal{ style: "display:none;" }
+  .modal-content.centered
+    %h2#popup-title
+    %hr
+    %br
+    %a(id="delete-button" class="btn generic-button-danger")Delete
+    %button#cancel-button.btn.generic-button(type='button')Cancel
+
+.row.justify-content-center
+  .col-sm-8.mw-75.event-manager
+    %h1 My Events
+    %h2 Upcoming
+    %table.table.table-striped.mb-1
+      %thead
+        %tr
+          %th{ scope: 'col' } Name
+          %th{ scope: 'col' } Date
+          %th{ scope: 'col' } Role
+          %th{ scope: 'col' } Status
+          %th{ scope: 'col' }
+      %tbody
+        - if @upcoming_events.each do |event|
+          %tr
+            %td{ scope: 'row' }
+              = link_to event.name, event_path(id: event.id)
+            %td{ scope: 'row' }
+              = event.date.strftime("%A #{event.date.day.ordinalize} %B %Y") || 'There is no date.'
+            %td{ scope: 'row' }
+              = event_role(event, @my_events, @organiser_events)
+            %td{ scope: 'row' }
+              - if event.draft
+                Draft
+              - else
+                Published
+            %td{ scope: 'row', class: 'text-end' }
+              = link_to edit_event_path(id: event.id), class: "btn generic-button-recommended p-1 mx-1", :title => "Edit the player." do
+                %img{:src => "/images/icons/edit-button.svg", :width => "20"}
+              .btn.generic-button-danger.delete-initial.p-1{
+                title: "Delete Event",
+                data: {
+                  event_id: "#{event.id}",
+                  specific_id: "#{event.id}",
+                  specific_name: "#{event.name}"
+                }
+              }
+                %img{ width: '20', height: '20', src: "/images/icons/rubbish-bin-white.svg" }
+        - end.empty?
+          %tr
+            %td{ scope: 'row', colspan: '5' } You have no upcoming events.
+    = link_to 'Create event', new_event_path, class: 'generic-button-success btn'
+
+    %h2{ class: 'mt-5' } Previous
+    %table.table.table-striped
+      %thead
+        %tr
+          %th{ scope: 'col' } Name
+          %th{ scope: 'col' } Date
+          %th{ scope: 'col' } Role
+          %th{ scope: 'col' } Status
+          %th{ scope: 'col' }
+      %tbody
+        - if @previous_events.each do |event|
+          %tr
+            %td{ scope: 'row' }
+              = link_to event.name, event_path(id: event.id)
+            %td{ scope: 'row' }
+              = event.date.strftime("%A #{event.date.day.ordinalize} %B %Y") || 'There is no date.'
+
+            %td{ scope: 'row' }
+              = event_role(event, @my_events, @organiser_events)
+            %td{ scope: 'row' }
+              - if event.draft
+                Draft
+              - else
+                Published
+            %td{ scope: 'row', class: 'text-end' }
+              .btn.generic-button-danger.delete-initial.p-1{
+                title: "Delete Event",
+                data: {
+                  event_id: "#{event.id}",
+                  specific_id: "#{event.id}",
+                  specific_name: "#{event.name}"
+                }
+              }
+                %img{ width: '20', height: '20', src: "/images/icons/rubbish-bin-white.svg" }
+        - end.empty?
+          %tr
+            %td{ scope: 'row', colspan: '5' } You have no previous events.

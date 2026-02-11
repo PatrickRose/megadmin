@@ -1,0 +1,15 @@
+%div{style: "background-color:#f8b878; font-size: 36px; padding:1px 10px; color:#1f1404; font-family:'Lilita One', sans-serif; text-align:center;"}
+  %h1 MEGAGAMES
+
+
+%div{style: "padding: 0 30%; font-family:'Fira Sans'; font-size: 26px"}
+  %p Hi,
+
+  %p An organiser account has been created for you, for the event: #{@event.name}
+
+  %p Your temporary password is: 
+  %p #{@organiser.password}
+  %p please change it!
+
+  = link_to 'manage your account here', "#{@url}/organisers/edit"
+  

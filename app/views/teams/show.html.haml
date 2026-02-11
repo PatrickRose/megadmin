@@ -1,0 +1,61 @@
+.row.justify-content-center
+  .col-sm-8.mw-75.event-manager
+    %h1
+      = "Team #{@team.name}"
+    .card
+      .card-header
+        Icon
+      .card-body
+        - if @team.image.attached?
+          %p
+            - if @team.image.representable?
+              = image_tag @team.image, style: 'max-height: 160px; max-width:160px;', id: 'icon-preview'
+            - else
+              = "The icon could not be displayed"
+          %p
+            = link_to "Download icon", rails_blob_path(@team.image, disposition: "attachment")
+        - else
+          = "No icon uploaded"
+    .card
+      .card-header
+        Brief
+      .card-body
+        - if @team.brief.attached?
+          - if @team.brief.content_type == 'application/pdf'
+            .centered
+              %embed{:src => "#{rails_blob_path(@team.brief)}", :id => 'brief-preview'}
+          - else
+            %p The brief is not a .pdf file and cannot be previewed.
+          %p
+            = link_to "Download brief", rails_blob_path(@team.brief, disposition: "attachment")
+        - else
+          = "No brief uploaded"
+    .card
+      .card-header
+        = link_to "Roles", event_roles_path
+      .card-body
+        - unless @team.roles.empty?
+          %ul
+            - @team.roles.each do |role|
+              %li
+                = link_to role.name, event_role_path(@event, role)
+        - else
+          %p This team has no roles yet.
+    -unless @organiser
+      .d-flex.gap-1.mt-1.btn-row-centered
+        = link_to "New team", new_event_team_path(@event), method: :get, class: 'btn generic-button-success'
+        = link_to "New role for this team", new_event_role_path(@event), method: :get, params: {default_team: @team}, class: 'btn generic-button-success'
+        = link_to 'Convert .docx to .pdf', event_team_pdf_path(event_id: @event.id, team_id: @team.id), method: :get, class: 'btn generic-button-recommended'
+        = link_to edit_event_team_path(@event, @team), class: 'btn generic-button-recommended p-1', title: 'Edit the team.' do
+          %img{ src: '/images/icons/edit-button.svg', width: '20', height: '20' }
+        .btn.generic-button-danger.delete-initial.p-1{
+          title: "Delete Team",
+          data: {
+            event_id: "#{@event.id}",
+            specific_id: "#{@team.id}",
+            specific_name: "#{@team.name}"
+          }
+        }
+          %img{ width: '20', height: '20', src: "/images/icons/rubbish-bin-white.svg" }
+    %br
+    %br

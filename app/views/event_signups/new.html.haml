@@ -1,0 +1,20 @@
+-# frozen_string_literal: true
+
+.row.justify-content-center
+  .form-box
+    %h1 Add New Player
+    %hr
+    %br
+
+    = simple_form_for(@event_signup, url: event_event_signups_path(event_id: params[:event_id]), method: :post) do |form|
+      .my-1
+        = form.input :name, label: 'Name:'
+      .my-1
+        = form.input :email, label: 'Email:'
+      .my-1
+        = form.input :team_id, prompt: "Select team", as: :select, collection: @teams, label: 'Team:', selected: params[:default_team]
+      .my-1
+        = form.input :role_id, prompt: "Select role", as: :select, collection: @roles, label: 'Role:', selected: params[:default_role]
+      %br
+      .form-actions
+        = form.button :submit, class: 'btn generic-button-success', value: 'Create player'
