@@ -76,9 +76,12 @@ Rails.application.configure do
   # Intentionally kept format to make it more obvious / easier to upgrade. #
   ##########################################################################
 
-  # Preview email in the browser instead of sending it
-  config.action_mailer.default_url_options = { host: 'localhost:3000' }
-  config.action_mailer.delivery_method = :letter_opener
+  config.action_mailer.default_url_options = { host: "localhost:#{ENV.fetch("WEB_PORT", 3000)}" }
+  config.action_mailer.delivery_method = :smtp
+  config.action_mailer.smtp_settings = {
+    address: ENV.fetch("SMTP_ADDRESS", "mail"),
+    port: ENV.fetch("SMTP_PORT", 1025).to_i
+  }
   config.action_mailer.perform_deliveries = true
 
   # Make sure we know about it if params haven't been whitelisted

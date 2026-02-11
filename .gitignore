@@ -9,3 +9,4 @@
 /public/packs
 /public/packs-test
 /spec/examples.txt
+/.env

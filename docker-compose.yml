@@ -1,0 +1,92 @@
+services:
+  db:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  mail:
+    image: axllent/mailpit
+    ports:
+      - "${MAILPIT_UI_PORT:-8025}:8025"
+      - "1025:1025"
+
+  web:
+    build: .
+    command: bin/rails server -b 0.0.0.0
+    ports:
+      - "${WEB_PORT:-3000}:3000"
+    volumes:
+      - .:/app
+      - bundle_cache:/usr/local/bundle
+      - node_modules:/app/node_modules
+    environment:
+      POSTGRES_HOST: db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: megadmin
+      SMTP_ADDRESS: mail
+      SMTP_PORT: 1025
+      RAILS_ENV: development
+      SHAKAPACKER_DEV_SERVER_HOST: webpack
+      PUPPETEER_EXECUTABLE_PATH: /usr/bin/chromium
+      WEB_PORT: ${WEB_PORT:-3000}
+      MAILER_FROM: ${MAILER_FROM:-no-reply@megadmin.patrickrosemusic.co.uk}
+    depends_on:
+      db:
+        condition: service_healthy
+      mail:
+        condition: service_started
+    tty: true
+    stdin_open: true
+
+  worker:
+    build: .
+    command: bin/rails jobs:work
+    volumes:
+      - .:/app
+      - bundle_cache:/usr/local/bundle
+      - node_modules:/app/node_modules
+    environment:
+      POSTGRES_HOST: db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: megadmin
+      SMTP_ADDRESS: mail
+      SMTP_PORT: 1025
+      RAILS_ENV: development
+      PUPPETEER_EXECUTABLE_PATH: /usr/bin/chromium
+      WEB_PORT: ${WEB_PORT:-3000}
+      MAILER_FROM: ${MAILER_FROM:-no-reply@megadmin.patrickrosemusic.co.uk}
+    depends_on:
+      db:
+        condition: service_healthy
+      mail:
+        condition: service_started
+
+  webpack:
+    build: .
+    command: bin/shakapacker-dev-server
+    ports:
+      - "${WEBPACK_PORT:-3035}:3035"
+    volumes:
+      - .:/app
+      - bundle_cache:/usr/local/bundle
+      - node_modules:/app/node_modules
+    environment:
+      SHAKAPACKER_DEV_SERVER_HOST: 0.0.0.0
+      RAILS_ENV: development
+
+volumes:
+  postgres_data:
+  bundle_cache:
+  node_modules:

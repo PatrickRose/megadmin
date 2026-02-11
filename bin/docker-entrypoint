@@ -1,0 +1,7 @@
+#!/bin/bash
+set -e
+
+# Remove stale PID file if it exists
+rm -f tmp/pids/server.pid
+
+exec "$@"

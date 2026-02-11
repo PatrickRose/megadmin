@@ -5,13 +5,16 @@ default: &default
 
 development:
     <<: *default
-    database: team12_dev
+    database: <%= ENV.fetch("POSTGRES_DB", "megadmin") %>
+    username: <%= ENV.fetch("POSTGRES_USER", "postgres") %>
+    password: <%= ENV.fetch("POSTGRES_PASSWORD", "postgres") %>
+    host: <%= ENV.fetch("POSTGRES_HOST", "localhost") %>
 
 test:
     <<: *default
-    database: team12_test
+    database: megadmin_test
     username: <%= ENV.fetch("POSTGRES_USER", "postgres") %>
-    password: <%= ENV.fetch("POSTGRES_PASSWORD", "") %>
+    password: <%= ENV.fetch("POSTGRES_PASSWORD", "postgres") %>
     host: <%= ENV.fetch("POSTGRES_HOST", "localhost") %>
 
 production:
