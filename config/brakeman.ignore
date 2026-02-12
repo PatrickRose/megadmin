@@ -1,0 +1,47 @@
+{
+  "ignored_warnings": [
+    {
+      "warning_type": "File Access",
+      "warning_code": 16,
+      "fingerprint": "242f77244892c9e73b92f65229665d2bb7de910dc7501150e59c756f3f8c7ad6",
+      "check_name": "FileAccess",
+      "message": "Model attribute used in file name",
+      "file": "app/controllers/download_controller.rb",
+      "line": 52,
+      "link": "https://brakemanscanner.org/docs/warning_types/file_access/",
+      "code": "File.read(Tempfile.new(\"#{EventSignup.find(params[:id]).event.name} #{(\"\" or \"team #{EventSignup.find(params[:id]).team.name} \")}.zip\").path)",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "DownloadController",
+        "method": "show"
+      },
+      "user_input": "EventSignup.find(params[:id]).team",
+      "confidence": "Weak",
+      "cwe_id": [
+        22
+      ],
+      "note": "Attribute is safe to include in filename - only admins set this"
+    },
+    {
+      "warning_type": "Unmaintained Dependency",
+      "warning_code": 120,
+      "fingerprint": "d84924377155b41e094acae7404ec2e521629d86f97b0ff628e3d1b263f8101c",
+      "check_name": "EOLRails",
+      "message": "Support for Rails 7.0.8.7 ended on 2025-04-01",
+      "file": "Gemfile.lock",
+      "line": 297,
+      "link": "https://brakemanscanner.org/docs/warning_types/unmaintained_dependency/",
+      "code": null,
+      "render_path": null,
+      "location": null,
+      "user_input": null,
+      "confidence": "High",
+      "cwe_id": [
+        1104
+      ],
+      "note": "Will be updated using dependabot"
+    }
+  ],
+  "brakeman_version": "7.0.2"
+}
