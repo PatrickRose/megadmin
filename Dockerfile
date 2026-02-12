@@ -11,6 +11,8 @@ RUN apt-get update -qq && \
       texlive-fonts-recommended \
       texlive-latex-recommended \
       chromium \
+      chromium-driver \
+      lmodern \
       curl \
       git \
     && rm -rf /var/lib/apt/lists/*
