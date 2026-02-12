@@ -28,7 +28,7 @@
     "terser-webpack-plugin": "5",
     "trix": "^2.1.16",
     "webpack": "5",
-    "webpack-assets-manifest": "5",
+    "webpack-assets-manifest": "6",
     "webpack-cli": "6",
     "webpack-dev-server": "5",
     "webpack-merge": "5"
