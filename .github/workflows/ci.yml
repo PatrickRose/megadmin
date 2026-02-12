@@ -51,10 +51,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Install system dependencies
-        uses: awalsh128/cache-apt-pkgs-action@latest
-        with:
-          packages: chromium libvips-dev pandoc texlive-latex-base texlive-fonts-recommended texlive-latex-recommended
-          version: 1.0
+        run: >-
+          sudo apt-get update && sudo apt-get install -y
+          chromium
+          libvips-dev
+          pandoc
+          texlive-latex-base
+          texlive-fonts-recommended
+          texlive-latex-recommended
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: "3.3"
