@@ -90,7 +90,7 @@ class EventOrganisersController < ApplicationController
                                     description: params[:organiser_to_event][:description])
         redirect_to event_event_organisers_path(event_id: params[:event_id], notice: 'Successfully updated')
       else
-        redirect_to edit_event_event_organiser_path(event_id: params[:event_id]), status: :unprocessable_entity
+        redirect_to edit_event_event_organiser_path(event_id: params[:event_id]), status: :unprocessable_content
       end
     else
       redirect_to event_event_organisers_path(event_id: params[:event_id]), alert: 'Cannot update'
