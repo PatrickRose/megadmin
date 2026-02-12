@@ -29,7 +29,7 @@
     "trix": "^2.1.14",
     "webpack": "5",
     "webpack-assets-manifest": "5",
-    "webpack-cli": "4",
+    "webpack-cli": "6",
     "webpack-dev-server": "4",
     "webpack-merge": "5"
   },
