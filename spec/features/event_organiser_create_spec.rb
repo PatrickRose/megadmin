@@ -39,7 +39,7 @@ RSpec.feature 'EventOrganiserCreates' do
     expect(page).to have_content 'email3@email.com'
 
     expect(ActionMailer::Base.deliveries.first.To.value).to eq 'email3@email.com'
-    expect(ActionMailer::Base.deliveries.first.From.value).to eq 'no-reply@sheffield.ac.uk'
+    expect(ActionMailer::Base.deliveries.first.From.value).to eq 'no-reply@megadmin.patrickrosemusic.co.uk'
     expect(ActionMailer::Base.deliveries.first.Subject.value).to eq 'An account has been created for you for ' \
                                                                     'Pennine Megagames!'
     expect(ActionMailer::Base.deliveries.first.To.value).to eq 'email3@email.com'

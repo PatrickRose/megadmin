@@ -101,11 +101,11 @@ RSpec.feature 'EventSignupEmails' do
     click_button('send-button')
 
     expect(ActionMailer::Base.deliveries.first.To.value).to eq(@signup1.email)
-    expect(ActionMailer::Base.deliveries.first.From.value).to eq('no-reply@sheffield.ac.uk')
+    expect(ActionMailer::Base.deliveries.first.From.value).to eq('no-reply@megadmin.patrickrosemusic.co.uk')
     expect(ActionMailer::Base.deliveries.first.Subject.value).to eq('My Event - Pennine Megagames. Event information!')
 
     expect(ActionMailer::Base.deliveries.second.To.value).to eq(@signup2.email)
-    expect(ActionMailer::Base.deliveries.second.From.value).to eq('no-reply@sheffield.ac.uk')
+    expect(ActionMailer::Base.deliveries.second.From.value).to eq('no-reply@megadmin.patrickrosemusic.co.uk')
     expect(ActionMailer::Base.deliveries.second.Subject.value).to eq('My Event - Pennine Megagames. Event information!')
 
     expect(page).to have_content 'Emails sent'
@@ -133,7 +133,7 @@ RSpec.feature 'EventSignupEmails' do
     click_button('send-button')
 
     expect(ActionMailer::Base.deliveries.first.To.value).to eq(@signup1.email)
-    expect(ActionMailer::Base.deliveries.first.From.value).to eq('no-reply@sheffield.ac.uk')
+    expect(ActionMailer::Base.deliveries.first.From.value).to eq('no-reply@megadmin.patrickrosemusic.co.uk')
     expect(ActionMailer::Base.deliveries.first.Subject.value).to eq('My Event - Pennine Megagames. Event information!')
 
     expect(page).to have_content 'Email sent'

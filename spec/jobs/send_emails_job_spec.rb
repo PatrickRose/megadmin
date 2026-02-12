@@ -27,7 +27,7 @@ RSpec.describe SendEmailsJob do
     described_class.perform_now(signup_string, event_string, '', organiser_string)
 
     expect(ActionMailer::Base.deliveries.first.To.value).to eq(@signup.email)
-    expect(ActionMailer::Base.deliveries.first.From.value).to eq('no-reply@sheffield.ac.uk')
+    expect(ActionMailer::Base.deliveries.first.From.value).to eq('no-reply@megadmin.patrickrosemusic.co.uk')
     expect(ActionMailer::Base.deliveries.first.Subject.value).to eq('My Event - Pennine Megagames. Event information!')
   end
 end
