@@ -7,7 +7,7 @@ git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 gem 'rails', '~> 7.2.0'
 
 # Use postgresql as the database for Active Record
-gem 'pg', '~> 1.1'
+gem 'pg', '~> 1.6'
 
 # Use the Puma web server [https://github.com/puma/puma]
 gem 'puma', '~> 7.2'
