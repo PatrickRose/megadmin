@@ -23,7 +23,7 @@
     "puppeteer": "^24.4.0",
     "sass": "^1.54.0",
     "sass-loader": "^13.0.2",
-    "shakapacker": "^8.2.0",
+    "shakapacker": "^9.5.0",
     "style-loader": "^4.0.0",
     "terser-webpack-plugin": "5",
     "trix": "^2.1.14",
