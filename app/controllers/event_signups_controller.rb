@@ -57,7 +57,7 @@ class EventSignupsController < ApplicationController
       flash[:alert] = @event_signup.errors.full_messages.to_sentence
       @teams = Team.where(event_id: params[:event_id]).map { |t| [t.name, t.id] }
       @roles = Role.where(event_id: params[:event_id]).map { |r| [r.name, r.id] }
-      render :new, status: :unprocessable_entity
+      render :new, status: :unprocessable_content
     end
   end
 
@@ -72,7 +72,7 @@ class EventSignupsController < ApplicationController
       @event = Event.find(params[:event_id])
       @teams = Team.where(event_id: params[:event_id]).map { |team| [team.name, team.id] }
       @roles = Role.where(event_id: params[:event_id]).map { |role| [role.name, role.id] }
-      render :edit, status: :unprocessable_entity
+      render :edit, status: :unprocessable_content
     end
   end
 

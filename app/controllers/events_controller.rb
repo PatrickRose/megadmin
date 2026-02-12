@@ -59,7 +59,7 @@ class EventsController < ApplicationController
                                           read_only: false)
       org_to_event.save
     else
-      render :new, status: :unprocessable_entity
+      render :new, status: :unprocessable_content
     end
   end
 
@@ -79,7 +79,7 @@ class EventsController < ApplicationController
       redirect_to event_path(id: @event.id), notice: 'Event was successfully updated.', status: :see_other
       nil
     else
-      render :edit, status: :unprocessable_entity
+      render :edit, status: :unprocessable_content
     end
   end
 
@@ -105,7 +105,7 @@ class EventsController < ApplicationController
     if @event.update(draft: false)
       redirect_to event_path(id: @event.id), notice: 'Event was successfully published.', status: :see_other
     else
-      render :edit, status: :unprocessable_entity
+      render :edit, status: :unprocessable_content
     end
   end
 

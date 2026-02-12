@@ -51,7 +51,7 @@ class TeamsController < ApplicationController
     if @team.save
       redirect_to url_for([@event, @team])
     else
-      render :new, status: :unprocessable_entity
+      render :new, status: :unprocessable_content
     end
   end
 
@@ -61,7 +61,7 @@ class TeamsController < ApplicationController
     if @team.update(team_params)
       redirect_to url_for([@event, @team])
     else
-      render :edit, status: :unprocessable_entity
+      render :edit, status: :unprocessable_content
     end
   end
 
