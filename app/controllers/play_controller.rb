@@ -36,7 +36,7 @@ class PlayController < ApplicationController
     # Date_difference in format "x/1"
     @date_difference = (Date.parse(@play_event.date.to_s[0, 11]) - Time.zone.today).to_s
     # Number is date_difference without "/1" eg @date_difference = "27/1" @number = 27
-    @number = @date_difference[0..@date_difference.index('/') - 1].to_i
+    @number = @date_difference[0..(@date_difference.index('/') - 1)].to_i
   end
 
   # For downloading cast list from player's page, might not be needed atm

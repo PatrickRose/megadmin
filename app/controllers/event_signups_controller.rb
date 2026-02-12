@@ -279,7 +279,7 @@ class EventSignupsController < ApplicationController
       end
     end
 
-    if signups.count.zero?
+    if signups.none?
       redirect_to event_event_signups_path(event_id: event.id), alert: 'There are no signups to email'
       return
     end
