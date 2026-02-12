@@ -1,0 +1,13 @@
+---
+ignore:
+  # activerecord 7.0.8.7 - CVE-2025-55193
+  # Fix requires upgrading to Rails 7.1+
+  - CVE-2025-55193
+
+  # activestorage 7.0.8.7 - CVE-2025-24293
+  # Fix requires upgrading to Rails 7.1+
+  - CVE-2025-24293
+
+  # shakapacker 8.2.0 - GHSA-96qw-h329-v5rg (HIGH)
+  # Fix requires upgrading to shakapacker 9.5+
+  - GHSA-96qw-h329-v5rg
