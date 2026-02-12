@@ -9,7 +9,7 @@
     "@babel/runtime": "7",
     "@popperjs/core": "^2.11.6",
     "@rails/actiontext": "^8.1.200",
-    "@rails/ujs": "7.0.8-4",
+    "@rails/ujs": "7.1.600",
     "@types/babel__core": "7",
     "@types/webpack": "5",
     "babel-loader": "10",
