@@ -20,6 +20,7 @@ AllCops:
     - "bin/**"
     - "db/schema.rb"
     - "db/migrate/*"
+    - "vendor/**/*"
 
 # Specific cop configs
 Style/FrozenStringLiteralComment:
