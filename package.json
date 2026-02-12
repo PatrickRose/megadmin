@@ -16,7 +16,7 @@
     "babel-plugin-macros": "^3.1.0",
     "bootstrap": "5.3.3",
     "bootstrap-icons": "^1.9.1",
-    "compression-webpack-plugin": "9",
+    "compression-webpack-plugin": "11",
     "css-loader": "^6.7.1",
     "improved-yarn-audit": "^3.0.4",
     "mini-css-extract-plugin": "^2.6.1",
