@@ -246,6 +246,7 @@ class EventSignupsController < ApplicationController
   end
 
   include CastList
+
   def organiser_cast_list
     @event = Event.find_by(id: params[:event_id])
 

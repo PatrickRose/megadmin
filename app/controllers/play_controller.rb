@@ -42,6 +42,7 @@ class PlayController < ApplicationController
   # For downloading cast list from player's page, might not be needed atm
   # Visit here /play/:id/player_cast_list
   include CastList
+
   def player_cast_list
     if params[:id].blank?
       redirect_to root_path, alert: 'Missing player UUID.', status: :see_other
