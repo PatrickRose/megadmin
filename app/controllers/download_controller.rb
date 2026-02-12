@@ -26,7 +26,7 @@ class DownloadController < ApplicationController
       # Initialise the tempfile as .zip
       Zip::OutputStream.open(temp)
       # Add files to the .zip file
-      Zip::File.open(temp.path, Zip::File::CREATE) do |zip|
+      Zip::File.open(temp.path, create: true) do |zip|
         # Role brief
         if !player.role.nil? && player.role.brief.attached?
           name = team_name + "role brief#{player.role.brief.filename.extension_with_delimiter}"
