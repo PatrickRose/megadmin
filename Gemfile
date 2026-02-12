@@ -71,7 +71,7 @@ gem 'active_storage_validations'
 gem 'rubyzip', require: 'zip'
 gem 'tempfile'
 
-gem 'concurrent-ruby', '1.3.4'
+gem 'concurrent-ruby', '1.3.6'
 
 gem 'pandoc-ruby'
 
