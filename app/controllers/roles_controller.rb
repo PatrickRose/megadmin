@@ -21,15 +21,11 @@ class RolesController < ApplicationController
     @event = Event.find(params[:event_id])
     @teams = @event.teams
     @role = Role.new
-  rescue ActiveRecord::RecordNotFound
-    @error = 'Event could not be found'
   end
 
   def edit
     @event = Event.find(params[:event_id])
     @role = Role.find(params[:id])
-  rescue ActiveRecord::RecordNotFound
-    @error = 'Event could not be found'
   end
 
   def create

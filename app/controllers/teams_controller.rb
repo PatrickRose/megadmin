@@ -31,11 +31,7 @@ class TeamsController < ApplicationController
   end
 
   def new
-    begin
-      @event = Event.find(params[:event_id])
-    rescue ActiveRecord::RecordNotFound
-      @error = 'Event could not be found'
-    end
+    @event = Event.find(params[:event_id])
     @team = Team.new
   end
 
