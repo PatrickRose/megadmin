@@ -4,7 +4,7 @@
 class ApplicationJob < ActiveJob::Base
   # Delayed Job uses the same database for its queue, so deferring enqueue
   # until after transaction commit (Rails 7.2 default) is unnecessary.
-  self.enqueue_after_transaction_commit = :never
+  self.enqueue_after_transaction_commit = false
 
   # Automatically retry jobs that encountered a deadlock
   # retry_on ActiveRecord::Deadlocked

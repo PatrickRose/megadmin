@@ -4,7 +4,7 @@ source 'https://rubygems.org'
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
 # Bundle edge Rails instead: gem "rails", github: "rails/rails", branch: "main"
-gem 'rails', '~> 7.2.0'
+gem 'rails', '~> 8.0.0'
 
 # Use postgresql as the database for Active Record
 gem 'pg', '~> 1.6'
@@ -76,7 +76,7 @@ gem 'concurrent-ruby', '1.3.6'
 gem 'pandoc-ruby'
 
 group :development do
-  gem 'annotate'
+  gem 'annotaterb'
   gem 'brakeman'
   gem 'bundler-audit'
   gem 'letter_opener'
