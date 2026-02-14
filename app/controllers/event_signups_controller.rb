@@ -333,6 +333,6 @@ class EventSignupsController < ApplicationController
   private
 
   def event_signup_params
-    params.require(:event_signup).permit(:name, :email, :event_id, :team_id, :role_id)
+    params.expect(event_signup: %i[name email event_id team_id role_id])
   end
 end

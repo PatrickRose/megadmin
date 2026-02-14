@@ -80,6 +80,6 @@ class TeamsController < ApplicationController
   private
 
   def team_params
-    params.require(:team).permit(:name, :image, :brief)
+    params.expect(team: %i[name image brief])
   end
 end

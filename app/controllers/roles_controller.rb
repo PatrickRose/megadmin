@@ -69,6 +69,6 @@ class RolesController < ApplicationController
   private
 
   def role_params
-    params.require(:role).permit(:name, :brief, :team_id)
+    params.expect(role: %i[name brief team_id])
   end
 end
