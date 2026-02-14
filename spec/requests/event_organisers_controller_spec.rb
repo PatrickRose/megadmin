@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe 'EventOrganisersController', type: :request do
+RSpec.describe 'EventOrganisersController' do
   let!(:organiser1) { create(:organiser, email: 'email1@email.com') }
   let!(:organiser2) { create(:organiser, email: 'email2@email.com') }
   let!(:event) { create(:event, organiser_id: organiser1.id) }
@@ -15,7 +15,11 @@ RSpec.describe 'EventOrganisersController', type: :request do
     it 'redirects with alert on save failure' do
       login_as organiser1
 
-      allow_any_instance_of(OrganiserToEvent).to receive(:save).and_return(false)
+      allow(OrganiserToEvent).to receive(:new).and_wrap_original do |method, *args|
+        instance = method.call(*args)
+        allow(instance).to receive(:save).and_return(false)
+        instance
+      end
 
       post event_event_organisers_path(event_id: event.id),
            params: { email: 'newsavedfail@email.com', read_only: false, description: 'test' }
@@ -48,12 +52,16 @@ RSpec.describe 'EventOrganisersController', type: :request do
 
       login_as organiser1
 
-      allow_any_instance_of(OrganiserToEvent).to receive(:update).and_return(false)
+      allow(OrganiserToEvent).to receive(:find).and_wrap_original do |method, *args|
+        instance = method.call(*args)
+        allow(instance).to receive(:update).and_return(false)
+        instance
+      end
 
       patch event_event_organiser_path(event_id: event.id, id: ote2.id),
             params: { organiser_to_event: { read_only: true, description: 'updated' } }
 
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
     end
   end
 end

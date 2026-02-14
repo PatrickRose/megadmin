@@ -126,5 +126,4 @@ class EventOrganisersController < ApplicationController
     @event = Event.find(params[:event_id])
     authorize! :read, @event
   end
-
 end

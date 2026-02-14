@@ -59,5 +59,4 @@ class PlayController < ApplicationController
 
     download_cast_list('event_signups/player_cast_list', event)
   end
-
 end

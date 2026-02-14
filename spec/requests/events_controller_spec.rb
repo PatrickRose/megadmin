@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe 'EventsController', type: :request do
+RSpec.describe 'EventsController' do
   let!(:organiser) { create(:organiser) }
   let!(:event) { create(:event, organiser_id: organiser.id) }
   let!(:draft) { create(:event, draft: true, organiser_id: organiser.id) }
@@ -15,11 +15,15 @@ RSpec.describe 'EventsController', type: :request do
 
   describe 'publish' do
     it 'renders edit on publish failure' do
-      allow_any_instance_of(Event).to receive(:update).and_return(false)
+      allow(Event).to receive(:find).and_wrap_original do |method, *args|
+        instance = method.call(*args)
+        allow(instance).to receive(:update).and_return(false) if instance.id == draft.id
+        instance
+      end
 
       patch publish_event_path(id: draft.id)
 
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
     end
   end
 
@@ -78,9 +82,9 @@ RSpec.describe 'EventsController', type: :request do
                               role: r, team: team)
       end
 
-      expect {
+      expect do
         post email_event_path(id: event.id)
-      }.to have_enqueued_job(SendEmailsJob)
+      end.to have_enqueued_job(SendEmailsJob)
     end
   end
 end

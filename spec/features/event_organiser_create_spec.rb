@@ -94,5 +94,4 @@ RSpec.feature 'EventOrganiserCreates' do
                                        event: @event)
     expect(new_ote.read_only).to be true
   end
-
 end

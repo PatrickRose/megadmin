@@ -2,13 +2,11 @@
 
 require 'rails_helper'
 
-RSpec.describe 'EventSignupsController', type: :request do
+RSpec.describe 'EventSignupsController' do
   let!(:organiser) { create(:organiser) }
   let!(:event) { create(:event, organiser_id: organiser.id) }
   let!(:draft) { create(:event, organiser_id: organiser.id, draft: true) }
   let!(:team) { create(:team, event: event) }
-  let!(:role1) { create(:role, event: event, name: 'role 1', team: team) }
-  let!(:role2) { create(:role, event: event, name: 'role 2', team: team) }
 
   before do
     event.organisers << organiser
@@ -49,9 +47,9 @@ RSpec.describe 'EventSignupsController', type: :request do
                               role: r, team: team)
       end
 
-      expect {
+      expect do
         post email_event_event_signups_path(event_id: event.id)
-      }.to have_enqueued_job(SendEmailsJob)
+      end.to have_enqueued_job(SendEmailsJob)
     end
   end
 
