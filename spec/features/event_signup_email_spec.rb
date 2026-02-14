@@ -152,4 +152,5 @@ RSpec.feature 'EventSignupEmails' do
     expect(page).to have_content 'The event must be published before you can send email briefs to players'
     expect(page).to have_no_button 'button#open-popup'
   end
+
 end
