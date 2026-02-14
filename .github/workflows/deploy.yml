@@ -1,0 +1,122 @@
+name: Deploy
+
+on:
+  workflow_dispatch:
+  workflow_run:
+    workflows: ["CI"]
+    types: [completed]
+    branches: [main]
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  AZURE_RESOURCE_GROUP: rg-megadmin-production
+  ACR_NAME: acrmegadminproduction
+  WEB_APP_NAME: ca-megadmin-web
+  WORKER_APP_NAME: ca-megadmin-worker
+  MIGRATE_JOB_NAME: caj-megadmin-migrate
+  IMAGE_NAME: megadmin
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Azure login via OIDC
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Login to ACR
+        run: az acr login --name ${{ env.ACR_NAME }}
+
+      - name: Build and push Docker image
+        run: |
+          IMAGE_TAG="${{ env.ACR_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:${{ github.sha }}"
+          IMAGE_LATEST="${{ env.ACR_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:latest"
+          docker build \
+            --build-arg RAILS_ENV=production \
+            --cache-from "$IMAGE_LATEST" \
+            -t "$IMAGE_TAG" \
+            -t "$IMAGE_LATEST" \
+            .
+          docker push "$IMAGE_TAG"
+          docker push "$IMAGE_LATEST"
+
+      - name: Update migration job image and run migrations
+        run: |
+          IMAGE_TAG="${{ env.ACR_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:${{ github.sha }}"
+
+          az containerapp job update \
+            --name ${{ env.MIGRATE_JOB_NAME }} \
+            --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
+            --image "$IMAGE_TAG"
+
+          az containerapp job start \
+            --name ${{ env.MIGRATE_JOB_NAME }} \
+            --resource-group ${{ env.AZURE_RESOURCE_GROUP }}
+
+          # Wait for migration job to complete
+          for i in $(seq 1 60); do
+            STATUS=$(az containerapp job execution list \
+              --name ${{ env.MIGRATE_JOB_NAME }} \
+              --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
+              --query "[0].properties.status" -o tsv)
+            if [ "$STATUS" = "Succeeded" ]; then
+              echo "Migration completed successfully"
+              break
+            elif [ "$STATUS" = "Failed" ]; then
+              echo "Migration failed!"
+              exit 1
+            fi
+            echo "Waiting for migration to complete... (attempt $i/60)"
+            sleep 10
+          done
+
+          if [ "$STATUS" != "Succeeded" ]; then
+            echo "Migration timed out"
+            exit 1
+          fi
+
+      - name: Update web container app
+        run: |
+          IMAGE_TAG="${{ env.ACR_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:${{ github.sha }}"
+          az containerapp update \
+            --name ${{ env.WEB_APP_NAME }} \
+            --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
+            --image "$IMAGE_TAG"
+
+      - name: Update worker container app
+        run: |
+          IMAGE_TAG="${{ env.ACR_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:${{ github.sha }}"
+          az containerapp update \
+            --name ${{ env.WORKER_APP_NAME }} \
+            --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
+            --image "$IMAGE_TAG"
+
+      - name: Health check
+        run: |
+          WEB_FQDN=$(az containerapp show \
+            --name ${{ env.WEB_APP_NAME }} \
+            --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
+            --query "properties.configuration.ingress.fqdn" -o tsv)
+
+          for i in $(seq 1 30); do
+            HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "https://$WEB_FQDN/up" || true)
+            if [ "$HTTP_STATUS" = "200" ]; then
+              echo "Health check passed!"
+              exit 0
+            fi
+            echo "Waiting for app to become healthy... (attempt $i/30, status: $HTTP_STATUS)"
+            sleep 10
+          done
+
+          echo "Health check failed after 5 minutes"
+          exit 1
