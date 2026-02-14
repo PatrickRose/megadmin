@@ -31,8 +31,14 @@ ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
 WORKDIR /app
 
 # Install gems
+ARG RAILS_ENV=production
+ENV RAILS_ENV=${RAILS_ENV}
+
 COPY Gemfile Gemfile.lock ./
-RUN bundle install
+RUN if [ "$RAILS_ENV" = "production" ]; then \
+      bundle config set --local without 'development test'; \
+    fi && \
+    bundle install
 
 # Install JS dependencies
 COPY package.json yarn.lock ./
@@ -40,6 +46,11 @@ RUN yarn install
 
 # Copy the rest of the application
 COPY . .
+
+# Precompile assets for production
+RUN if [ "$RAILS_ENV" = "production" ]; then \
+      SECRET_KEY_BASE=precompile_placeholder bundle exec rails assets:precompile; \
+    fi
 
 ENTRYPOINT ["bin/docker-entrypoint"]
 
