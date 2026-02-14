@@ -67,4 +67,32 @@ RSpec.feature 'EventOrganiserCreates' do
 
     expect(page).to have_content 'Organiser already assigned'
   end
+
+  specify 'blank email is rejected' do
+    visit new_event_event_organiser_path(event_id: @event.id)
+
+    click_on 'Add Organiser'
+
+    expect(page).to have_content 'Email cannot be blank'
+  end
+
+  specify 'control team creates organiser as read_only' do
+    control = create(:organiser, email: 'control@email.com')
+    create(:organiser_to_event, event_id: @event.id, organiser_id: control.id, read_only: true)
+
+    login_as control
+
+    visit new_event_event_organiser_path(event_id: @event.id)
+
+    fill_in 'email', with: 'newcontrol@email.com'
+
+    click_on 'Add Organiser'
+
+    expect(page).to have_content 'Organiser added to event'
+
+    new_ote = OrganiserToEvent.find_by(organiser: Organiser.find_by(email: 'newcontrol@email.com'),
+                                       event: @event)
+    expect(new_ote.read_only).to be true
+  end
+
 end
