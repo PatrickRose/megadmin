@@ -126,8 +126,4 @@ class EventOrganisersController < ApplicationController
     @event = Event.find(params[:event_id])
     authorize! :read, @event
   end
-
-  def event_organiser_params
-    params.require(:event_organiser).permit(:read_only, :email, :event_id)
-  end
 end

@@ -112,6 +112,17 @@ RSpec.describe Team do
     expect { team.delete }.to change(described_class, :count).by(-1)
   end
 
+  # name_brief
+  it 'returns the name when brief is attached' do
+    team.brief.attach(io: Rails.root.join('spec/fixtures/files/pdf.pdf').open, filename: 'pdf.pdf',
+                      content_type: 'application/pdf')
+    expect(team.name_brief).to eq('Test team')
+  end
+
+  it 'returns "name [NO BRIEF]" when brief is not attached' do
+    expect(team.name_brief).to eq('Test team [NO BRIEF]')
+  end
+
   # PDF conversion
   it 'converts a docx brief to pdf' do
     team.brief.attach(io: Rails.root.join('spec/fixtures/files/docx.docx').open,

@@ -82,6 +82,9 @@ RSpec.configure do |config|
 
   # Use this to test real error pages (e.g. epiSupport)
   config.around(:each, :error_page) do |example|
+    original_show_exceptions = Rails.application.config.action_dispatch.show_exceptions
+    original_consider_local = Rails.application.config.consider_all_requests_local
+
     # Rails caches the action_dispatch setting. Need to remove it for the new setting to apply.
     if Rails.application.instance_variable_defined?(:@app_env_config)
       Rails.application.remove_instance_variable(:@app_env_config)
@@ -94,8 +97,8 @@ RSpec.configure do |config|
     if Rails.application.instance_variable_defined?(:@app_env_config)
       Rails.application.remove_instance_variable(:@app_env_config)
     end
-    Rails.application.config.action_dispatch.show_exceptions = :none
-    Rails.application.config.consider_all_requests_local = true
+    Rails.application.config.action_dispatch.show_exceptions = original_show_exceptions
+    Rails.application.config.consider_all_requests_local = original_consider_local
   end
 
   # RSpec Rails can automatically mix in different behaviours to your tests

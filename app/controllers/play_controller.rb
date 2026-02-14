@@ -59,11 +59,4 @@ class PlayController < ApplicationController
 
     download_cast_list('event_signups/player_cast_list', event)
   end
-
-  private
-
-  def event_params
-    params.require(:event).permit(:name, :description, :location, :google_maps_link, :date, :timetable,
-                                  :additional_info)
-  end
 end

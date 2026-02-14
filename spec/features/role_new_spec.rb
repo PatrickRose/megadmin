@@ -73,7 +73,7 @@ RSpec.feature 'Role new page' do
     context 'for an invalid event' do
       scenario 'user is shown the error message' do
         visit new_event_role_path(event_id: 9_999_999)
-        expect(page).to have_content 'Event could not be found'
+        expect(page).to have_content 'You are not authorised to access this page'
       end
     end
   end
@@ -96,7 +96,7 @@ RSpec.feature 'Role new page' do
       scenario 'user is shown the error message' do
         visit new_event_role_path(event_id: 9_999_999)
 
-        expect(page).to have_content 'Event could not be found'
+        expect(page).to have_content 'You are not authorised to access this page'
       end
     end
   end

@@ -86,6 +86,13 @@ RSpec.feature 'Role edit page' do
         expect(page).to have_content 'Role no brief'
       end
     end
+
+    context 'for an invalid event' do
+      scenario 'user is shown the error message' do
+        visit edit_event_role_path(event_id: 9_999_999, id: @role_brief.id)
+        expect(page).to have_content 'You are not authorised to access this page'
+      end
+    end
   end
 
   context 'as the control team' do
