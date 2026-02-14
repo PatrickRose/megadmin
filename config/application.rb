@@ -21,7 +21,7 @@ Bundler.require(*Rails.groups)
 
 module Project
   class Application < Rails::Application
-    config.load_defaults 7.2
+    config.load_defaults 8.1
 
     config.active_job.queue_adapter = :delayed_job
 

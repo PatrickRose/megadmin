@@ -151,8 +151,8 @@ class EventsController < ApplicationController
   private
 
   def event_params
-    params.require(:event).permit(:name, :description, :location, :google_maps_link, :date, :timetable,
-                                  :additional_info, :organiser_id, :rulebook,
-                                  :draft, additional_documents: [])
+    params.expect(event: [:name, :description, :location, :google_maps_link, :date, :timetable,
+                          :additional_info, :organiser_id, :rulebook,
+                          :draft, { additional_documents: [] }])
   end
 end

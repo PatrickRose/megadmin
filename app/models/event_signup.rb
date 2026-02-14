@@ -41,7 +41,7 @@ class EventSignup < ApplicationRecord
   def role_fulfilled_by_another_player
     return if role_id.nil?
 
-    existing_signup = EventSignup.where(role_id: role_id, team_id: team_id).first
+    existing_signup = EventSignup.find_by(role_id: role_id, team_id: team_id)
     return if existing_signup.nil? || existing_signup == self
 
     errors.add(:base,
@@ -50,7 +50,7 @@ class EventSignup < ApplicationRecord
   end
 
   def email_not_in_use
-    existing_email_signup = EventSignup.where(event_id: event_id, email: email).first
+    existing_email_signup = EventSignup.find_by(event_id: event_id, email: email)
     return if existing_email_signup.nil? || existing_email_signup == self
 
     errors.add(:base, "The email '#{email}' is already in use by '#{existing_email_signup.name}'.")

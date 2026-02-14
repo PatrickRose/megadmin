@@ -52,7 +52,7 @@
           - @event = Event.find(params[:event_id])
         - rescue # sometimes event_id param is just id
           - @event = Event.find(params[:id])
-        - @ct = OrganiserToEvent.where(organiser_id: current_organiser.id, event_id: @event.id).first
+        - @ct = OrganiserToEvent.find_by(organiser_id: current_organiser.id, event_id: @event.id)
         - @control_team = @ct.read_only
         %ul
           %li= link_to 'All Events', events_path
