@@ -68,6 +68,8 @@ gem 'csv'
 
 gem 'active_storage_validations'
 
+gem 'azure-storage-blob', '~> 2.0', require: false
+
 gem 'rubyzip', require: 'zip'
 gem 'tempfile'
 

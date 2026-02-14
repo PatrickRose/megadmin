@@ -18,15 +18,12 @@ test:
     host: <%= ENV.fetch("POSTGRES_HOST", "localhost") %>
 
 production:
-    primary: &primary_production
-        <<: *default
-        database: team12_production
-        username: team12
-        password: <%= ENV["MIGRATION_TEST_DATABASE_PASSWORD"] %>
-    cable:
-        <<: *primary_production
-        database: team12_production_cable
-        migrations_paths: db/cable_migrate
+    <<: *default
+    database: <%= ENV.fetch("POSTGRES_DB", "megadmin_production") %>
+    username: <%= ENV.fetch("POSTGRES_USER", "megadmin_admin") %>
+    password: <%= ENV["POSTGRES_PASSWORD"] %>
+    host: <%= ENV.fetch("POSTGRES_HOST", "localhost") %>
+    sslmode: require
 
 demo:
     <<: *default
