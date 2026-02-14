@@ -42,6 +42,14 @@ RSpec.describe EventSignup, type: :feature do
     create(:role, event: event, team: team, name: 'role 1')
   end
 
+  describe 'email_not_in_use validation' do
+    it 'rejects a duplicate email for the same event' do
+      duplicate = build(:event_signup, email: event_signup.email, event: event, name: 'Duplicate')
+      expect(duplicate).not_to be_valid
+      expect(duplicate.errors[:base].to_s).to include('already in use')
+    end
+  end
+
   specify 'I can create a new event signup.' do
     login_as organiser
 
@@ -58,6 +66,55 @@ RSpec.describe EventSignup, type: :feature do
 
     expect(page).to have_current_path(event_event_signups_path(event_id: event.id))
     expect(page).to have_content 'Player was successfully created.'
+  end
+
+  specify 'I cannot create a signup with an invalid team/role combination' do
+    login_as organiser
+
+    # Create a second team with its own role
+    team2 = create(:team, name: 'Team 2', event: event)
+    role_on_team2 = create(:role, event: event, team: team2, name: 'team2 role')
+
+    visit new_event_event_signup_path(event_id: event.id)
+
+    fill_in 'Name', with: 'Player bad combo'
+    fill_in 'Email', with: 'badcombo@email.com'
+    # Select team but a role from a different team
+    select team.name, from: 'event_signup_team_id'
+    select role_on_team2.name, from: 'event_signup_role_id'
+
+    click_on 'Create player'
+
+    expect(page).to have_content 'Invalid combination of team and role'
+  end
+
+  specify 'I see validation errors when creating a signup with a duplicate email' do
+    login_as organiser
+
+    visit new_event_event_signup_path(event_id: event.id)
+
+    fill_in 'Name', with: 'Duplicate email player'
+    fill_in 'Email', with: event_signup.email
+    select team.name, from: 'event_signup_team_id'
+    select role3.name, from: 'event_signup_role_id'
+
+    click_on 'Create player'
+
+    expect(page).to have_content 'already in use'
+  end
+
+  specify 'I see validation errors when updating a signup with a duplicate email' do
+    login_as organiser
+    signup2 = create(:event_signup, event: event, team: team, role: role3,
+                                    name: 'Player three', email: 'playerthree@email.com')
+
+    visit edit_event_event_signup_path(event_id: event.id, id: signup2.id)
+
+    fill_in 'Email', with: event_signup.email
+
+    click_on 'Update player'
+
+    expect(page).to have_content 'already in use'
   end
 
   specify 'I cannot create a new event signup as control team.' do
