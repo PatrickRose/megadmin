@@ -82,17 +82,6 @@ group :development do
   gem 'letter_opener'
   gem 'ruby-lsp'
   gem 'web-console'
-
-  gem 'capistrano'
-  gem 'capistrano-bundler', require: false
-  gem 'capistrano-passenger', require: false
-  gem 'capistrano-rails', require: false
-  gem 'capistrano-rvm', require: false
-  gem 'capistrano-yarn', require: false
-
-  gem 'bcrypt_pbkdf', '>= 1.0', '< 2.0'
-  gem 'ed25519', '>= 1.2', '< 2.0'
-  gem 'epi_deploy', git: 'https://github.com/epigenesys/epi_deploy.git'
 end
 
 group :development, :test do
