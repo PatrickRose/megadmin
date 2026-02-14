@@ -10,7 +10,7 @@ class EventSignupsController < ApplicationController
   def index
     @event = Event.find(params[:event_id])
 
-    @ct = OrganiserToEvent.where(organiser_id: current_organiser.id, event_id: @event.id).first
+    @ct = OrganiserToEvent.find_by(organiser_id: current_organiser.id, event_id: @event.id)
     @control_team = @ct.read_only
 
     raise CanCan::AccessDenied.new('Not authorized to access this page', :read, EventSignup) if @ct.nil?
@@ -36,8 +36,8 @@ class EventSignupsController < ApplicationController
   end
 
   def create
-    team = Team.where(id: event_signup_params[:team_id], event_id: params[:event_id]).first
-    role = Role.where(id: event_signup_params[:role_id], event_id: params[:event_id]).first
+    team = Team.find_by(id: event_signup_params[:team_id], event_id: params[:event_id])
+    role = Role.find_by(id: event_signup_params[:role_id], event_id: params[:event_id])
 
     unless team.roles.include? role
       redirect_to event_event_signups_path(event_id: params[:event_id]), notice: 'Invalid combination of team and role'

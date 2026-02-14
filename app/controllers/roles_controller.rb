@@ -11,10 +11,10 @@ class RolesController < ApplicationController
     @role = Role.find(params[:id])
     @team = @role.team_id
 
-    o = OrganiserToEvent.where(organiser_id: current_organiser.id, event_id: @event)
-    raise CanCan::AccessDenied.new('Not authorized to access this page', :read, EventSignup) if o.first.nil?
+    o = OrganiserToEvent.find_by(organiser_id: current_organiser.id, event_id: @event)
+    raise CanCan::AccessDenied.new('Not authorized to access this page', :read, EventSignup) if o.nil?
 
-    @organiser = o.first.read_only
+    @organiser = o.read_only
   end
 
   def new
@@ -31,7 +31,7 @@ class RolesController < ApplicationController
   def create
     @event = Event.find(params[:event_id])
     @role = Role.new(role_params)
-    @role.team = Team.where(id: role_params[:team_id], event_id: params[:event_id]).first
+    @role.team = Team.find_by(id: role_params[:team_id], event_id: params[:event_id])
     @role.event = @event
     if @role.save
       redirect_to url_for([@event, @role])

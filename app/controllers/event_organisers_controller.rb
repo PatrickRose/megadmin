@@ -9,7 +9,7 @@ class EventOrganisersController < ApplicationController
     @params = params
     @event = Event.find(params[:event_id])
 
-    @ct = OrganiserToEvent.where(organiser_id: current_organiser.id, event_id: @event.id).first
+    @ct = OrganiserToEvent.find_by(organiser_id: current_organiser.id, event_id: @event.id)
     @control_team = @ct.read_only
 
     @organisers_to_events = OrganiserToEvent.where(event_id: params[:event_id])
@@ -18,7 +18,7 @@ class EventOrganisersController < ApplicationController
   def new
     @event = Event.find(params[:event_id])
 
-    @ct = OrganiserToEvent.where(organiser_id: current_organiser.id, event_id: @event.id).first
+    @ct = OrganiserToEvent.find_by(organiser_id: current_organiser.id, event_id: @event.id)
     @control_team = @ct.read_only
 
     @event_organiser = OrganiserToEvent.new
@@ -38,7 +38,7 @@ class EventOrganisersController < ApplicationController
       return
     end
 
-    @ct = OrganiserToEvent.where(organiser_id: current_organiser.id, event_id: @event.id).first
+    @ct = OrganiserToEvent.find_by(organiser_id: current_organiser.id, event_id: @event.id)
     @control_team = @ct.read_only
 
     organiser = Organiser.find_by(email: params[:email])
@@ -81,7 +81,7 @@ class EventOrganisersController < ApplicationController
   def update
     @event = Event.find(params[:event_id])
     @organiser_to_event = OrganiserToEvent.find(params[:id])
-    @ct = OrganiserToEvent.where(organiser_id: current_organiser.id, event_id: @event.id).first
+    @ct = OrganiserToEvent.find_by(organiser_id: current_organiser.id, event_id: @event.id)
     @control_team = @ct.read_only
     # Disallow control team edits, and edits to own account
 

@@ -13,7 +13,7 @@ class TeamsController < ApplicationController
       @error = 'Event could not be found'
     end
 
-    organiser = OrganiserToEvent.where(organiser_id: current_organiser.id, event_id: @event).first
+    organiser = OrganiserToEvent.find_by(organiser_id: current_organiser.id, event_id: @event)
     raise CanCan::AccessDenied.new('Not authorized to access this page', :read, EventSignup) if organiser.nil?
     raise CanCan::AccessDenied.new('Not authorized to access this page', :read, EventSignup) unless can? :read, @event
 
@@ -24,8 +24,8 @@ class TeamsController < ApplicationController
   def show
     @event = Event.find(params[:event_id])
 
-    organiser = OrganiserToEvent.where(organiser_id: current_organiser.id, event_id: @event)
-    @organiser = organiser.first.read_only
+    organiser = OrganiserToEvent.find_by(organiser_id: current_organiser.id, event_id: @event)
+    @organiser = organiser.read_only
 
     @team = Team.find(params[:id])
   end
