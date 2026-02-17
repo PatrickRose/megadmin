@@ -55,12 +55,13 @@ module Project
 
     # Email
     config.action_mailer.smtp_settings = {
-      address: 'mailhost.shef.ac.uk',
-      port: 587,
-      enable_starttls_auto: true,
-      openssl_verify_mode: OpenSSL::SSL::VERIFY_PEER,
-      openssl_verify_depth: 3,
-      ca_file: '/etc/ssl/certs/ca-certificates.crt'
+      address: ENV.fetch('SMTP_ADDRESS', 'smtp.mailgun.org'),
+      port: ENV.fetch('SMTP_PORT', 587).to_i,
+      user_name: ENV.fetch('SMTP_USERNAME', nil),
+      password: ENV.fetch('SMTP_PASSWORD', nil),
+      authentication: ENV['SMTP_USERNAME'].present? ? :plain : nil,
+      domain: ENV.fetch('SMTP_DOMAIN', nil),
+      enable_starttls_auto: true
     }
   end
 end
