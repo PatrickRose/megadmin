@@ -43,11 +43,11 @@ locals {
   ]
 
   shared_secrets = [
-    { name = "postgres-password", value = var.postgres_admin_password },
-    { name = "secret-key-base", value = var.secret_key_base },
-    { name = "rails-master-key", value = var.rails_master_key },
-    { name = "storage-access-key", value = azurerm_storage_account.main.primary_access_key },
-    { name = "smtp-password", value = var.smtp_password },
+    { name = "postgres-password", key_vault_secret_id = azurerm_key_vault_secret.postgres_password.versionless_id, identity = azurerm_user_assigned_identity.container_app.id },
+    { name = "secret-key-base", key_vault_secret_id = azurerm_key_vault_secret.secret_key_base.versionless_id, identity = azurerm_user_assigned_identity.container_app.id },
+    { name = "rails-master-key", key_vault_secret_id = azurerm_key_vault_secret.rails_master_key.versionless_id, identity = azurerm_user_assigned_identity.container_app.id },
+    { name = "storage-access-key", key_vault_secret_id = azurerm_key_vault_secret.storage_access_key.versionless_id, identity = azurerm_user_assigned_identity.container_app.id },
+    { name = "smtp-password", key_vault_secret_id = azurerm_key_vault_secret.smtp_password.versionless_id, identity = azurerm_user_assigned_identity.container_app.id },
   ]
 
   image_placeholder = "${azurerm_container_registry.main.login_server}/${var.project_name}:latest"
@@ -73,8 +73,9 @@ resource "azurerm_container_app" "web" {
   dynamic "secret" {
     for_each = local.shared_secrets
     content {
-      name  = secret.value.name
-      value = secret.value.value
+      name                = secret.value.name
+      key_vault_secret_id = secret.value.key_vault_secret_id
+      identity            = secret.value.identity
     }
   }
 
@@ -164,8 +165,9 @@ resource "azurerm_container_app" "worker" {
   dynamic "secret" {
     for_each = local.shared_secrets
     content {
-      name  = secret.value.name
-      value = secret.value.value
+      name                = secret.value.name
+      key_vault_secret_id = secret.value.key_vault_secret_id
+      identity            = secret.value.identity
     }
   }
 
@@ -215,7 +217,6 @@ resource "azurerm_container_app_job" "migrate" {
   location                     = azurerm_resource_group.main.location
   replica_timeout_in_seconds   = 600
   replica_retry_limit          = 1
-  trigger_type                 = "Manual"
 
   identity {
     type         = "UserAssigned"
@@ -230,8 +231,9 @@ resource "azurerm_container_app_job" "migrate" {
   dynamic "secret" {
     for_each = local.shared_secrets
     content {
-      name  = secret.value.name
-      value = secret.value.value
+      name                = secret.value.name
+      key_vault_secret_id = secret.value.key_vault_secret_id
+      identity            = secret.value.identity
     }
   }
 
