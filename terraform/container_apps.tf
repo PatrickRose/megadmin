@@ -32,6 +32,8 @@ locals {
     { name = "SMTP_ADDRESS", value = var.smtp_address },
     { name = "SMTP_PORT", value = var.smtp_port },
     { name = "SMTP_USERNAME", value = var.smtp_username },
+    { name = "SMTP_DOMAIN", value = var.smtp_domain },
+    { name = "MAILER_FROM", value = var.mailer_from },
   ]
 
   shared_secret_env_vars = [

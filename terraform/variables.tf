@@ -85,7 +85,7 @@ variable "app_hostname" {
 variable "smtp_address" {
   description = "SMTP server address"
   type        = string
-  default     = ""
+  default     = "smtp.mailgun.org"
 }
 
 variable "smtp_port" {
@@ -105,6 +105,18 @@ variable "smtp_password" {
   type        = string
   sensitive   = true
   default     = ""
+}
+
+variable "smtp_domain" {
+  description = "SMTP HELO domain"
+  type        = string
+  default     = ""
+}
+
+variable "mailer_from" {
+  description = "Default from address for mailers"
+  type        = string
+  default     = "no-reply@megadmin.patrickrosemusic.co.uk"
 }
 
 # Container Apps
