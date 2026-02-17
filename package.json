@@ -31,7 +31,7 @@
     "webpack-assets-manifest": "6",
     "webpack-cli": "6",
     "webpack-dev-server": "5",
-    "webpack-merge": "5"
+    "webpack-merge": "6"
   },
   "version": "0.1.0",
   "babel": {
