@@ -20,7 +20,7 @@
     "css-loader": "^7.1.4",
     "improved-yarn-audit": "^3.0.4",
     "mini-css-extract-plugin": "^2.10.0",
-    "puppeteer": "^24.37.3",
+    "puppeteer": "^24.37.4",
     "sass": "^1.97.3",
     "sass-loader": "^16.0.7",
     "shakapacker": "^9.5.0",
