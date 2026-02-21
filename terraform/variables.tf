@@ -110,19 +110,19 @@ variable "web_min_replicas" {
 variable "web_max_replicas" {
   description = "Maximum number of web replicas"
   type        = number
-  default     = 3
+  default     = 1
 }
 
 variable "web_cpu" {
   description = "CPU cores for web container"
   type        = number
-  default     = 0.5
+  default     = 0.25
 }
 
 variable "web_memory" {
   description = "Memory (Gi) for web container"
   type        = string
-  default     = "1Gi"
+  default     = "0.5Gi"
 }
 
 variable "worker_cpu" {
