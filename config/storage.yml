@@ -22,7 +22,7 @@ local:
 #   bucket: your_own_bucket-<%= Rails.env %>
 
 azure:
-  service: AzureStorage
+  service: AzureBlob
   storage_account_name: <%= ENV["AZURE_STORAGE_ACCOUNT_NAME"] %>
   storage_access_key: <%= ENV["AZURE_STORAGE_ACCESS_KEY"] %>
   storage_blob_host: <%= ENV["AZURE_STORAGE_BLOB_HOST"] %>
