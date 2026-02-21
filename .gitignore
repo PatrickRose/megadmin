@@ -10,3 +10,9 @@
 /public/packs-test
 /spec/examples.txt
 /.env
+
+# Terraform
+terraform/.terraform/
+terraform/*.tfstate
+terraform/*.tfstate.backup
+terraform/*.tfvars
