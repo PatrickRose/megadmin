@@ -96,7 +96,7 @@ Rails.application.configure do
   # Intentionally kept format to make it more obvious / easier to upgrade. #
   ##########################################################################
 
-  app_url = ENV.fetch('APP_HOSTNAME', 'megadmin.patrickrosemusic.co.uk')
+  app_url = ENV.fetch('APP_HOSTNAME', 'megagameadmin.co.uk')
   config.action_mailer.default_url_options    = { host: app_url, protocol: 'https' }
   config.action_mailer.asset_host             = "https://#{app_url}"
 end

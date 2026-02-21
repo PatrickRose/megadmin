@@ -59,7 +59,7 @@ variable "postgres_version" {
 variable "app_hostname" {
   description = "Application hostname for mailer and URL generation"
   type        = string
-  default     = "megadmin.patrickrosemusic.co.uk"
+  default     = "megagameadmin.co.uk"
 }
 
 # SMTP
@@ -97,7 +97,7 @@ variable "smtp_domain" {
 variable "mailer_from" {
   description = "Default from address for mailers"
   type        = string
-  default     = "no-reply@megadmin.patrickrosemusic.co.uk"
+  default     = "noreply@megagameadmin.co.uk"
 }
 
 # Container Apps
