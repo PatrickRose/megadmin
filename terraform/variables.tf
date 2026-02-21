@@ -38,12 +38,6 @@ variable "postgres_admin_username" {
   default     = "megadmin_admin"
 }
 
-variable "postgres_admin_password" {
-  description = "PostgreSQL administrator password"
-  type        = string
-  sensitive   = true
-}
-
 variable "postgres_database_name" {
   description = "PostgreSQL database name"
   type        = string
@@ -60,19 +54,6 @@ variable "postgres_version" {
   description = "PostgreSQL major version"
   type        = string
   default     = "17"
-}
-
-# Rails
-variable "rails_master_key" {
-  description = "Rails master key for credentials decryption"
-  type        = string
-  sensitive   = true
-}
-
-variable "secret_key_base" {
-  description = "Rails SECRET_KEY_BASE"
-  type        = string
-  sensitive   = true
 }
 
 variable "app_hostname" {

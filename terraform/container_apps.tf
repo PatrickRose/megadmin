@@ -39,7 +39,6 @@ locals {
   shared_secret_env_vars = [
     { name = "POSTGRES_PASSWORD", secret_name = "postgres-password" },
     { name = "SECRET_KEY_BASE", secret_name = "secret-key-base" },
-    { name = "RAILS_MASTER_KEY", secret_name = "rails-master-key" },
     { name = "AZURE_STORAGE_ACCESS_KEY", secret_name = "storage-access-key" },
     { name = "SMTP_PASSWORD", secret_name = "smtp-password" },
   ]
@@ -47,7 +46,6 @@ locals {
   shared_secrets = [
     { name = "postgres-password", key_vault_secret_id = azurerm_key_vault_secret.postgres_password.versionless_id, identity = azurerm_user_assigned_identity.container_app.id },
     { name = "secret-key-base", key_vault_secret_id = azurerm_key_vault_secret.secret_key_base.versionless_id, identity = azurerm_user_assigned_identity.container_app.id },
-    { name = "rails-master-key", key_vault_secret_id = azurerm_key_vault_secret.rails_master_key.versionless_id, identity = azurerm_user_assigned_identity.container_app.id },
     { name = "storage-access-key", key_vault_secret_id = azurerm_key_vault_secret.storage_access_key.versionless_id, identity = azurerm_user_assigned_identity.container_app.id },
     { name = "smtp-password", key_vault_secret_id = azurerm_key_vault_secret.smtp_password.versionless_id, identity = azurerm_user_assigned_identity.container_app.id },
   ]

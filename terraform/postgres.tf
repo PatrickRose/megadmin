@@ -4,7 +4,7 @@ resource "azurerm_postgresql_flexible_server" "main" {
   location                      = azurerm_resource_group.main.location
   version                       = var.postgres_version
   administrator_login           = var.postgres_admin_username
-  administrator_password        = var.postgres_admin_password
+  administrator_password        = random_password.postgres_admin_password.result
   sku_name                      = var.postgres_sku
   storage_mb                    = 32768
   backup_retention_days         = 7

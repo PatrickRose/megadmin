@@ -25,7 +25,7 @@ resource "azurerm_role_assignment" "keyvault_secrets_officer" {
 
 resource "azurerm_key_vault_secret" "postgres_password" {
   name         = "postgres-password"
-  value        = var.postgres_admin_password
+  value        = random_password.postgres_admin_password.result
   key_vault_id = azurerm_key_vault.main.id
 
   depends_on = [azurerm_role_assignment.keyvault_secrets_officer]
@@ -33,15 +33,7 @@ resource "azurerm_key_vault_secret" "postgres_password" {
 
 resource "azurerm_key_vault_secret" "secret_key_base" {
   name         = "secret-key-base"
-  value        = var.secret_key_base
-  key_vault_id = azurerm_key_vault.main.id
-
-  depends_on = [azurerm_role_assignment.keyvault_secrets_officer]
-}
-
-resource "azurerm_key_vault_secret" "rails_master_key" {
-  name         = "rails-master-key"
-  value        = var.rails_master_key
+  value        = random_password.secret_key_base.result
   key_vault_id = azurerm_key_vault.main.id
 
   depends_on = [azurerm_role_assignment.keyvault_secrets_officer]

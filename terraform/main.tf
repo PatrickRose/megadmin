@@ -10,6 +10,10 @@ terraform {
       source  = "hashicorp/azuread"
       version = "~> 3.0"
     }
+    random = {
+      source  = "hashicorp/random"
+      version = "~> 3.0"
+    }
   }
 }
 
@@ -19,6 +23,16 @@ provider "azurerm" {
 }
 
 provider "azuread" {}
+
+resource "random_password" "postgres_admin_password" {
+  length  = 32
+  special = true
+}
+
+resource "random_password" "secret_key_base" {
+  length  = 128
+  special = false
+}
 
 resource "azurerm_resource_group" "main" {
   name     = "rg-${var.project_name}-${var.environment}"
