@@ -34,6 +34,7 @@ locals {
     { name = "SMTP_USERNAME", value = var.smtp_username },
     { name = "SMTP_DOMAIN", value = var.smtp_domain },
     { name = "MAILER_FROM", value = var.mailer_from },
+    { name = "SENTRY_DSN", value = var.sentry_dsn },
   ]
 
   shared_secret_env_vars = [

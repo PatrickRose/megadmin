@@ -100,6 +100,13 @@ variable "mailer_from" {
   default     = "noreply@megagameadmin.co.uk"
 }
 
+# Sentry
+variable "sentry_dsn" {
+  description = "Sentry DSN for error reporting (leave empty to disable)"
+  type        = string
+  default     = ""
+}
+
 # Container Apps
 variable "web_min_replicas" {
   description = "Minimum number of web replicas"
