@@ -44,7 +44,7 @@
     -unless @organiser
       .d-flex.gap-1.mt-1.btn-row-centered
         = link_to "New team", new_event_team_path(@event), method: :get, class: 'btn generic-button-success'
-        = link_to "New role for this team", new_event_role_path(@event), method: :get, params: {default_team: @team}, class: 'btn generic-button-success'
+        = link_to "New role for this team", new_event_role_path(@event, default_team: @team.id), class: 'btn generic-button-success'
         = link_to 'Convert .docx to .pdf', event_team_pdf_path(event_id: @event.id, team_id: @team.id), method: :get, class: 'btn generic-button-recommended'
         = link_to edit_event_team_path(@event, @team), class: 'btn generic-button-recommended p-1', title: 'Edit the team.' do
           %img{ src: '/images/icons/edit-button.svg', width: '20', height: '20' }
