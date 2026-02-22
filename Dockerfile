@@ -1,7 +1,7 @@
 # =============================================================================
-# Build stage — compiles gems, installs node modules, precompiles assets
+# Base stage — shared toolchain (Ruby, Node.js, Yarn), no app code
 # =============================================================================
-FROM ruby:3.3.4-bookworm AS build
+FROM ruby:3.3.4-bookworm AS base
 
 RUN apt-get update -qq && \
     apt-get install -y --no-install-recommends \
@@ -22,6 +22,11 @@ RUN corepack enable && corepack prepare yarn@stable --activate
 
 WORKDIR /app
 
+# =============================================================================
+# Build stage — installs production gems, node modules, precompiles assets
+# =============================================================================
+FROM base AS build
+
 # Install gems (cached unless Gemfile/Gemfile.lock change)
 COPY Gemfile Gemfile.lock ./
 RUN bundle config set --local without 'development test' && \
@@ -37,8 +42,10 @@ RUN SECRET_KEY_BASE=precompile_placeholder RAILS_ENV=production bundle exec rail
 
 # =============================================================================
 # Development stage — full toolchain for local dev (used by docker-compose)
+# Branches from base so dev system packages are cached independently of
+# Gemfile/yarn.lock changes.
 # =============================================================================
-FROM build AS development
+FROM base AS development
 
 RUN apt-get update -qq && \
     apt-get install -y --no-install-recommends \
@@ -51,9 +58,16 @@ RUN apt-get update -qq && \
       chromium-driver \
     && rm -rf /var/lib/apt/lists/*
 
-# Dev needs all gem groups
-RUN bundle config unset --local without && \
-    bundle install
+# Install gems (all groups including dev/test)
+COPY Gemfile Gemfile.lock ./
+RUN bundle install
+
+# Install JS dependencies
+COPY package.json yarn.lock ./
+RUN yarn install
+
+# Copy application code
+COPY . .
 
 ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
 
