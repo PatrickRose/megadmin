@@ -6,6 +6,9 @@ on:
     workflows: ["CI"]
     types: [completed]
     branches: [main]
+  schedule:
+    # Weekly no-cache rebuild: Sunday at midnight UTC
+    - cron: '0 0 * * 0'
 
 permissions:
   id-token: write
@@ -22,7 +25,7 @@ env:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    if: ${{ github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
 
     steps:
       - uses: actions/checkout@v6
@@ -37,18 +40,28 @@ jobs:
       - name: Login to ACR
         run: az acr login --name ${{ env.ACR_NAME }}
 
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
       - name: Build and push Docker image
         run: |
           IMAGE_TAG="${{ env.ACR_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:${{ github.sha }}"
           IMAGE_LATEST="${{ env.ACR_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:latest"
-          docker build \
-            --build-arg RAILS_ENV=production \
-            --cache-from "$IMAGE_LATEST" \
+          CACHE_REF="${{ env.ACR_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:cache"
+
+          CACHE_ARGS=""
+          if [ "${{ github.event_name }}" != "schedule" ]; then
+            CACHE_ARGS="--cache-from type=registry,ref=${CACHE_REF}"
+          fi
+
+          docker buildx build \
+            --target production \
+            ${CACHE_ARGS} \
+            --cache-to type=registry,ref=${CACHE_REF},mode=max \
             -t "$IMAGE_TAG" \
             -t "$IMAGE_LATEST" \
+            --push \
             .
-          docker push "$IMAGE_TAG"
-          docker push "$IMAGE_LATEST"
 
       - name: Update migration job image and run migrations
         run: |
