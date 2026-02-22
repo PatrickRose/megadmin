@@ -1,7 +1,7 @@
 # =============================================================================
 # Base stage — shared toolchain (Ruby, Node.js, Yarn), no app code
 # =============================================================================
-FROM ruby:3.3.4-bookworm AS base
+FROM ruby:4.0.1-bookworm AS base
 
 RUN apt-get update -qq && \
     apt-get install -y --no-install-recommends \
@@ -79,7 +79,7 @@ CMD ["bin/rails", "server", "-b", "0.0.0.0"]
 # =============================================================================
 # Production stage — runtime only, no build tools or Node.js
 # =============================================================================
-FROM ruby:3.3.4-slim-bookworm AS production
+FROM ruby:4.0.1-slim-bookworm AS production
 
 RUN apt-get update -qq && \
     apt-get install -y --no-install-recommends \
