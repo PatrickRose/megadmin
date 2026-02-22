@@ -41,5 +41,8 @@
   },
   "browserslist": [
     "defaults"
-  ]
+  ],
+  "resolutions": {
+    "ajv": "^8.18.0"
+  }
 }
