@@ -167,6 +167,12 @@ RSpec.feature 'Team show page' do
         expect(page).to have_no_content 'Download brief'
         expect(page).to have_no_css('#brief-preview')
       end
+
+      scenario 'clicking "New role for this team" pre-selects the team' do
+        visit event_team_path(event_id: @event.id, id: @team_neither.id)
+        click_on 'New role for this team'
+        expect(page).to have_select('role_team_id', selected: @team_neither.name)
+      end
     end
   end
 
