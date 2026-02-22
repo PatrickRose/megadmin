@@ -33,7 +33,7 @@ RUN yarn install
 
 # Copy application code and precompile assets
 COPY . .
-RUN SECRET_KEY_BASE=precompile_placeholder bundle exec rails assets:precompile
+RUN SECRET_KEY_BASE=precompile_placeholder RAILS_ENV=production bundle exec rails assets:precompile
 
 # =============================================================================
 # Development stage — full toolchain for local dev (used by docker-compose)
