@@ -47,10 +47,14 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
       - name: Build development image
-        run: >-
-          docker buildx build --target development
-          --cache-from type=gha --cache-to type=gha,mode=max
-          --load -t megadmin-dev .
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          target: development
+          load: true
+          tags: megadmin-dev
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
       - name: Run tests
         run: >-
           docker run --rm --network host
