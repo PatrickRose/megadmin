@@ -42,49 +42,33 @@ jobs:
           --health-interval 5s
           --health-timeout 5s
           --health-retries 5
-    env:
-      POSTGRES_HOST: localhost
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      RAILS_ENV: test
-      PUPPETEER_EXECUTABLE_PATH: /usr/bin/chromium
     steps:
       - uses: actions/checkout@v6
-      - name: Install cached system dependencies
-        uses: awalsh128/cache-apt-pkgs-action@latest
-        with:
-          packages: chromium libvips-dev pandoc
-          version: 1.0
-      - name: Install texlive
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Build development image
         run: >-
-          sudo apt-get install -y
-          texlive-latex-base
-          texlive-fonts-recommended
-          texlive-latex-recommended
-      - uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: "3.3"
-          bundler-cache: true
-      - uses: actions/setup-node@v6
-        with:
-          node-version: "20"
-          cache: yarn
-      - run: yarn install
-      - run: bin/rails db:test:prepare
-      - run: bundle exec rspec
+          docker buildx build --target development
+          --cache-from type=gha --cache-to type=gha,mode=max
+          --load -t megadmin-dev .
+      - name: Run tests
+        run: >-
+          docker run --rm --network host
+          -e RAILS_ENV=test
+          -e POSTGRES_HOST=localhost
+          -e POSTGRES_USER=postgres
+          -e POSTGRES_PASSWORD=postgres
+          -v ${{ github.workspace }}/coverage:/app/coverage
+          megadmin-dev
+          bash -c "bin/rails db:test:prepare && bundle exec rspec"
       - name: Coverage summary
         if: always()
         run: |
           if [ -f coverage/.last_run.json ]; then
-            ruby -rjson -e '
-              data = JSON.parse(File.read("coverage/.last_run.json"))
-              line = data["result"]["line"]
-              puts "## Code Coverage"
-              puts ""
-              puts "| Metric | Coverage |"
-              puts "|--------|----------|"
-              puts "| Line   | #{"%.2f%%" % line} |"
-            ' >> "$GITHUB_STEP_SUMMARY"
+            jq -r '
+              .result.line as $line |
+              "## Code Coverage\n\n| Metric | Coverage |\n|--------|----------|\n| Line   | \($line)% |"
+            ' coverage/.last_run.json >> "$GITHUB_STEP_SUMMARY"
           fi
       - name: Upload coverage report
         if: always()

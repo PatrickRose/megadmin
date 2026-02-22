@@ -27,7 +27,9 @@ services:
       - "1025:1025"
 
   web:
-    build: .
+    build:
+      context: .
+      target: development
     command: bin/rails server -b 0.0.0.0
     ports:
       - "${WEB_PORT:-3000}:3000"
@@ -62,7 +64,9 @@ services:
     stdin_open: true
 
   worker:
-    build: .
+    build:
+      context: .
+      target: development
     command: bin/rails jobs:work
     volumes:
       - .:/app
@@ -92,7 +96,9 @@ services:
         condition: service_started
 
   webpack:
-    build: .
+    build:
+      context: .
+      target: development
     command: bin/shakapacker-dev-server
     ports:
       - "${WEBPACK_PORT:-3035}:3035"
