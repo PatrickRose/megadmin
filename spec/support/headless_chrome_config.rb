@@ -28,6 +28,15 @@ Capybara.register_driver :headless_chrome do |app|
 end
 Capybara.javascript_driver = :headless_chrome
 
+# Chrome can throw "Node with given id does not belong to the document" (an UnknownError)
+# during page transitions. Adding it to invalid_element_errors makes Capybara retry
+# instead of failing immediately on this transient CDP race condition.
+Capybara::Selenium::Driver.prepend(Module.new do
+  def invalid_element_errors
+    super + [Selenium::WebDriver::Error::UnknownError]
+  end
+end)
+
 if ENV['SELENIUM_HOST']
   RSpec.configure do |config|
     config.before(:each, :js) do
