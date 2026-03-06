@@ -103,7 +103,7 @@ end
 
 gem 'grover', '~> 1.2'
 
-gem 'rubocop', '~> 1.75'
+gem 'rubocop', '~> 1.85'
 gem 'rubocop-capybara'
 gem 'rubocop-factory_bot'
 gem 'rubocop-haml'
