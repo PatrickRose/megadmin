@@ -12,7 +12,7 @@
     "@rails/ujs": "^7.1.600",
     "@types/babel__core": "^7.20.5",
     "@types/webpack": "^5.28.5",
-    "babel-loader": "^10.0.0",
+    "babel-loader": "^10.1.0",
     "babel-plugin-macros": "^3.1.0",
     "bootstrap": "^5.3.8",
     "bootstrap-icons": "^1.13.1",
