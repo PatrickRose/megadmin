@@ -28,10 +28,10 @@ RSpec.feature 'Team edit page' do
     context 'for a team with both image and brief attached' do
       scenario 'user can see the page with all the inputs' do
         visit edit_event_team_path(event_id: @event.id, id: @team_both.id)
-        expect(page).to have_content "Editing Team #{@team_both.name}"
-        expect(page).to have_content 'Name'
-        expect(page).to have_content 'Icon'
-        expect(page).to have_content 'Brief'
+        expect(page).to have_text "Editing Team #{@team_both.name}"
+        expect(page).to have_text 'Name'
+        expect(page).to have_text 'Icon'
+        expect(page).to have_text 'Brief'
       end
 
       scenario 'user can edit the team with valid details' do
@@ -41,9 +41,9 @@ RSpec.feature 'Team edit page' do
         attach_file('team_brief', Rails.root.join('spec/fixtures/files/pdf.pdf'))
         click_on 'commit'
         expect(page).to have_current_path event_team_path(event_id: @event.id, id: @team_both.id)
-        expect(page).to have_content 'Team Edited team'
-        expect(page).to have_content 'Download icon'
-        expect(page).to have_content 'Download brief'
+        expect(page).to have_text 'Team Edited team'
+        expect(page).to have_text 'Download icon'
+        expect(page).to have_text 'Download brief'
         expect(page).to have_css '#icon-preview'
         expect(page).to have_css '#brief-preview'
       end
@@ -52,7 +52,7 @@ RSpec.feature 'Team edit page' do
         visit edit_event_team_path(event_id: @event.id, id: @team_both.id)
         fill_in 'team_name', with: '    '
         click_on 'commit'
-        expect(page).to have_content "Name can't be blank"
+        expect(page).to have_text "Name can't be blank"
       end
 
       scenario 'user cannot edit the team with invalid image filetype' do
@@ -60,7 +60,7 @@ RSpec.feature 'Team edit page' do
         fill_in 'team_name', with: 'Edited team'
         attach_file('team_image', Rails.root.join('spec/fixtures/files/text.txt'))
         click_on 'commit'
-        expect(page).to have_content 'The file must be an image'
+        expect(page).to have_text 'The file must be an image'
       end
 
       scenario 'user cannot edit the team with invalid brief filetype' do
@@ -68,14 +68,14 @@ RSpec.feature 'Team edit page' do
         fill_in 'team_name', with: 'Edited team'
         attach_file('team_brief', Rails.root.join('spec/fixtures/files/text.txt'))
         click_on 'commit'
-        expect(page).to have_content 'Brief has an invalid content type'
+        expect(page).to have_text 'Brief has an invalid content type'
       end
 
       scenario 'user can go to the team index page' do
         visit edit_event_team_path(event_id: @event.id, id: @team_both.id)
         click_on 'Manage Teams'
         expect(page).to have_current_path(event_teams_path(event_id: @event.id))
-        expect(page).to have_content 'Team both'
+        expect(page).to have_text 'Team both'
       end
     end
   end
@@ -89,7 +89,7 @@ RSpec.feature 'Team edit page' do
     context 'for a team with both image and brief attached' do
       scenario 'control cannot edit the team' do
         visit edit_event_team_path(event_id: @event.id, id: @team_both.id)
-        expect(page).to have_content 'You are not authorised to access this page'
+        expect(page).to have_text 'You are not authorised to access this page'
       end
     end
   end

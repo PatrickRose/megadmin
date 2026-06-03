@@ -19,7 +19,7 @@ RSpec.describe OrganiserToEvent do
     visit event_event_organisers_path(event_id: event.id)
 
     expect(page).to have_current_path("/organise/events/#{event.id}/event_organisers")
-    expect(page).to have_content 'organiser1@email.com'
+    expect(page).to have_text 'organiser1@email.com'
 
     find_by_id('nav-bar').click_on('Add Organisers')
 
@@ -33,11 +33,11 @@ RSpec.describe OrganiserToEvent do
     click_on 'Add Organiser'
 
     expect(page).to have_current_path("/organise/events/#{event.id}/event_organisers")
-    expect(page).to have_content 'Organiser added to event'
-    expect(page).to have_content organiser.email
-    expect(page).to have_content control_team.email
-    expect(page).to have_content 'Control team'
-    expect(page).to have_content 'control team role description'
+    expect(page).to have_text 'Organiser added to event'
+    expect(page).to have_text organiser.email
+    expect(page).to have_text control_team.email
+    expect(page).to have_text 'Control team'
+    expect(page).to have_text 'control team role description'
   end
 
   specify 'I can remove an organiser from an event', :js do
@@ -58,9 +58,9 @@ RSpec.describe OrganiserToEvent do
     find("div[data-specific-id=\"#{id_org2}\"]").click
     click_link(href: "/organise/events/#{event.id}/event_organisers/#{id_org2}")
 
-    expect(page).to have_content 'Organiser successfully removed from event'
-    expect(page).to have_content 'organiser1@email.com'
-    expect(page).to have_no_content 'organiser2@email.com'
+    expect(page).to have_text 'Organiser successfully removed from event'
+    expect(page).to have_text 'organiser1@email.com'
+    expect(page).to have_no_text 'organiser2@email.com'
   end
 
   specify 'I can move an organiser to control team' do
@@ -79,8 +79,8 @@ RSpec.describe OrganiserToEvent do
     visit event_event_organisers_path(event_id: event.id)
 
     expect(page).to have_current_path("/organise/events/#{event.id}/event_organisers")
-    expect(page).to have_content organiser.email
-    expect(page).to have_content control_team.email
+    expect(page).to have_text organiser.email
+    expect(page).to have_text control_team.email
 
     click_link(href: "/organise/events/#{event.id}/event_organisers/#{id_org2}/edit")
 
@@ -90,10 +90,10 @@ RSpec.describe OrganiserToEvent do
 
     click_on 'Update organiser'
 
-    expect(page).to have_content organiser.email
-    expect(page).to have_content control_team.email
-    expect(page).to have_content 'Organiser'
-    expect(page).to have_no_content 'Control team'
+    expect(page).to have_text organiser.email
+    expect(page).to have_text control_team.email
+    expect(page).to have_text 'Organiser'
+    expect(page).to have_no_text 'Control team'
   end
 
   specify 'I cannot remove the event author from an event', :js do
@@ -115,8 +115,8 @@ RSpec.describe OrganiserToEvent do
     find("div[data-specific-id=\"#{id}\"]").click
     click_link(href: "/organise/events/#{event.id}/event_organisers/#{id}")
 
-    expect(page).to have_content '(You) organiser1@email.com'
-    expect(page).to have_content 'Cannot remove event author from event'
+    expect(page).to have_text '(You) organiser1@email.com'
+    expect(page).to have_text 'Cannot remove event author from event'
   end
 
   specify 'I cannot remove myself from an event', :js do
@@ -126,7 +126,7 @@ RSpec.describe OrganiserToEvent do
     find("div[data-specific-id=\"#{organiser2.id}\"]").click
     click_link(href: "/organise/events/#{event.id}/event_organisers/#{organiser2.id}")
 
-    expect(page).to have_content "(You) #{organiser2.email}"
-    expect(page).to have_content 'Cannot remove yourself from event'
+    expect(page).to have_text "(You) #{organiser2.email}"
+    expect(page).to have_text 'Cannot remove yourself from event'
   end
 end

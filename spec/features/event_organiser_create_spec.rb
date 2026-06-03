@@ -21,14 +21,14 @@ RSpec.feature 'EventOrganiserCreates' do
 
     visit event_event_organisers_path(event_id: @event.id)
 
-    expect(page).to have_content 'You are not authorised to access this page.'
+    expect(page).to have_text 'You are not authorised to access this page.'
   end
 
   specify 'organisers without accounts get emailed to setup an account' do
     visit event_event_organisers_path(event_id: @event.id)
 
-    expect(page).to have_content 'email1@email.com'
-    expect(page).to have_no_content 'email2@email.com'
+    expect(page).to have_text 'email1@email.com'
+    expect(page).to have_no_text 'email2@email.com'
 
     click_link(href: "/organise/events/#{@event.id}/event_organisers/new")
 
@@ -36,7 +36,7 @@ RSpec.feature 'EventOrganiserCreates' do
 
     click_on 'Add Organiser'
 
-    expect(page).to have_content 'email3@email.com'
+    expect(page).to have_text 'email3@email.com'
 
     expect(ActionMailer::Base.deliveries.first.To.value).to eq 'email3@email.com'
     expect(ActionMailer::Base.deliveries.first.From.value).to eq 'no-reply@megadmin.patrickrosemusic.co.uk'
@@ -48,8 +48,8 @@ RSpec.feature 'EventOrganiserCreates' do
   specify 'organisers already assigned to an event cannot be added again' do
     visit event_event_organisers_path(event_id: @event.id)
 
-    expect(page).to have_content 'email1@email.com'
-    expect(page).to have_no_content 'email2@email.com'
+    expect(page).to have_text 'email1@email.com'
+    expect(page).to have_no_text 'email2@email.com'
 
     click_link(href: "/organise/events/#{@event.id}/event_organisers/new")
 
@@ -65,7 +65,7 @@ RSpec.feature 'EventOrganiserCreates' do
 
     click_on 'Add Organiser'
 
-    expect(page).to have_content 'Organiser already assigned'
+    expect(page).to have_text 'Organiser already assigned'
   end
 
   specify 'blank email is rejected' do
@@ -73,7 +73,7 @@ RSpec.feature 'EventOrganiserCreates' do
 
     click_on 'Add Organiser'
 
-    expect(page).to have_content 'Email cannot be blank'
+    expect(page).to have_text 'Email cannot be blank'
   end
 
   specify 'control team creates organiser as read_only' do
@@ -88,7 +88,7 @@ RSpec.feature 'EventOrganiserCreates' do
 
     click_on 'Add Organiser'
 
-    expect(page).to have_content 'Organiser added to event'
+    expect(page).to have_text 'Organiser added to event'
 
     new_ote = OrganiserToEvent.find_by(organiser: Organiser.find_by(email: 'newcontrol@email.com'),
                                        event: @event)

@@ -53,18 +53,18 @@ context 'Viewing the player page' do
 
   scenario "I can view an event's basic information (name, date, location, etc)" do
     visit "/play/#{@event_signup1.uuid}"
-    expect(page).to have_content 'Test event'
-    expect(page).to have_content 'desc'
-    expect(page).to have_content 'location'
-    expect(page).to have_content 'additional info'
-    expect(page).to have_content 'Sunday 15th March 2026'
+    expect(page).to have_text 'Test event'
+    expect(page).to have_text 'desc'
+    expect(page).to have_text 'location'
+    expect(page).to have_text 'additional info'
+    expect(page).to have_text 'Sunday 15th March 2026'
     expect(page).to have_css('iframe[src^="https://www.google.com/maps/embed?pb="]')
   end
 
   scenario 'There will be a note if roles and teams are not yet assigned' do
     visit "/play/#{@event_signup1.uuid}"
 
-    expect(page).to have_content "Your team and role haven't yet been assigned"
+    expect(page).to have_text "Your team and role haven't yet been assigned"
   end
 
   scenario 'Player can see their role and team if assigned' do
@@ -73,56 +73,56 @@ context 'Viewing the player page' do
 
     visit "/play/#{@event_signup3.uuid}"
 
-    expect(page).to have_content "You'll be on the team 'Team'"
-    expect(page).to have_content "Your individual role will be 'Role'"
+    expect(page).to have_text "You'll be on the team 'Team'"
+    expect(page).to have_text "Your individual role will be 'Role'"
   end
 
   scenario 'Player can see their name and email on the page to confirm they are on the right page' do
     visit "/play/#{@event_signup1.uuid}"
-    expect(page).to have_content 'Game brief for name'
-    expect(page).to have_content '(email1@email.com)'
+    expect(page).to have_text 'Game brief for name'
+    expect(page).to have_text '(email1@email.com)'
   end
 
   scenario 'Players can see the roles and teams of all players' do
     t = Team.create(id: 1, event_id: 1, name: 'Team')
     Role.create(id: 1, event_id: 1, name: 'Role', team: t)
     visit "/play/#{@event_signup1.uuid}"
-    expect(page).to have_content 'Name'
-    expect(page).to have_content 'name'
-    expect(page).to have_content 'Unassigned Team'
-    expect(page).to have_content 'Unassigned Role'
-    expect(page).to have_content 'Team'
-    expect(page).to have_content 'name2'
-    expect(page).to have_content 'Role'
+    expect(page).to have_text 'Name'
+    expect(page).to have_text 'name'
+    expect(page).to have_text 'Unassigned Team'
+    expect(page).to have_text 'Unassigned Role'
+    expect(page).to have_text 'Team'
+    expect(page).to have_text 'name2'
+    expect(page).to have_text 'Role'
   end
 
   scenario 'Players can see additional documents' do
     visit "/play/#{@event_signup4.uuid}"
-    expect(page).to have_content 'pdf.pdf'
-    expect(page).to have_content 'doc.doc'
-    expect(page).to have_content 'This document is not a .pdf file and cannot be previewed.'
+    expect(page).to have_text 'pdf.pdf'
+    expect(page).to have_text 'doc.doc'
+    expect(page).to have_text 'This document is not a .pdf file and cannot be previewed.'
     expect(page).to have_css('#doc-preview')
-    expect(page).to have_no_content 'There are no additional documents.'
+    expect(page).to have_no_text 'There are no additional documents.'
   end
 
   scenario 'There will be a note if no additional documents are attached' do
     visit "/play/#{@event_signup1.uuid}"
-    expect(page).to have_content 'There are no additional documents.'
+    expect(page).to have_text 'There are no additional documents.'
     expect(page).to have_no_css('#doc-preview')
-    expect(page).to have_no_content 'pdf.pdf'
-    expect(page).to have_no_content 'doc.doc'
+    expect(page).to have_no_text 'pdf.pdf'
+    expect(page).to have_no_text 'doc.doc'
   end
 
   scenario 'There will be an error if uuid is blank when downloading cast list' do
     visit 'play/%20/player_cast_list'
     expect(page).to have_current_path(root_path)
-    expect(page).to have_content('Missing player UUID.')
+    expect(page).to have_text('Missing player UUID.')
   end
 
   scenario 'There will be an error if uuid is nil when downloading cast list' do
     visit 'play/invalid_uuid/player_cast_list'
     expect(page).to have_current_path(root_path)
-    expect(page).to have_content('Player not found.')
+    expect(page).to have_text('Player not found.')
   end
 
   scenario 'download_cast_list called correctly with correct params' do

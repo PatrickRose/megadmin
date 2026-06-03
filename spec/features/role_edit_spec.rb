@@ -38,10 +38,10 @@ RSpec.feature 'Role edit page' do
     context 'for a role with brief attached' do
       scenario 'user can see the page with all the inputs' do
         visit edit_event_role_path(event_id: @event.id, id: @role_brief.id)
-        expect(page).to have_content 'Name'
-        expect(page).to have_content "Editing Role #{@role_brief.name}"
-        expect(page).to have_content 'Brief'
-        expect(page).to have_content 'Team'
+        expect(page).to have_text 'Name'
+        expect(page).to have_text "Editing Role #{@role_brief.name}"
+        expect(page).to have_text 'Brief'
+        expect(page).to have_text 'Team'
       end
 
       scenario 'user can edit the role with valid details' do
@@ -51,22 +51,22 @@ RSpec.feature 'Role edit page' do
         select 'New team', from: 'role_team_id'
         click_on 'commit'
         expect(page).to have_current_path(event_role_path(event_id: @event.id, id: @role_brief.id))
-        expect(page).to have_content 'Role Edited role'
-        expect(page).to have_content 'New team'
+        expect(page).to have_text 'Role Edited role'
+        expect(page).to have_text 'New team'
       end
 
       scenario 'user cannot edit the role with blank name' do
         visit edit_event_role_path(event_id: @event.id, id: @role_brief.id)
         fill_in 'role_name', with: '    '
         click_on 'commit'
-        expect(page).to have_content "Name can't be blank"
+        expect(page).to have_text "Name can't be blank"
       end
 
       scenario 'user cannot edit the role with a name that is already taken in its team' do
         visit edit_event_role_path(event_id: @event.id, id: @role_brief.id)
         fill_in 'role_name', with: 'ABCD'
         click_on 'commit'
-        expect(page).to have_content 'Name must be unique within a team.'
+        expect(page).to have_text 'Name must be unique within a team.'
       end
 
       scenario 'user cannot edit the role with invalid brief filetype' do
@@ -74,7 +74,7 @@ RSpec.feature 'Role edit page' do
         fill_in 'role_name', with: 'Edited role'
         attach_file('role_brief', Rails.root.join('spec/fixtures/files/text.txt'))
         click_on 'commit'
-        expect(page).to have_content 'Brief has an invalid content type'
+        expect(page).to have_text 'Brief has an invalid content type'
       end
 
       scenario 'user can go to the teams and roles index page' do
@@ -82,15 +82,15 @@ RSpec.feature 'Role edit page' do
         click_on 'Manage Teams'
 
         expect(page).to have_current_path(event_teams_path(event_id: @event.id))
-        expect(page).to have_content 'Role brief'
-        expect(page).to have_content 'Role no brief'
+        expect(page).to have_text 'Role brief'
+        expect(page).to have_text 'Role no brief'
       end
     end
 
     context 'for an invalid event' do
       scenario 'user is shown the error message' do
         visit edit_event_role_path(event_id: 9_999_999, id: @role_brief.id)
-        expect(page).to have_content 'You are not authorised to access this page'
+        expect(page).to have_text 'You are not authorised to access this page'
       end
     end
   end
@@ -104,7 +104,7 @@ RSpec.feature 'Role edit page' do
     context 'for a role with brief attached' do
       scenario 'control cannot edit the role' do
         visit edit_event_role_path(event_id: @event.id, id: @role_brief.id)
-        expect(page).to have_content 'You are not authorised to access this page'
+        expect(page).to have_text 'You are not authorised to access this page'
       end
     end
   end

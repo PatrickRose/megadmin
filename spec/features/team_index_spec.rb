@@ -30,8 +30,8 @@ RSpec.feature 'Team index page' do
       scenario 'user sees the teams' do
         visit event_teams_path(event_id: event_teams.id)
 
-        expect(page).to have_content 'Test team 1'
-        expect(page).to have_no_content 'No teams found for the game'
+        expect(page).to have_text 'Test team 1'
+        expect(page).to have_no_text 'No teams found for the game'
       end
 
       scenario 'user can go to a new team page' do
@@ -62,7 +62,7 @@ RSpec.feature 'Team index page' do
         find("div[data-specific-id=\"#{team.id}\"]").click
         click_link(href: "/organise/events/#{event_teams.id}/teams/#{team.id}")
 
-        expect(page).to have_no_content team.name
+        expect(page).to have_no_text team.name
       end
 
       scenario 'user can go back to the event page' do
@@ -72,7 +72,7 @@ RSpec.feature 'Team index page' do
         find_by_id('nav-bar').click_on(event_teams.name)
 
         expect(page).to have_current_path(event_path(id: event_teams.id))
-        expect(page).to have_content event_teams.name
+        expect(page).to have_text event_teams.name
       end
     end
 
@@ -80,8 +80,8 @@ RSpec.feature 'Team index page' do
       scenario "user sees the 'no teams' message" do
         visit event_teams_path(event_id: event_no_teams.id)
 
-        expect(page).to have_content 'No teams found for the game'
-        expect(page).to have_no_content 'Test team 1'
+        expect(page).to have_text 'No teams found for the game'
+        expect(page).to have_no_text 'Test team 1'
       end
 
       scenario 'user can go to a new team page' do
@@ -99,7 +99,7 @@ RSpec.feature 'Team index page' do
         find_by_id('nav-bar').click_on(event_no_teams.name)
 
         expect(page).to have_current_path(event_path(id: event_no_teams.id))
-        expect(page).to have_content event_no_teams.name
+        expect(page).to have_text event_no_teams.name
       end
     end
 
@@ -107,7 +107,7 @@ RSpec.feature 'Team index page' do
       scenario 'user sees the error message' do
         visit event_teams_path(event_id: 99_999_999)
         # expect(page).to have_content 'Event could not be found'
-        expect(page).to have_content 'You are not authorised to access this page.'
+        expect(page).to have_text 'You are not authorised to access this page.'
       end
     end
   end
@@ -140,7 +140,7 @@ RSpec.feature 'Team index page' do
         find_by_id('nav-bar').click_on(event_teams.name)
 
         expect(page).to have_current_path(event_path(id: event_teams.id))
-        expect(page).to have_content event_teams.name
+        expect(page).to have_text event_teams.name
       end
     end
 
@@ -148,8 +148,8 @@ RSpec.feature 'Team index page' do
       scenario "user sees the 'no teams' message" do
         visit event_teams_path(event_id: event_no_teams.id)
 
-        expect(page).to have_content 'No teams found for the game'
-        expect(page).to have_no_content 'Test team 1'
+        expect(page).to have_text 'No teams found for the game'
+        expect(page).to have_no_text 'Test team 1'
       end
 
       scenario 'user CANNOT go to a new team page' do
@@ -166,7 +166,7 @@ RSpec.feature 'Team index page' do
         find_by_id('nav-bar').click_on(event_no_teams.name)
 
         expect(page).to have_current_path(event_path(id: event_no_teams.id))
-        expect(page).to have_content event_no_teams.name
+        expect(page).to have_text event_no_teams.name
       end
     end
   end

@@ -17,7 +17,7 @@ RSpec.describe OrganiserToEvent do
 
     visit events_path
 
-    expect(page).to have_content('My Event')
+    expect(page).to have_text('My Event')
 
     click_link(href: "/organise/events/#{event.id}")
   end
@@ -27,7 +27,7 @@ RSpec.describe OrganiserToEvent do
 
     visit events_path
 
-    expect(page).to have_content('My Event')
+    expect(page).to have_text('My Event')
   end
 
   specify 'I cannot see events Im not on control team for' do
@@ -35,7 +35,7 @@ RSpec.describe OrganiserToEvent do
 
     visit events_path
 
-    expect(page).to have_content 'My Events'
-    expect(page).to have_no_content 'event 2'
+    expect(page).to have_text 'My Events'
+    expect(page).to have_no_text 'event 2'
   end
 end

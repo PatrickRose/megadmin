@@ -23,11 +23,11 @@ RSpec.feature 'EventOrganiserCreates' do
 
     click_on('Upload')
 
-    expect(page).to have_content '3 player(s) were uploaded successfully.'
-    expect(page).to have_content 'Jeff'
-    expect(page).to have_content 'jeff@jeffmail.com'
-    expect(page).to have_content 'team 1'
-    expect(page).to have_content 'role 1'
+    expect(page).to have_text '3 player(s) were uploaded successfully.'
+    expect(page).to have_text 'Jeff'
+    expect(page).to have_text 'jeff@jeffmail.com'
+    expect(page).to have_text 'team 1'
+    expect(page).to have_text 'role 1'
   end
 
   specify 'I can upload a player csv without create teams and create roles checkboxes.' do
@@ -39,17 +39,17 @@ RSpec.feature 'EventOrganiserCreates' do
 
     click_on('Upload')
 
-    expect(page).to have_content '3 player(s) were uploaded successfully.'
-    expect(page).to have_content 'Jeff'
-    expect(page).to have_content 'jeff@jeffmail.com'
-    expect(page).to have_content 'No team'
-    expect(page).to have_content 'No role'
-    expect(page).to have_content 'The following teams and roles were missing from the event, ' \
-                                 'and were not created when uploading.'
-    expect(page).to have_content 'team 1'
-    expect(page).to have_content 'role 1'
-    expect(page).to have_content 'role 2'
-    expect(page).to have_content 'team 2'
+    expect(page).to have_text '3 player(s) were uploaded successfully.'
+    expect(page).to have_text 'Jeff'
+    expect(page).to have_text 'jeff@jeffmail.com'
+    expect(page).to have_text 'No team'
+    expect(page).to have_text 'No role'
+    expect(page).to have_text 'The following teams and roles were missing from the event, ' \
+                              'and were not created when uploading.'
+    expect(page).to have_text 'team 1'
+    expect(page).to have_text 'role 1'
+    expect(page).to have_text 'role 2'
+    expect(page).to have_text 'team 2'
   end
 
   specify 'I cannot upload a player csv without create teams and with create roles.' do
@@ -62,7 +62,7 @@ RSpec.feature 'EventOrganiserCreates' do
 
     click_on('Upload')
 
-    expect(page).to have_content 'Unable to upload players. Cannot create roles without also creating teams.'
+    expect(page).to have_text 'Unable to upload players. Cannot create roles without also creating teams.'
   end
 
   specify 'I cannot upload a valid player csv as control team.' do
@@ -70,8 +70,8 @@ RSpec.feature 'EventOrganiserCreates' do
 
     visit event_event_signups_path(event_id: event.id)
 
-    expect(page).to have_content('Players')
-    expect(page).to have_no_content 'player_csv'
+    expect(page).to have_text('Players')
+    expect(page).to have_no_text 'player_csv'
   end
 
   specify 'I cannot upload nothing as a player csv.' do
@@ -81,7 +81,7 @@ RSpec.feature 'EventOrganiserCreates' do
 
     click_on('Upload')
 
-    expect(page).to have_content 'Unable to upload players. No file / an incorrect file type has been provided.'
+    expect(page).to have_text 'Unable to upload players. No file / an incorrect file type has been provided.'
   end
 
   specify 'I cannot upload a player csv with forbidden headers.' do
@@ -93,7 +93,7 @@ RSpec.feature 'EventOrganiserCreates' do
 
     click_on('Upload')
 
-    expect(page).to have_content 'The uploaded CSV contains the following forbidden header(s): \'HELLO\''
+    expect(page).to have_text 'The uploaded CSV contains the following forbidden header(s): \'HELLO\''
   end
 
   specify 'I cannot upload a player csv without all the correct headers.' do
@@ -105,7 +105,7 @@ RSpec.feature 'EventOrganiserCreates' do
 
     click_on('Upload')
 
-    expect(page).to have_content 'The uploaded CSV does not contain the following header(s): \'role\', \'team\'.'
+    expect(page).to have_text 'The uploaded CSV does not contain the following header(s): \'role\', \'team\'.'
   end
 
   specify 'I cannot upload a player csv with missing fields in rows.' do
@@ -117,7 +117,7 @@ RSpec.feature 'EventOrganiserCreates' do
 
     click_on('Upload')
 
-    expect(page).to have_content 'Malformed row on line 4, not enough fields (3, should be 4)'
+    expect(page).to have_text 'Malformed row on line 4, not enough fields (3, should be 4)'
   end
 
   specify 'I cannot upload a player csv with invalid emails.' do
@@ -129,7 +129,7 @@ RSpec.feature 'EventOrganiserCreates' do
 
     click_on('Upload')
 
-    expect(page).to have_content 'Malformed row on line 2, the email \'jeffjeffmail.com\' is invalid'
+    expect(page).to have_text 'Malformed row on line 2, the email \'jeffjeffmail.com\' is invalid'
   end
 
   specify 'I cannot upload a player csv with players who are playing already fulfilled roles.' do
@@ -145,6 +145,6 @@ RSpec.feature 'EventOrganiserCreates' do
 
     click_on('Upload')
 
-    expect(page).to have_content 'The role \'role 1\' is already fulfilled by \'Fred\' on this team.'
+    expect(page).to have_text 'The role \'role 1\' is already fulfilled by \'Fred\' on this team.'
   end
 end

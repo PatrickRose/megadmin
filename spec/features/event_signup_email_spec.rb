@@ -39,17 +39,17 @@ RSpec.feature 'EventSignupEmails' do
   specify 'emails cannot be sent if not all signups have roles' do
     visit event_event_signups_path(event_id: @event.id)
 
-    expect(page).to have_content 'signup 1'
-    expect(page).to have_content 'email1@email.com'
+    expect(page).to have_text 'signup 1'
+    expect(page).to have_text 'email1@email.com'
 
-    expect(page).to have_content 'signup 2'
-    expect(page).to have_content 'email2@email.com'
+    expect(page).to have_text 'signup 2'
+    expect(page).to have_text 'email2@email.com'
 
     click_button('open-popup')
     Capybara.ignore_hidden_elements = false
     click_button('send-button')
 
-    expect(page).to have_content 'a signup is missing a role'
+    expect(page).to have_text 'a signup is missing a role'
   end
 
   specify 'emails cannot be sent if not all roles and teams have briefs' do
@@ -60,18 +60,18 @@ RSpec.feature 'EventSignupEmails' do
 
     visit event_event_signups_path(event_id: @event.id)
 
-    expect(page).to have_content 'signup 1'
-    expect(page).to have_content 'email1@email.com'
-    expect(page).to have_content 'role 1'
-    expect(page).to have_content 'signup 2'
-    expect(page).to have_content 'email2@email.com'
-    expect(page).to have_content 'role 2'
+    expect(page).to have_text 'signup 1'
+    expect(page).to have_text 'email1@email.com'
+    expect(page).to have_text 'role 1'
+    expect(page).to have_text 'signup 2'
+    expect(page).to have_text 'email2@email.com'
+    expect(page).to have_text 'role 2'
 
     click_button('open-popup')
     Capybara.ignore_hidden_elements = false
     click_button('send-button')
 
-    expect(page).to have_content(/is missing a team or role|are missing teams or roles/)
+    expect(page).to have_text(/is missing a team or role|are missing teams or roles/)
   end
 
   specify 'emails can be sent to all signups with roles with briefs' do
@@ -89,12 +89,12 @@ RSpec.feature 'EventSignupEmails' do
 
     visit event_event_signups_path(event_id: @event.id)
 
-    expect(page).to have_content 'signup 1'
-    expect(page).to have_content 'email1@email.com'
-    expect(page).to have_content 'role 1'
-    expect(page).to have_content 'signup 2'
-    expect(page).to have_content 'email2@email.com'
-    expect(page).to have_content 'role 2'
+    expect(page).to have_text 'signup 1'
+    expect(page).to have_text 'email1@email.com'
+    expect(page).to have_text 'role 1'
+    expect(page).to have_text 'signup 2'
+    expect(page).to have_text 'email2@email.com'
+    expect(page).to have_text 'role 2'
 
     click_button('open-popup')
     Capybara.ignore_hidden_elements = false
@@ -108,7 +108,7 @@ RSpec.feature 'EventSignupEmails' do
     expect(ActionMailer::Base.deliveries.second.From.value).to eq('no-reply@megadmin.patrickrosemusic.co.uk')
     expect(ActionMailer::Base.deliveries.second.Subject.value).to eq('My Event - Pennine Megagames. Event information!')
 
-    expect(page).to have_content 'Emails sent'
+    expect(page).to have_text 'Emails sent'
   end
 
   specify 'emails cannot be sent to individual signups if they dont have a role assigned' do
@@ -119,7 +119,7 @@ RSpec.feature 'EventSignupEmails' do
     click_button('send-button')
 
     expect(page).to have_current_path("/organise/events/#{@event.id}/event_signups/#{@signup1.id}/edit")
-    expect(page).to have_content "this signup doesn't have a role assigned"
+    expect(page).to have_text "this signup doesn't have a role assigned"
   end
 
   specify 'emails can be sent to individual signups' do
@@ -136,20 +136,20 @@ RSpec.feature 'EventSignupEmails' do
     expect(ActionMailer::Base.deliveries.first.From.value).to eq('no-reply@megadmin.patrickrosemusic.co.uk')
     expect(ActionMailer::Base.deliveries.first.Subject.value).to eq('My Event - Pennine Megagames. Event information!')
 
-    expect(page).to have_content 'Email sent'
+    expect(page).to have_text 'Email sent'
   end
 
   specify 'I cannot send individual emails for draft events' do
     visit edit_event_event_signup_path(event_id: @draft.id, id: @signup2.id)
 
-    expect(page).to have_content 'The event must be published before you can send email briefs to players'
+    expect(page).to have_text 'The event must be published before you can send email briefs to players'
     expect(page).to have_no_button 'button#open-popup'
   end
 
   specify 'I cannot send all signup emails for draft events' do
     visit event_event_signups_path(event_id: @draft.id)
 
-    expect(page).to have_content 'The event must be published before you can send email briefs to players'
+    expect(page).to have_text 'The event must be published before you can send email briefs to players'
     expect(page).to have_no_button 'button#open-popup'
   end
 end
