@@ -27,8 +27,8 @@ before_script:
   # - apk add zip unzip
   - curl -fsSL https://fnm.vercel.app/install | bash
   - source ~/.bashrc
-  - fnm install 20
-  - fnm default 20
+  - fnm install 22
+  - fnm default 22
   - node -v
   
   # yarn
