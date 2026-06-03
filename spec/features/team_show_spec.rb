@@ -49,25 +49,25 @@ RSpec.feature 'Team show page' do
     context 'for a team with an image, a pdf brief, and a role' do
       scenario 'user can see the team name' do
         visit event_team_path(event_id: @event.id, id: @team_image_pdf.id)
-        expect(page).to have_content 'team image pdf'
+        expect(page).to have_text 'team image pdf'
       end
 
       scenario 'user can see the image' do
         visit event_team_path(event_id: @event.id, id: @team_image_pdf.id)
-        expect(page).to have_content 'Download icon'
+        expect(page).to have_text 'Download icon'
         expect(page).to have_css('#icon-preview')
       end
 
       scenario 'user can see the embedded brief' do
         visit event_team_path(event_id: @event.id, id: @team_image_pdf.id)
-        expect(page).to have_content 'Download brief'
+        expect(page).to have_text 'Download brief'
         expect(page).to have_css('#brief-preview')
       end
 
       scenario 'user can see the list of roles assigned to the team' do
         visit event_team_path(event_id: @event.id, id: @team_image_pdf.id)
-        expect(page).to have_content 'Roles'
-        expect(page).to have_content 'test role'
+        expect(page).to have_text 'Roles'
+        expect(page).to have_text 'test role'
         click_on 'test role'
         expect(page).to have_current_path(event_role_path(event_id: @event.id, id: @role.id))
       end
@@ -88,7 +88,7 @@ RSpec.feature 'Team show page' do
         visit event_team_path(event_id: @event.id, id: @team_image_pdf.id)
         click_on 'Convert .docx to .pdf'
 
-        expect(page).to have_content('The .docx files have been successfully converted to .pdf.')
+        expect(page).to have_text('The .docx files have been successfully converted to .pdf.')
         expect(page).to have_css('#brief-preview')
       end
     end
@@ -97,14 +97,14 @@ RSpec.feature 'Team show page' do
       scenario 'user can see the image' do
         visit event_team_path(event_id: @event.id, id: @team_image_docx.id)
 
-        expect(page).to have_content 'Download icon'
+        expect(page).to have_text 'Download icon'
         expect(page).to have_css('#icon-preview')
       end
 
       scenario 'user can see the brief could not be previewed message' do
         visit event_team_path(event_id: @event.id, id: @team_image_docx.id)
 
-        expect(page).to have_content('The brief is not a .pdf file and cannot be previewed.')
+        expect(page).to have_text('The brief is not a .pdf file and cannot be previewed.')
         expect(page).to have_no_css('#brief-preview')
       end
 
@@ -112,7 +112,7 @@ RSpec.feature 'Team show page' do
         visit event_team_path(event_id: @event.id, id: @team_image_docx.id)
         click_on 'Convert .docx to .pdf'
 
-        expect(page).to have_content('The .docx files have been successfully converted to .pdf.')
+        expect(page).to have_text('The .docx files have been successfully converted to .pdf.')
         expect(page).to have_css('#brief-preview')
       end
     end
@@ -120,14 +120,14 @@ RSpec.feature 'Team show page' do
     context 'for a team with an image but no brief' do
       scenario 'user can see the image' do
         visit event_team_path(event_id: @event.id, id: @team_image.id)
-        expect(page).to have_content 'Download icon'
+        expect(page).to have_text 'Download icon'
         expect(page).to have_css('#icon-preview')
       end
 
       scenario 'user can see the no brief message' do
         visit event_team_path(event_id: @event.id, id: @team_image.id)
-        expect(page).to have_content 'No brief uploaded'
-        expect(page).to have_no_content 'Download brief'
+        expect(page).to have_text 'No brief uploaded'
+        expect(page).to have_no_text 'Download brief'
         expect(page).to have_no_css('#brief-preview')
       end
     end
@@ -135,14 +135,14 @@ RSpec.feature 'Team show page' do
     context 'for a team with a pdf brief but no image' do
       scenario 'user can see the no image message' do
         visit event_team_path(event_id: @event.id, id: @team_pdf.id)
-        expect(page).to have_content 'No icon uploaded'
-        expect(page).to have_no_content 'Download icon'
+        expect(page).to have_text 'No icon uploaded'
+        expect(page).to have_no_text 'Download icon'
         expect(page).to have_no_css('#icon-preview')
       end
 
       scenario 'user can see the embedded brief' do
         visit event_team_path(event_id: @event.id, id: @team_pdf.id)
-        expect(page).to have_content 'Download brief'
+        expect(page).to have_text 'Download brief'
         expect(page).to have_css('#brief-preview')
       end
     end
@@ -150,21 +150,21 @@ RSpec.feature 'Team show page' do
     context 'for a team with neither an image, a brief, nor a role' do
       scenario 'user can see the no image message' do
         visit event_team_path(event_id: @event.id, id: @team_neither.id)
-        expect(page).to have_content 'No icon uploaded'
-        expect(page).to have_no_content 'Download icon'
+        expect(page).to have_text 'No icon uploaded'
+        expect(page).to have_no_text 'Download icon'
         expect(page).to have_no_css('#icon-preview')
       end
 
       scenario 'user can see the no roles message' do
         visit event_team_path(event_id: @event.id, id: @team_neither.id)
-        expect(page).to have_content 'This team has no roles yet'
-        expect(page).to have_no_content 'test role'
+        expect(page).to have_text 'This team has no roles yet'
+        expect(page).to have_no_text 'test role'
       end
 
       scenario 'user can see the no brief message' do
         visit event_team_path(event_id: @event.id, id: @team_neither.id)
-        expect(page).to have_content 'No brief uploaded'
-        expect(page).to have_no_content 'Download brief'
+        expect(page).to have_text 'No brief uploaded'
+        expect(page).to have_no_text 'Download brief'
         expect(page).to have_no_css('#brief-preview')
       end
 
@@ -187,7 +187,7 @@ RSpec.feature 'Team show page' do
     context 'for a team' do
       scenario 'user CANNOT access the create team page' do
         visit new_event_team_path(event_id: @event.id)
-        expect(page).to have_content 'You are not authorised to access this page'
+        expect(page).to have_text 'You are not authorised to access this page'
       end
     end
   end

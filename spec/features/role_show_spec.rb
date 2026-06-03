@@ -33,18 +33,18 @@ RSpec.feature 'Role show page' do
     context 'for a role with a pdf brief' do
       scenario 'user can see the role name' do
         visit event_role_path(event_id: @event.id, id: @role_pdf.id)
-        expect(page).to have_content 'Role pdf'
+        expect(page).to have_text 'Role pdf'
       end
 
       scenario 'user can see the embedded brief' do
         visit event_role_path(event_id: @event.id, id: @role_pdf.id)
-        expect(page).to have_content 'Download brief'
+        expect(page).to have_text 'Download brief'
         expect(page).to have_css('#brief-preview')
       end
 
       scenario "user can go to the role's team page" do
         visit event_role_path(event_id: @event.id, id: @role_pdf.id)
-        expect(page).to have_content 'Team'
+        expect(page).to have_text 'Team'
         click_on 'Test team'
         expect(page).to have_current_path(event_team_path(event_id: @event.id, id: @team.id))
       end
@@ -66,7 +66,7 @@ RSpec.feature 'Role show page' do
         visit event_role_path(event_id: @event.id, id: @role_pdf.id)
         click_on 'Convert .docx to .pdf'
 
-        expect(page).to have_content('The .docx files have been successfully converted to .pdf.')
+        expect(page).to have_text('The .docx files have been successfully converted to .pdf.')
         expect(page).to have_css('#brief-preview')
       end
     end
@@ -75,7 +75,7 @@ RSpec.feature 'Role show page' do
       scenario 'user can see the brief could not be previewed message' do
         visit event_role_path(event_id: @event.id, id: @role_docx.id)
 
-        expect(page).to have_content('The brief is not a .pdf file and cannot be previewed.')
+        expect(page).to have_text('The brief is not a .pdf file and cannot be previewed.')
         expect(page).to have_no_css('#brief-preview')
       end
 
@@ -83,7 +83,7 @@ RSpec.feature 'Role show page' do
         visit event_role_path(event_id: @event.id, id: @role_docx.id)
         click_on 'Convert .docx to .pdf'
 
-        expect(page).to have_content('The .docx files have been successfully converted to .pdf.')
+        expect(page).to have_text('The .docx files have been successfully converted to .pdf.')
         expect(page).to have_css('#brief-preview')
       end
     end
@@ -91,8 +91,8 @@ RSpec.feature 'Role show page' do
     context 'for a role with no brief' do
       scenario 'user can see the no brief message' do
         visit event_role_path(event_id: @event.id, id: @role_no_brief.id)
-        expect(page).to have_content 'No brief uploaded'
-        expect(page).to have_no_content 'Download brief'
+        expect(page).to have_text 'No brief uploaded'
+        expect(page).to have_no_text 'Download brief'
         expect(page).to have_no_css('#brief-preview')
       end
     end
@@ -107,7 +107,7 @@ RSpec.feature 'Role show page' do
     context 'for a role with a pdf brief' do
       scenario "user can go to the role's team page" do
         visit event_role_path(event_id: @event.id, id: @role_pdf.id)
-        expect(page).to have_content 'Team'
+        expect(page).to have_text 'Team'
         click_on 'Test team'
         expect(page).to have_current_path(event_team_path(event_id: @event.id, id: @team.id))
       end

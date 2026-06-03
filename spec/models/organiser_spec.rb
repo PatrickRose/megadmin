@@ -32,7 +32,7 @@ RSpec.describe Organiser, type: :feature do
   specify 'I cannot view new event page if I am not logged in' do
     visit new_event_path
 
-    expect(page).to have_content 'You need to log in or sign up before continuing'
+    expect(page).to have_text 'You need to log in or sign up before continuing'
   end
 
   specify 'I can log in' do
@@ -43,7 +43,7 @@ RSpec.describe Organiser, type: :feature do
 
     click_button 'Log in'
 
-    expect(page).to have_content 'Logged in successfully'
+    expect(page).to have_text 'Logged in successfully'
   end
 
   specify 'I cannot log in with the wrong password' do
@@ -54,7 +54,7 @@ RSpec.describe Organiser, type: :feature do
 
     click_button 'Log in'
 
-    expect(page).to have_content 'Invalid email or password'
+    expect(page).to have_text 'Invalid email or password'
   end
 
   specify 'I can sign up' do
@@ -68,7 +68,7 @@ RSpec.describe Organiser, type: :feature do
       fill_in 'organiser_password_confirmation', with: 'testpw'
       click_button 'Sign up'
     end.to change(described_class, :count).by(1)
-    expect(page).to have_content 'Welcome! You have signed up successfully'
+    expect(page).to have_text 'Welcome! You have signed up successfully'
   end
 
   specify 'I can delete all my events' do

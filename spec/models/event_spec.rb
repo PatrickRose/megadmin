@@ -50,7 +50,7 @@ RSpec.describe Event, type: :feature do
 
     visit events_path
 
-    expect(page).to have_content('My Event')
+    expect(page).to have_text('My Event')
   end
 
   specify 'I can delete an event', :js do
@@ -61,7 +61,7 @@ RSpec.describe Event, type: :feature do
     find('div[title="Delete Event"]').click
     find('a[id="delete-button"]').click
 
-    expect(page).to have_content('Event was successfully deleted.')
+    expect(page).to have_text('Event was successfully deleted.')
   end
 
   specify 'I can create a new event with minimum details' do
@@ -78,7 +78,7 @@ RSpec.describe Event, type: :feature do
 
     click_on 'Create Event'
 
-    expect(page).to have_content 'Event was successfully created.'
+    expect(page).to have_text 'Event was successfully created.'
   end
 
   specify 'I cannot create a new event without the minimum details' do
@@ -91,7 +91,7 @@ RSpec.describe Event, type: :feature do
 
     click_on 'Create Event'
 
-    expect(page).to have_content "Name can't be blank"
+    expect(page).to have_text "Name can't be blank"
   end
 
   specify 'I can create a new event with .pdf rulebook attached' do
@@ -108,7 +108,7 @@ RSpec.describe Event, type: :feature do
 
     click_on 'Create Event'
 
-    expect(page).to have_content 'Event was successfully created.'
+    expect(page).to have_text 'Event was successfully created.'
   end
 
   specify 'I can create a new event with .docx rulebook attached' do
@@ -124,7 +124,7 @@ RSpec.describe Event, type: :feature do
 
     click_on 'Create Event'
 
-    expect(page).to have_content 'Event was successfully created.'
+    expect(page).to have_text 'Event was successfully created.'
   end
 
   specify 'I can create a new event with .doc rulebook attached' do
@@ -140,7 +140,7 @@ RSpec.describe Event, type: :feature do
 
     click_on 'Create Event'
 
-    expect(page).to have_content 'Event was successfully created.'
+    expect(page).to have_text 'Event was successfully created.'
   end
 
   specify 'I cannot create a new event with .txt rulebook attached' do
@@ -156,7 +156,7 @@ RSpec.describe Event, type: :feature do
 
     click_on 'Create Event'
 
-    expect(page).to have_content 'Rulebook has an invalid content type'
+    expect(page).to have_text 'Rulebook has an invalid content type'
   end
 
   specify 'I can create a new event with .pdf, .doc, and .docx additional documents attached' do
@@ -174,7 +174,7 @@ RSpec.describe Event, type: :feature do
 
     click_on 'Create Event'
 
-    expect(page).to have_content 'Event was successfully created.'
+    expect(page).to have_text 'Event was successfully created.'
   end
 
   specify 'I cannot create a new event with invalid additional documents filetypes attached' do
@@ -192,8 +192,8 @@ RSpec.describe Event, type: :feature do
 
     click_on 'Create Event'
 
-    expect(page).to have_content 'Additional documents has an invalid content type'
-    expect(page).to have_no_content 'Event was successfully created.'
+    expect(page).to have_text 'Additional documents has an invalid content type'
+    expect(page).to have_no_text 'Event was successfully created.'
   end
 
   specify 'I can create a new event as a draft' do
@@ -207,7 +207,7 @@ RSpec.describe Event, type: :feature do
 
     click_on 'Save as Draft'
 
-    expect(page).to have_content 'Event was successfully saved as draft.'
+    expect(page).to have_text 'Event was successfully saved as draft.'
   end
 
   specify 'I can publish a draft', :js do
@@ -218,7 +218,7 @@ RSpec.describe Event, type: :feature do
     click_on 'Publish Event'
     click_on 'Publish'
 
-    expect(page).to have_content 'Event was successfully published.'
+    expect(page).to have_text 'Event was successfully published.'
   end
 
   specify 'I can edit an event' do
@@ -230,8 +230,8 @@ RSpec.describe Event, type: :feature do
 
     click_on 'Update Event'
 
-    expect(page).to have_content 'Event was successfully updated.'
-    expect(page).to have_content 'My updated event'
+    expect(page).to have_text 'Event was successfully updated.'
+    expect(page).to have_text 'My updated event'
   end
 
   specify 'I can upload a valid google maps iframe' do
@@ -248,7 +248,7 @@ RSpec.describe Event, type: :feature do
 
     click_on 'Update Event'
 
-    expect(page).to have_content 'Event was successfully updated.'
+    expect(page).to have_text 'Event was successfully updated.'
   end
 
   specify 'I can not upload an invalid google maps iframe' do
@@ -260,7 +260,7 @@ RSpec.describe Event, type: :feature do
 
     click_on 'Update Event'
 
-    expect(page).to have_content 'Invalid input for Google Maps Iframe.'
+    expect(page).to have_text 'Invalid input for Google Maps Iframe.'
   end
 
   specify 'I can edit an event by attaching a valid rulebook filetype' do
@@ -269,17 +269,17 @@ RSpec.describe Event, type: :feature do
     visit edit_event_path(id: event.id)
     attach_file('event_rulebook', Rails.root.join('spec/fixtures/files/pdf.pdf'))
     click_on 'Update Event'
-    expect(page).to have_content 'Event was successfully updated.'
+    expect(page).to have_text 'Event was successfully updated.'
 
     visit edit_event_path(id: event.id)
     attach_file('event_rulebook', Rails.root.join('spec/fixtures/files/docx.docx'))
     click_on 'Update Event'
-    expect(page).to have_content 'Event was successfully updated.'
+    expect(page).to have_text 'Event was successfully updated.'
 
     visit edit_event_path(id: event.id)
     attach_file('event_rulebook', Rails.root.join('spec/fixtures/files/doc.doc'))
     click_on 'Update Event'
-    expect(page).to have_content 'Event was successfully updated.'
+    expect(page).to have_text 'Event was successfully updated.'
   end
 
   specify 'I cannot edit an event by attaching an invalid rulebook filetype' do
@@ -288,12 +288,12 @@ RSpec.describe Event, type: :feature do
     visit edit_event_path(id: event.id)
     attach_file('event_rulebook', Rails.root.join('spec/fixtures/files/text.txt'))
     click_on 'Update Event'
-    expect(page).to have_content 'Rulebook has an invalid content type'
+    expect(page).to have_text 'Rulebook has an invalid content type'
 
     visit edit_event_path(id: event.id)
     attach_file('event_rulebook', Rails.root.join('spec/fixtures/files/image.jpg'))
     click_on 'Update Event'
-    expect(page).to have_content 'Rulebook has an invalid content type'
+    expect(page).to have_text 'Rulebook has an invalid content type'
   end
 
   specify 'I can edit an event by attaching valid additional documents filetypes' do
@@ -305,7 +305,7 @@ RSpec.describe Event, type: :feature do
                                                Rails.root.join('spec/fixtures/files/doc.doc')])
     click_on 'Update Event'
 
-    expect(page).to have_content 'Event was successfully updated.'
+    expect(page).to have_text 'Event was successfully updated.'
   end
 
   specify 'I cannot edit an event by attaching invalid additional documents filetypes' do
@@ -317,8 +317,8 @@ RSpec.describe Event, type: :feature do
                                                Rails.root.join('spec/fixtures/files/image.png')])
     click_on 'Update Event'
 
-    expect(page).to have_content 'Additional documents has an invalid content type'
-    expect(page).to have_no_content 'Event was successfully updated.'
+    expect(page).to have_text 'Additional documents has an invalid content type'
+    expect(page).to have_no_text 'Event was successfully updated.'
   end
 
   specify 'I cannot edit an event without the minimum details' do
@@ -330,7 +330,7 @@ RSpec.describe Event, type: :feature do
 
     click_on 'Update Event'
 
-    expect(page).to have_content "Name can't be blank"
+    expect(page).to have_text "Name can't be blank"
   end
 
   specify 'I cannot edit an event as a control team' do
@@ -338,15 +338,15 @@ RSpec.describe Event, type: :feature do
 
     visit edit_event_path(id: event.id)
 
-    expect(page).to have_content 'You are not authorised to access this page'
+    expect(page).to have_text 'You are not authorised to access this page'
   end
 
   specify 'I can see the no brief message in an event with no brief attached' do
     login_as organiser
     visit event_path(id: event.id)
 
-    expect(page).to have_content 'There is no rulebook.'
-    expect(page).to have_no_content 'Download rulebook'
+    expect(page).to have_text 'There is no rulebook.'
+    expect(page).to have_no_text 'Download rulebook'
     expect(page).to have_no_css('#rulebook-preview')
   end
 
@@ -360,9 +360,9 @@ RSpec.describe Event, type: :feature do
     login_as organiser
     visit event_path(id: event.id)
 
-    expect(page).to have_content 'Download rulebook'
+    expect(page).to have_text 'Download rulebook'
     expect(page).to have_css('#rulebook-preview')
-    expect(page).to have_no_content 'There is no rulebook.'
+    expect(page).to have_no_text 'There is no rulebook.'
   end
 
   specify 'I can see the rulebook could not be previewed message in an event with a doc rulebook' do
@@ -375,16 +375,16 @@ RSpec.describe Event, type: :feature do
     login_as organiser
     visit event_path(id: event.id)
 
-    expect(page).to have_content 'The rulebook is not a .pdf file and cannot be previewed.'
+    expect(page).to have_text 'The rulebook is not a .pdf file and cannot be previewed.'
     expect(page).to have_no_css('#rulebook-preview')
-    expect(page).to have_no_content 'There is no rulebook.'
+    expect(page).to have_no_text 'There is no rulebook.'
   end
 
   specify 'I can see the no additional documents message in an event without them attached' do
     login_as organiser
     visit event_path(id: event.id)
 
-    expect(page).to have_content 'There are no additional documents.'
+    expect(page).to have_text 'There are no additional documents.'
     expect(page).to have_no_css('#doc-preview')
   end
 
@@ -400,10 +400,10 @@ RSpec.describe Event, type: :feature do
     login_as organiser
     visit event_path(id: event.id)
 
-    expect(page).to have_content 'pdf.pdf'
-    expect(page).to have_content 'doc.doc'
+    expect(page).to have_text 'pdf.pdf'
+    expect(page).to have_text 'doc.doc'
     expect(page).to have_css('#doc-preview')
-    expect(page).to have_no_content 'There are no additional documents.'
+    expect(page).to have_no_text 'There are no additional documents.'
   end
 
   specify 'I cannot view an event that I am not an organiser of' do
@@ -411,7 +411,7 @@ RSpec.describe Event, type: :feature do
 
     visit event_path(id: event.id)
 
-    expect(page).to have_content 'You are not authorised to access this page'
+    expect(page).to have_text 'You are not authorised to access this page'
   end
 
   specify 'I can convert .docx files to .pdf' do
@@ -435,10 +435,10 @@ RSpec.describe Event, type: :feature do
     visit event_path(id: event.id)
     click_on 'Convert .docx to .pdf'
 
-    expect(page).to have_content('The .docx files have been successfully converted to .pdf.')
-    expect(page).to have_no_content('The rulebook is not a .pdf file and cannot be previewed.')
-    expect(page).to have_content('pdf.pdf')
-    expect(page).to have_content('doc.doc')
-    expect(page).to have_content('docx.pdf')
+    expect(page).to have_text('The .docx files have been successfully converted to .pdf.')
+    expect(page).to have_no_text('The rulebook is not a .pdf file and cannot be previewed.')
+    expect(page).to have_text('pdf.pdf')
+    expect(page).to have_text('doc.doc')
+    expect(page).to have_text('docx.pdf')
   end
 end

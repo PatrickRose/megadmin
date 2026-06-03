@@ -28,7 +28,7 @@ RSpec.feature 'Role new page' do
     context 'for a valid event' do
       scenario 'user can access the create role page' do
         visit new_event_role_path(event_id: event.id)
-        expect(page).to have_content 'Create a Role'
+        expect(page).to have_text 'Create a Role'
       end
 
       scenario 'user can create a new role with valid paramaters' do
@@ -37,14 +37,14 @@ RSpec.feature 'Role new page' do
         attach_file('role_brief', Rails.root.join('spec/fixtures/files/pdf.pdf'))
         select team.name, from: 'role_team_id'
         click_on 'commit'
-        expect(page).to have_content 'Test role'
+        expect(page).to have_text 'Test role'
       end
 
       scenario 'user cannot create a new role with blank name' do
         visit new_event_role_path(event_id: event.id)
         fill_in 'role_name', with: '   '
         click_on 'commit'
-        expect(page).to have_content "Name can't be blank"
+        expect(page).to have_text "Name can't be blank"
       end
 
       scenario 'user cannot create a new role with non-unique name in its team' do
@@ -52,7 +52,7 @@ RSpec.feature 'Role new page' do
         fill_in 'role_name', with: 'ABCD'
         select team2.name, from: 'role_team_id'
         click_on 'commit'
-        expect(page).to have_content 'Name must be unique within a team.'
+        expect(page).to have_text 'Name must be unique within a team.'
       end
 
       scenario 'user cannot attach an invalid filetype to the brief upload field' do
@@ -60,7 +60,7 @@ RSpec.feature 'Role new page' do
         fill_in 'role_name', with: 'Test role'
         attach_file('role_brief', Rails.root.join('spec/fixtures/files/text.txt'))
         click_on 'commit'
-        expect(page).to have_content 'Brief has an invalid content type'
+        expect(page).to have_text 'Brief has an invalid content type'
       end
 
       scenario 'user can go back to view all teams and roles' do
@@ -73,7 +73,7 @@ RSpec.feature 'Role new page' do
     context 'for an invalid event' do
       scenario 'user is shown the error message' do
         visit new_event_role_path(event_id: 9_999_999)
-        expect(page).to have_content 'You are not authorised to access this page'
+        expect(page).to have_text 'You are not authorised to access this page'
       end
     end
   end
@@ -88,7 +88,7 @@ RSpec.feature 'Role new page' do
       scenario 'user CANNOT access the create role page' do
         visit new_event_role_path(event_id: event.id)
 
-        expect(page).to have_content 'You are not authorised to access this page'
+        expect(page).to have_text 'You are not authorised to access this page'
       end
     end
 
@@ -96,7 +96,7 @@ RSpec.feature 'Role new page' do
       scenario 'user is shown the error message' do
         visit new_event_role_path(event_id: 9_999_999)
 
-        expect(page).to have_content 'You are not authorised to access this page'
+        expect(page).to have_text 'You are not authorised to access this page'
       end
     end
   end

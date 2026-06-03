@@ -12,7 +12,7 @@ RSpec.feature 'Pages' do
     end
 
     scenario 'user stays on the main page' do
-      expect(page).to have_content 'Welcome to Megagames!'
+      expect(page).to have_text 'Welcome to Megagames!'
       expect(page).to have_link('Sign up')
       expect(page).to have_link('Log in')
       expect(page).to have_link('Legal')
@@ -21,13 +21,13 @@ RSpec.feature 'Pages' do
 
     scenario 'user clicks on the legal page button' do
       click_on 'Legal'
-      expect(page).to have_content 'Legal statement'
+      expect(page).to have_text 'Legal statement'
       expect(page).to have_link('MEGAGAMES')
     end
 
     scenario 'user clicks on the accessibility page button' do
       click_on 'Accessibility'
-      expect(page).to have_content 'Accessibility statement'
+      expect(page).to have_text 'Accessibility statement'
       expect(page).to have_link('MEGAGAMES')
     end
 
@@ -35,10 +35,10 @@ RSpec.feature 'Pages' do
       login_as organiser
       visit root_path
 
-      expect(page).to have_content 'Welcome to Megagames!'
-      expect(page).to have_content('Manage events')
-      expect(page).to have_no_content('Sign up')
-      expect(page).to have_no_content('Log in')
+      expect(page).to have_text 'Welcome to Megagames!'
+      expect(page).to have_text('Manage events')
+      expect(page).to have_no_text('Sign up')
+      expect(page).to have_no_text('Log in')
     end
   end
 
@@ -46,7 +46,7 @@ RSpec.feature 'Pages' do
     scenario 'from the Legal page' do
       visit legal_path
       click_on 'MEGAGAMES'
-      expect(page).to have_content 'Welcome to Megagames!'
+      expect(page).to have_text 'Welcome to Megagames!'
       expect(page).to have_link('Sign up')
       expect(page).to have_link('Log in')
     end
@@ -54,7 +54,7 @@ RSpec.feature 'Pages' do
     scenario 'from the Accessibility page' do
       visit accessibility_path
       click_on 'MEGAGAMES'
-      expect(page).to have_content 'Welcome to Megagames!'
+      expect(page).to have_text 'Welcome to Megagames!'
       expect(page).to have_link('Sign up')
       expect(page).to have_link('Log in')
     end

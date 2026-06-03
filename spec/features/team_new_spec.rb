@@ -24,7 +24,7 @@ RSpec.feature 'Team new page' do
     context 'for a valid event' do
       scenario 'user can access the create team page' do
         visit new_event_team_path(event_id: event.id)
-        expect(page).to have_content 'Create a Team'
+        expect(page).to have_text 'Create a Team'
       end
 
       scenario 'user can create a new team with valid paramaters' do
@@ -33,14 +33,14 @@ RSpec.feature 'Team new page' do
         attach_file('team_image', Rails.root.join('spec/fixtures/files/image.jpg'))
         attach_file('team_brief', Rails.root.join('spec/fixtures/files/pdf.pdf'))
         click_on 'commit'
-        expect(page).to have_content 'Test team'
+        expect(page).to have_text 'Test team'
       end
 
       scenario 'user cannot create a new team with blank name' do
         visit new_event_team_path(event_id: event.id)
         fill_in 'team_name', with: '   '
         click_on 'commit'
-        expect(page).to have_content "Name can't be blank"
+        expect(page).to have_text "Name can't be blank"
       end
 
       scenario 'user cannot create a team with the same name as another in the same event' do
@@ -51,7 +51,7 @@ RSpec.feature 'Team new page' do
         visit new_event_team_path(event_id: event.id)
         fill_in 'team_name', with: 'Team 1'
         click_on 'commit'
-        expect(page).to have_content 'Name has already been taken for this event'
+        expect(page).to have_text 'Name has already been taken for this event'
       end
 
       scenario 'user cannot attach an invalid filetype to the image upload field' do
@@ -59,7 +59,7 @@ RSpec.feature 'Team new page' do
         fill_in 'team_name', with: 'Test team'
         attach_file('team_image', Rails.root.join('spec/fixtures/files/text.txt'))
         click_on 'commit'
-        expect(page).to have_content 'The file must be an image'
+        expect(page).to have_text 'The file must be an image'
       end
 
       scenario 'user cannot attach an invalid filetype to the brief upload field' do
@@ -67,7 +67,7 @@ RSpec.feature 'Team new page' do
         fill_in 'team_name', with: 'Test team'
         attach_file('team_brief', Rails.root.join('spec/fixtures/files/text.txt'))
         click_on 'commit'
-        expect(page).to have_content 'Brief has an invalid content type'
+        expect(page).to have_text 'Brief has an invalid content type'
       end
 
       scenario 'user can go back to view all teams' do
@@ -80,7 +80,7 @@ RSpec.feature 'Team new page' do
     context 'for an invalid event' do
       scenario 'user is shown the error message' do
         visit new_event_team_path(event_id: 9_999_999)
-        expect(page).to have_content 'You are not authorised to access this page.'
+        expect(page).to have_text 'You are not authorised to access this page.'
       end
     end
   end
@@ -94,7 +94,7 @@ RSpec.feature 'Team new page' do
     context 'for a valid event' do
       scenario 'user CANNOT access the create team page' do
         visit new_event_team_path(event_id: event.id)
-        expect(page).to have_content 'You are not authorised to access this page'
+        expect(page).to have_text 'You are not authorised to access this page'
       end
     end
   end

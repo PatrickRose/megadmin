@@ -65,7 +65,7 @@ RSpec.describe EventSignup, type: :feature do
     click_on 'Create player'
 
     expect(page).to have_current_path(event_event_signups_path(event_id: event.id))
-    expect(page).to have_content 'Player was successfully created.'
+    expect(page).to have_text 'Player was successfully created.'
   end
 
   specify 'I cannot create a signup with an invalid team/role combination' do
@@ -85,7 +85,7 @@ RSpec.describe EventSignup, type: :feature do
 
     click_on 'Create player'
 
-    expect(page).to have_content 'Invalid combination of team and role'
+    expect(page).to have_text 'Invalid combination of team and role'
   end
 
   specify 'I see validation errors when creating a signup with a duplicate email' do
@@ -100,7 +100,7 @@ RSpec.describe EventSignup, type: :feature do
 
     click_on 'Create player'
 
-    expect(page).to have_content 'already in use'
+    expect(page).to have_text 'already in use'
   end
 
   specify 'I see validation errors when updating a signup with a duplicate email' do
@@ -114,7 +114,7 @@ RSpec.describe EventSignup, type: :feature do
 
     click_on 'Update player'
 
-    expect(page).to have_content 'already in use'
+    expect(page).to have_text 'already in use'
   end
 
   specify 'I cannot create a new event signup as control team.' do
@@ -122,7 +122,7 @@ RSpec.describe EventSignup, type: :feature do
 
     visit event_event_signups_path(event_id: event.id)
 
-    expect(page).to have_content 'Players'
+    expect(page).to have_text 'Players'
     expect(page).to have_no_link(href: "/organise/events/#{event.id}/event_signups/new")
   end
 
@@ -145,8 +145,8 @@ RSpec.describe EventSignup, type: :feature do
 
     click_on 'Update player'
 
-    expect(page).to have_content 'Player was successfully updated.'
-    expect(page).to have_content 'Player two'
+    expect(page).to have_text 'Player was successfully updated.'
+    expect(page).to have_text 'Player two'
   end
 
   specify 'I cannot edit an event signup as control team.' do
@@ -154,7 +154,7 @@ RSpec.describe EventSignup, type: :feature do
 
     visit edit_event_event_signup_path(event_id: event.id, id: event_signup.id)
 
-    expect(page).to have_content 'You are not authorised to access this page.'
+    expect(page).to have_text 'You are not authorised to access this page.'
   end
 
   # specify "I cannot remove necessary fields from an event signup while editing it." do
@@ -175,7 +175,7 @@ RSpec.describe EventSignup, type: :feature do
     find("div[data-specific-id=\"#{event_signup.id}\"]").click
     click_link href: "/organise/events/#{event.id}/event_signups/#{event_signup.id}"
 
-    expect(page).to have_content 'Player was successfully deleted.'
+    expect(page).to have_text 'Player was successfully deleted.'
   end
 
   specify 'I cannot delete an event signup as control team.', :js do
@@ -183,7 +183,7 @@ RSpec.describe EventSignup, type: :feature do
 
     visit event_event_signups_path(event_id: event.id)
 
-    expect(page).to have_content 'Players'
+    expect(page).to have_text 'Players'
 
     expect(page).to have_no_link(href: "/organise/events/#{event.id}/event_signups/#{event_signup.id}")
   end
@@ -193,7 +193,7 @@ RSpec.describe EventSignup, type: :feature do
 
     visit event_event_signups_path(event_id: event.id)
 
-    expect(page).to have_content 'You are not authorised to access this page'
+    expect(page).to have_text 'You are not authorised to access this page'
   end
 
   specify 'I can download a cast list for an event that I organise' do
@@ -203,9 +203,9 @@ RSpec.describe EventSignup, type: :feature do
 
     click_on('Download cast list')
 
-    expect(response_headers['Content-Type']).to have_content 'application/pdf'
-    expect(response_headers['Content-Disposition']).to have_content 'attachment; ' \
-                                                                    "filename=\"#{event.formatted_name} Cast List.pdf\""
+    expect(response_headers['Content-Type']).to have_text 'application/pdf'
+    expect(response_headers['Content-Disposition']).to have_text 'attachment; ' \
+                                                                 "filename=\"#{event.formatted_name} Cast List.pdf\""
   end
 
   specify 'I cannot download a cast list for an event that does not exist' do
@@ -215,6 +215,6 @@ RSpec.describe EventSignup, type: :feature do
 
     visit organiser_cast_list_event_event_signups_path(event_id: id)
 
-    expect(page).to have_content "The provided event (#{id}) does not exist."
+    expect(page).to have_text "The provided event (#{id}) does not exist."
   end
 end
