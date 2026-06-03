@@ -3,20 +3,20 @@
     {
       "warning_type": "File Access",
       "warning_code": 16,
-      "fingerprint": "242f77244892c9e73b92f65229665d2bb7de910dc7501150e59c756f3f8c7ad6",
+      "fingerprint": "feb78405268b221e452c36d397f8fbb57118ea619c3a28ec0d129d7cc060398e",
       "check_name": "FileAccess",
       "message": "Model attribute used in file name",
       "file": "app/controllers/download_controller.rb",
-      "line": 52,
+      "line": 53,
       "link": "https://brakemanscanner.org/docs/warning_types/file_access/",
-      "code": "File.read(Tempfile.new(\"#{EventSignup.find(params[:id]).event.name} #{(\"\" or \"team #{EventSignup.find(params[:id]).team.name} \")}.zip\").path)",
+      "code": "File.read(Tempfile.new(\"#{EventSignup.find(params.expect(:id)).event.name} #{(\"\" or \"team #{EventSignup.find(params.expect(:id)).team.name} \")}.zip\").path)",
       "render_path": null,
       "location": {
         "type": "method",
         "class": "DownloadController",
         "method": "show"
       },
-      "user_input": "EventSignup.find(params[:id]).team",
+      "user_input": "EventSignup.find(params.expect(:id)).team",
       "confidence": "Weak",
       "cwe_id": [
         22
