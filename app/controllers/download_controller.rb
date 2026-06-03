@@ -5,7 +5,7 @@ class DownloadController < ApplicationController
   include CastList
 
   def show
-    player = EventSignup.find(params[:id])
+    player = EventSignup.find(params.expect(:id))
     team_name = if player.team.nil? || player.team.name.blank?
                   ''
                 else

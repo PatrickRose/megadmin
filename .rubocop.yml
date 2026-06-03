@@ -30,6 +30,10 @@ Style/FrozenStringLiteralComment:
 Rails/I18nLocaleTexts:
   Enabled: false
 
+Rails/Exit:
+  Exclude:
+    - "spec/**/*"
+
 RSpec/MultipleExpectations:
   Enabled: false
 RSpec/InstanceVariable:

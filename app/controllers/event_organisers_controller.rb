@@ -7,7 +7,7 @@ class EventOrganisersController < ApplicationController
 
   def index
     @params = params
-    @event = Event.find(params[:event_id])
+    @event = Event.find(params.expect(:event_id))
 
     @ct = OrganiserToEvent.find_by(organiser_id: current_organiser.id, event_id: @event.id)
     @control_team = @ct.read_only
@@ -16,7 +16,7 @@ class EventOrganisersController < ApplicationController
   end
 
   def new
-    @event = Event.find(params[:event_id])
+    @event = Event.find(params.expect(:event_id))
 
     @ct = OrganiserToEvent.find_by(organiser_id: current_organiser.id, event_id: @event.id)
     @control_team = @ct.read_only
@@ -26,9 +26,9 @@ class EventOrganisersController < ApplicationController
   end
 
   def edit
-    @event = Event.find(params[:event_id])
-    @organiser_to_event = OrganiserToEvent.find(params[:id])
-    @event = Event.find(params[:event_id])
+    @event = Event.find(params.expect(:event_id))
+    @organiser_to_event = OrganiserToEvent.find(params.expect(:id))
+    @event = Event.find(params.expect(:event_id))
   end
 
   def create
@@ -51,7 +51,7 @@ class EventOrganisersController < ApplicationController
       organiser.save
 
       # Sends email to specified email with their password
-      OrganiserMailer.organiser_email(organiser, Event.find(params[:event_id]), request.base_url).deliver
+      OrganiserMailer.organiser_email(organiser, Event.find(params.expect(:event_id)), request.base_url).deliver
     end
 
     unless OrganiserToEvent.find_by(event_id: params[:event_id], organiser_id: organiser.id).nil?
@@ -79,8 +79,8 @@ class EventOrganisersController < ApplicationController
   end
 
   def update
-    @event = Event.find(params[:event_id])
-    @organiser_to_event = OrganiserToEvent.find(params[:id])
+    @event = Event.find(params.expect(:event_id))
+    @organiser_to_event = OrganiserToEvent.find(params.expect(:id))
     @ct = OrganiserToEvent.find_by(organiser_id: current_organiser.id, event_id: @event.id)
     @control_team = @ct.read_only
     # Disallow control team edits, and edits to own account
@@ -98,7 +98,7 @@ class EventOrganisersController < ApplicationController
   end
 
   def destroy
-    organiser = OrganiserToEvent.find(params[:id])
+    organiser = OrganiserToEvent.find(params.expect(:id))
     event = Event.find(organiser.event_id)
 
     # Prevent removing the event author
@@ -123,7 +123,7 @@ class EventOrganisersController < ApplicationController
 
   def authorize_perms
     # Only allow organisers/control to manage organisers on event
-    @event = Event.find(params[:event_id])
+    @event = Event.find(params.expect(:event_id))
     authorize! :read, @event
   end
 end

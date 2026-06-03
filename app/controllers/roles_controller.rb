@@ -7,8 +7,8 @@ class RolesController < ApplicationController
 
   # Public methods
   def show
-    @event = Event.find(params[:event_id])
-    @role = Role.find(params[:id])
+    @event = Event.find(params.expect(:event_id))
+    @role = Role.find(params.expect(:id))
     @team = @role.team_id
 
     o = OrganiserToEvent.find_by(organiser_id: current_organiser.id, event_id: @event)
@@ -18,18 +18,18 @@ class RolesController < ApplicationController
   end
 
   def new
-    @event = Event.find(params[:event_id])
+    @event = Event.find(params.expect(:event_id))
     @teams = @event.teams
     @role = Role.new
   end
 
   def edit
-    @event = Event.find(params[:event_id])
-    @role = Role.find(params[:id])
+    @event = Event.find(params.expect(:event_id))
+    @role = Role.find(params.expect(:id))
   end
 
   def create
-    @event = Event.find(params[:event_id])
+    @event = Event.find(params.expect(:event_id))
     @role = Role.new(role_params)
     @role.team = Team.find_by(id: role_params[:team_id], event_id: params[:event_id])
     @role.event = @event
@@ -41,8 +41,8 @@ class RolesController < ApplicationController
   end
 
   def update
-    @event = Event.find(params[:event_id])
-    @role = Role.find(params[:id])
+    @event = Event.find(params.expect(:event_id))
+    @role = Role.find(params.expect(:id))
     if @role.update(role_params)
       redirect_to url_for([@event, @role])
     else
@@ -51,15 +51,15 @@ class RolesController < ApplicationController
   end
 
   def destroy
-    @event = Event.find(params[:event_id])
-    @role = Role.find(params[:id])
+    @event = Event.find(params.expect(:event_id))
+    @role = Role.find(params.expect(:id))
     @role.destroy
     redirect_to event_teams_path
   end
 
   # Converting ONLY .docx files to .pdf
   def pdf
-    role = Role.find(params[:role_id])
+    role = Role.find(params.expect(:role_id))
     role.to_pdf
     redirect_to event_role_path(id: role.id), notice: 'The .docx files have been successfully converted to .pdf.',
                                               status: :see_other
