@@ -8,7 +8,7 @@ class EventSignupsController < ApplicationController
   load_and_authorize_resource
 
   def index
-    @event = Event.find(params[:event_id])
+    @event = Event.find(params.expect(:event_id))
 
     @ct = OrganiserToEvent.find_by(organiser_id: current_organiser.id, event_id: @event.id)
     @control_team = @ct.read_only
@@ -21,14 +21,14 @@ class EventSignupsController < ApplicationController
 
   def new
     @event_signup = EventSignup.new
-    @event = Event.find(params[:event_id])
+    @event = Event.find(params.expect(:event_id))
     @teams = @event.teams.map { |team| [team.name, team.id] }
     @roles = @event.roles.map { |role| [role.name, role.id] }
   end
 
   def edit
-    @event_signup = EventSignup.find(params[:id])
-    @event = Event.find(params[:event_id])
+    @event_signup = EventSignup.find(params.expect(:id))
+    @event = Event.find(params.expect(:event_id))
     @teams = @event.teams.map { |team| [team.name, team.id] }
     @roles = @event.roles.map do |role|
       ["#{role.name} (Team '#{role.team.name}')", role.id]
@@ -62,14 +62,14 @@ class EventSignupsController < ApplicationController
   end
 
   def update
-    @event_signup = EventSignup.find(params[:id])
+    @event_signup = EventSignup.find(params.expect(:id))
 
     if @event_signup.update(event_signup_params)
       redirect_to event_event_signups_path(event_id: params[:event_id]), notice: 'Player was successfully updated.',
                                                                          status: :see_other
     else
       flash[:alert] = @event_signup.errors.full_messages.to_sentence
-      @event = Event.find(params[:event_id])
+      @event = Event.find(params.expect(:event_id))
       @teams = Team.where(event_id: params[:event_id]).map { |team| [team.name, team.id] }
       @roles = Role.where(event_id: params[:event_id]).map { |role| [role.name, role.id] }
       render :edit, status: :unprocessable_content
@@ -77,7 +77,7 @@ class EventSignupsController < ApplicationController
   end
 
   def destroy
-    event_signup = EventSignup.find(params[:id])
+    event_signup = EventSignup.find(params.expect(:id))
 
     event_signup.destroy
 
@@ -106,7 +106,7 @@ class EventSignupsController < ApplicationController
     end
 
     # Send the csv file
-    event = Event.find(params[:event_id])
+    event = Event.find(params.expect(:event_id))
     send_data csv_file, filename: "Generated Template CSV for #{event.formatted_name}.csv", type: 'text/csv'
   end
 
@@ -260,7 +260,7 @@ class EventSignupsController < ApplicationController
 
   # Sends emails to all signups
   def email
-    event = Event.find(params[:event_id])
+    event = Event.find(params.expect(:event_id))
     signups = EventSignup.where(event_id: event.id)
     email_note = params[:email_note]
     organiser = Organiser.find_by(id: event.organiser_id)
@@ -307,9 +307,9 @@ class EventSignupsController < ApplicationController
 
   # Sends an email to a single signup
   def email_single
-    event = Event.find(params[:event_id])
+    event = Event.find(params.expect(:event_id))
     organiser = Organiser.find_by(id: event.organiser_id)
-    signup = EventSignup.find(params[:id])
+    signup = EventSignup.find(params.expect(:id))
     email_note = params[:email_note]
 
     # Emails cannot be sent for a draft event

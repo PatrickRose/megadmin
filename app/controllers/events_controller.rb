@@ -23,7 +23,7 @@ class EventsController < ApplicationController
   end
 
   def show
-    @event = Event.find(params[:id])
+    @event = Event.find(params.expect(:id))
     @control_team = OrganiserToEvent.where(organiser_id: current_organiser.id,
                                            event_id: @event.id).pick(:read_only)
 
@@ -41,7 +41,7 @@ class EventsController < ApplicationController
   end
 
   def edit
-    @event = Event.find(params[:id])
+    @event = Event.find(params.expect(:id))
   end
 
   def create
@@ -64,7 +64,7 @@ class EventsController < ApplicationController
   end
 
   def update
-    @event = Event.find(params[:id])
+    @event = Event.find(params.expect(:id))
 
     # Sanitize map iframe with rules in /config/initializers/sanitize.rb
     map_link = event_params[:google_maps_link]
@@ -84,7 +84,7 @@ class EventsController < ApplicationController
   end
 
   def destroy
-    @event = Event.find(params[:id])
+    @event = Event.find(params.expect(:id))
 
     @event.destroy
 
@@ -92,7 +92,7 @@ class EventsController < ApplicationController
   end
 
   def pdf
-    event = Event.find(params[:event_id])
+    event = Event.find(params.expect(:event_id))
     event.to_pdf
     redirect_to event_path(id: event.id), notice: 'The .docx files have been successfully converted to .pdf.',
                                           status: :see_other
@@ -100,7 +100,7 @@ class EventsController < ApplicationController
 
   # Publish a draft event
   def publish
-    @event = Event.find(params[:id])
+    @event = Event.find(params.expect(:id))
 
     if @event.update(draft: false)
       redirect_to event_path(id: @event.id), notice: 'Event was successfully published.', status: :see_other
@@ -110,7 +110,7 @@ class EventsController < ApplicationController
   end
 
   def email
-    event = Event.find(params[:id])
+    event = Event.find(params.expect(:id))
     signups = event.event_signups
     email_note = params[:email_note]
     organiser = Organiser.find_by(id: event.organiser_id)

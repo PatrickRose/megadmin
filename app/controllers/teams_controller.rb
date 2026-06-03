@@ -8,7 +8,7 @@ class TeamsController < ApplicationController
   # Public methods
   def index
     begin
-      @event = Event.find(params[:event_id])
+      @event = Event.find(params.expect(:event_id))
     rescue ActiveRecord::RecordNotFound
       @error = 'Event could not be found'
     end
@@ -22,26 +22,26 @@ class TeamsController < ApplicationController
   end
 
   def show
-    @event = Event.find(params[:event_id])
+    @event = Event.find(params.expect(:event_id))
 
     organiser = OrganiserToEvent.find_by(organiser_id: current_organiser.id, event_id: @event)
     @organiser = organiser.read_only
 
-    @team = Team.find(params[:id])
+    @team = Team.find(params.expect(:id))
   end
 
   def new
-    @event = Event.find(params[:event_id])
+    @event = Event.find(params.expect(:event_id))
     @team = Team.new
   end
 
   def edit
-    @event = Event.find(params[:event_id])
-    @team = Team.find(params[:id])
+    @event = Event.find(params.expect(:event_id))
+    @team = Team.find(params.expect(:id))
   end
 
   def create
-    @event = Event.find(params[:event_id])
+    @event = Event.find(params.expect(:event_id))
     @team = Team.new(team_params)
     @team.event = @event
     if @team.save
@@ -52,8 +52,8 @@ class TeamsController < ApplicationController
   end
 
   def update
-    @event = Event.find(params[:event_id])
-    @team = Team.find(params[:id])
+    @event = Event.find(params.expect(:event_id))
+    @team = Team.find(params.expect(:id))
     if @team.update(team_params)
       redirect_to url_for([@event, @team])
     else
@@ -62,15 +62,15 @@ class TeamsController < ApplicationController
   end
 
   def destroy
-    @event = Event.find(params[:event_id])
-    @team = Team.find(params[:id])
+    @event = Event.find(params.expect(:event_id))
+    @team = Team.find(params.expect(:id))
     @team.destroy
     redirect_to action: 'index'
   end
 
   # Converting ONLY .docx files to .pdf
   def pdf
-    team = Team.find(params[:team_id])
+    team = Team.find(params.expect(:team_id))
     team.to_pdf
     redirect_to event_team_path(id: team.id), notice: 'The .docx files have been successfully converted to .pdf.',
                                               status: :see_other
