@@ -8,7 +8,7 @@
     "@babel/preset-env": "^7.29.7",
     "@babel/runtime": "^7.29.7",
     "@popperjs/core": "^2.11.6",
-    "@rails/actiontext": "^8.1.200",
+    "@rails/actiontext": "^8.1.300",
     "@rails/ujs": "^7.1.600",
     "@types/babel__core": "^7.20.5",
     "@types/webpack": "^5.28.5",
