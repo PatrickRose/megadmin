@@ -6,7 +6,7 @@
     "@babel/core": "^7.29.7",
     "@babel/plugin-transform-runtime": "^7.29.7",
     "@babel/preset-env": "^7.29.7",
-    "@babel/runtime": "^7.29.7",
+    "@babel/runtime": "^8.0.0",
     "@popperjs/core": "^2.11.6",
     "@rails/actiontext": "^8.1.300",
     "@rails/ujs": "^7.1.600",
