@@ -73,7 +73,7 @@ gem 'azure-blob'
 gem 'rubyzip', require: 'zip'
 gem 'tempfile'
 
-gem 'concurrent-ruby', '1.3.6'
+gem 'concurrent-ruby', '1.3.7'
 
 gem 'pandoc-ruby'
 
