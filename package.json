@@ -29,7 +29,7 @@
     "trix": "^2.1.19",
     "webpack": "^5.107.2",
     "webpack-assets-manifest": "^6.5.2",
-    "webpack-cli": "^7.0.3",
+    "webpack-cli": "^7.1.0",
     "webpack-dev-server": "^5.2.5",
     "webpack-merge": "^5.9.0"
   },
