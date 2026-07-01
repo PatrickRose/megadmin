@@ -3,17 +3,11 @@
   "private": true,
   "packageManager": "yarn@1.22.22",
   "dependencies": {
-    "@babel/core": "^7.29.7",
-    "@babel/plugin-transform-runtime": "^7.29.7",
-    "@babel/preset-env": "^7.29.7",
-    "@babel/runtime": "^7.29.7",
     "@popperjs/core": "^2.11.6",
     "@rails/actiontext": "^8.1.300",
     "@rails/ujs": "^7.1.600",
-    "@types/babel__core": "^7.20.5",
+    "@swc/core": "^1.13.0",
     "@types/webpack": "^5.28.5",
-    "babel-loader": "^10.1.1",
-    "babel-plugin-macros": "^3.1.0",
     "bootstrap": "^5.3.8",
     "bootstrap-icons": "^1.13.1",
     "compression-webpack-plugin": "^12.0.0",
@@ -25,6 +19,7 @@
     "sass-loader": "^17.0.0",
     "shakapacker": "^10.1.0",
     "style-loader": "^4.0.0",
+    "swc-loader": "^0.2.6",
     "terser-webpack-plugin": "^5.6.1",
     "trix": "^2.1.19",
     "webpack": "^5.107.2",
@@ -34,11 +29,6 @@
     "webpack-merge": "^5.9.0"
   },
   "version": "0.1.0",
-  "babel": {
-    "presets": [
-      "./node_modules/shakapacker/package/babel/preset.js"
-    ]
-  },
   "browserslist": [
     "defaults"
   ],
