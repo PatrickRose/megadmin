@@ -32,7 +32,11 @@ COPY Gemfile Gemfile.lock ./
 RUN bundle config set --local without 'development test' && \
     bundle install
 
-# Install JS dependencies (cached unless package.json/yarn.lock change)
+# Install JS dependencies (cached unless package.json/yarn.lock change).
+# Download Puppeteer's version-matched Chrome for Testing under /app so it is
+# copied into the production image (Debian's apt chromium drifts ahead of the
+# Puppeteer version and fails to launch).
+ENV PUPPETEER_CACHE_DIR=/app/.cache/puppeteer
 COPY package.json yarn.lock ./
 RUN yarn install
 
@@ -104,7 +108,11 @@ RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - && \
     apt-get install -y --no-install-recommends nodejs && \
     rm -rf /var/lib/apt/lists/*
 
-ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
+# Use Puppeteer's own version-matched Chrome for Testing (copied from the build
+# stage under /app/.cache/puppeteer) rather than the apt chromium binary, whose
+# version drifts ahead of Puppeteer and fails to launch. The apt chromium
+# package is still installed above to supply Chrome's shared libraries.
+ENV PUPPETEER_CACHE_DIR=/app/.cache/puppeteer
 
 WORKDIR /app
 

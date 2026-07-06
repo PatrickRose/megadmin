@@ -68,6 +68,25 @@ jobs:
             --push \
             .
 
+      - name: Smoke test PDF rendering (real published Google Doc)
+        # Renders a real published Google Doc to PDF inside the just-built
+        # production image, so a broken PDF toolchain (missing Node, Chromium
+        # launch failure, version drift) fails the deploy here instead of only
+        # surfacing when a user generates a brief.
+        run: |
+          IMAGE_TAG="${{ env.ACR_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:${{ github.sha }}"
+          docker run --rm -w /app "$IMAGE_TAG" \
+            bundle exec ruby -e '
+              require "grover"
+              url = "https://docs.google.com/document/d/e/2PACX-1vRga67T_20rnTp9JtgEuprfiSnTlFohxlHiwj2jF4u97n8TNMXF7wWax2nzNgJbYW-e0jYhTNK3mqVK/pub"
+              pdf = Grover.new(
+                url, format: "A4", wait_until: "networkidle0",
+                launch_args: ["--no-sandbox", "--disable-setuid-sandbox", "--disable-dev-shm-usage"]
+              ).to_pdf
+              raise "Grover produced no PDF" unless pdf && pdf.byteslice(0, 5) == "%PDF-"
+              warn "Grover smoke test OK (#{pdf.bytesize} bytes)"
+            '
+
       - name: Update migration job image and run migrations
         run: |
           IMAGE_TAG="${{ env.ACR_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:${{ github.sha }}"
