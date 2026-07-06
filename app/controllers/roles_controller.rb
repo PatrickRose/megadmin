@@ -45,6 +45,7 @@ class RolesController < ApplicationController
     @event = Event.find(params.expect(:event_id))
     @role = Role.find(params.expect(:id))
     if @role.update(role_params)
+      purge_marked_attachments(@role, :brief)
       apply_google_doc_brief(@role)
       redirect_to url_for([@event, @role])
     else
@@ -82,6 +83,6 @@ class RolesController < ApplicationController
   end
 
   def role_params
-    keep_existing_files(params.expect(role: %i[name brief team_id brief_url]), :brief)
+    keep_existing_files(params.expect(role: %i[name brief team_id brief_url remove_brief]), :brief)
   end
 end

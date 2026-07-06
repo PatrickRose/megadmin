@@ -53,6 +53,16 @@ class ApplicationController < ActionController::Base
     permitted
   end
 
+  # Purges the named has_one attachments whose `remove_<name>` virtual flag is
+  # truthy (set from a "Remove" checkbox on the edit form).
+  def purge_marked_attachments(record, *names)
+    names.each do |name|
+      next unless ActiveModel::Type::Boolean.new.cast(record.public_send(:"remove_#{name}"))
+
+      record.public_send(name).purge
+    end
+  end
+
   def update_headers_to_disable_caching
     response.headers['Cache-Control'] = 'no-cache, no-cache="set-cookie", no-store, private, proxy-revalidate'
     response.headers['Pragma'] = 'no-cache'

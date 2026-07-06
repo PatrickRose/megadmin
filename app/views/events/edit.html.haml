@@ -13,6 +13,8 @@
           = form.rich_text_area :description
         -# For some reason, if you use "label:" on the checkbox, it floats to the right instead of the left.
         = form.input :rulebook, label: 'Rulebook:'
+        - if @event.rulebook.attached?
+          = form.input :remove_rulebook, as: :boolean, label: 'Remove current rulebook'
         = form.input :location, label: 'Location:'
         = form.input :google_maps_link, label: 'Google Maps Link ⓘ:', label_html: {class: 'tooltip-label', title: 'Once you have found the venue location on Google Maps: click "Share", "Embed a map" and "COPY HTML". Paste that text here.' }
         = form.input :date, as: :string, input_html: { type: 'datetime-local', value: @event.date.strftime('%Y-%m-%dT%H:%M') }, label: 'Date and Time:'
@@ -23,5 +25,11 @@
         .form-group
           = form.input :additional_documents, label: 'Additional Documents:', input_html: { multiple: true }
           %p.text-muted.small Leave empty to keep the current documents; uploading replaces the whole set.
+          - if @event.additional_documents.attached?
+            %p.small.mb-1 Tick any current documents to remove:
+            - @event.additional_documents.each do |doc|
+              .form-check
+                = check_box_tag 'event[remove_additional_document_ids][]', doc.id, false, id: "remove_doc_#{doc.id}", class: 'form-check-input'
+                = label_tag "remove_doc_#{doc.id}", doc.filename.to_s, class: 'form-check-label'
         .form-actions
           = form.button :submit, class: 'btn generic-button-success'

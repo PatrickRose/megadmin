@@ -24,6 +24,9 @@
 class Role < ApplicationRecord
   include GoogleDocBrief
 
+  # Virtual flag set from the edit form to delete the brief on save.
+  attr_accessor :remove_brief
+
   # Associations
   belongs_to :event
   belongs_to :team

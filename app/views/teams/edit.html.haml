@@ -9,8 +9,12 @@
             = form.input :name
             %p
             = form.input :image, label: "Icon", error: "The file must be an image"
+            - if @team.image.attached?
+              = form.input :remove_image, as: :boolean, label: 'Remove current icon'
             %p
             = form.input :brief
+            - if @team.brief.attached?
+              = form.input :remove_brief, as: :boolean, label: 'Remove current brief'
             %p.text-muted.small.mb-0 Or generate the brief from a published Google Doc:
             = form.input :brief_url, label: false, placeholder: 'https://docs.google.com/document/d/e/…/pub',
               hint: 'In Google Docs: File → Share → Publish to web, then paste the link here. This overrides any uploaded file.'

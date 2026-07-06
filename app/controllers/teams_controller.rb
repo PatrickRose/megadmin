@@ -56,6 +56,7 @@ class TeamsController < ApplicationController
     @event = Event.find(params.expect(:event_id))
     @team = Team.find(params.expect(:id))
     if @team.update(team_params)
+      purge_marked_attachments(@team, :image, :brief)
       apply_google_doc_brief(@team)
       redirect_to url_for([@event, @team])
     else
@@ -93,6 +94,7 @@ class TeamsController < ApplicationController
   end
 
   def team_params
-    keep_existing_files(params.expect(team: %i[name image brief brief_url]), :image, :brief)
+    keep_existing_files(params.expect(team: %i[name image brief brief_url remove_image remove_brief]),
+                        :image, :brief)
   end
 end

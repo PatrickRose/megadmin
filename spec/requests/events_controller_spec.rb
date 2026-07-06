@@ -53,6 +53,21 @@ RSpec.describe 'EventsController' do
     end
   end
 
+  describe 'edit page' do
+    it 'shows remove controls for existing attachments' do
+      event.rulebook.attach(io: Rails.root.join('spec/fixtures/files/pdf.pdf').open,
+                            filename: 'rulebook.pdf', content_type: 'application/pdf')
+      event.additional_documents.attach(io: Rails.root.join('spec/fixtures/files/pdf.pdf').open,
+                                        filename: 'doc.pdf', content_type: 'application/pdf')
+
+      get edit_event_path(id: event.id)
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include('Remove current rulebook')
+      expect(response.body).to include('remove_additional_document_ids')
+    end
+  end
+
   describe 'update can remove attachments' do
     it 'removes the rulebook when remove_rulebook is checked' do
       event.rulebook.attach(io: Rails.root.join('spec/fixtures/files/pdf.pdf').open,
