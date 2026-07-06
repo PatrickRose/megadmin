@@ -284,22 +284,24 @@ class EventSignupsController < ApplicationController
       return
     end
 
-    # Sends emails inline if there are a low number of signups
-    # Otherwise it uses the async job
-    if signups.count <= 10
-      signups.each do |i|
-        SignupMailer.brief_email(i, event, email_note, organiser).deliver
-      end
-    else
-      # Converts necessary paramaters to strings to use as paramaters for the job
-      string_signups = signups.map { |signup| signup.to_global_id.to_s }
-      event_string = event.to_global_id.to_s
-      organiser_string = organiser.to_global_id.to_s
+    # Default to only players who haven't been emailed yet, so re-triggering a
+    # send after adding players doesn't re-email everyone. Ticking "resend to all"
+    # emails every player regardless.
+    recipients = params[:resend_all] == '1' ? signups : signups.where(brief_emailed_at: nil)
 
-      # Uses background job to prevent page from freezing
+    if recipients.none?
+      redirect_to event_event_signups_path(event_id: event.id),
+                  alert: 'All players have already been emailed. Tick "Resend to players ' \
+                         'who have already been emailed" to send to them again.'
+      return
+    end
 
-      # This is set in application.rb and development.rb but setting it here makes it work
-      SendEmailsJob.perform_later(string_signups, event_string, email_note, organiser_string)
+    # Enqueue one job per recipient. A single big job that looped over every
+    # signup would, on any failure, be retried from the top by Delayed Job and
+    # re-send to everyone already emailed. Per-recipient jobs isolate retries to
+    # the recipient that actually failed.
+    recipients.each do |signup|
+      SendBriefEmailJob.perform_later(signup, event, email_note, organiser)
     end
 
     redirect_to event_event_signups_path(event_id: event.id), notice: 'Emails sent'
@@ -325,7 +327,7 @@ class EventSignupsController < ApplicationController
       return
     end
 
-    SignupMailer.brief_email(signup, event, email_note, organiser).deliver
+    SendBriefEmailJob.perform_later(signup, event, email_note, organiser)
 
     redirect_to edit_event_event_signup_path(event_id: event.id, id: signup.id), notice: 'Email sent'
   end

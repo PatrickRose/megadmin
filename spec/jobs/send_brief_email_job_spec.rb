@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe SendEmailsJob do
+RSpec.describe SendBriefEmailJob do
   before do
     @organiser = create(:organiser)
     @event = create(:event, organiser_id: @organiser.id)
@@ -16,18 +16,18 @@ RSpec.describe SendEmailsJob do
                                     email: 'email1@email.com',
                                     role: @role,
                                     team: @team)
-    login_as @organiser
   end
 
-  specify 'the job correctly sends the emails' do
-    signup_string = [@signup.to_global_id.to_s]
-    event_string = @event.to_global_id.to_s
-    organiser_string = @organiser.to_global_id.to_s
-
-    described_class.perform_now(signup_string, event_string, '', organiser_string)
+  specify 'the job sends the brief email to the signup' do
+    described_class.perform_now(@signup, @event, '', @organiser)
 
     expect(ActionMailer::Base.deliveries.first.To.value).to eq(@signup.email)
     expect(ActionMailer::Base.deliveries.first.From.value).to eq('no-reply@megadmin.patrickrosemusic.co.uk')
     expect(ActionMailer::Base.deliveries.first.Subject.value).to eq('My Event - Pennine Megagames. Event information!')
+  end
+
+  specify 'the job records when the brief was emailed' do
+    expect { described_class.perform_now(@signup, @event, '', @organiser) }
+      .to(change { @signup.reload.brief_emailed_at }.from(nil))
   end
 end

@@ -48,6 +48,9 @@
       = form_tag(email_event_event_signups_path(event_id: @event.id), method: :post, id: 'email-note-form') do
         %textarea#optional-text{name: 'email_note', rows: 4, cols: 40, placeholder: "Add an optional note in the email to players here" }
         %br/
+        %label.d-block.my-2
+          = check_box_tag 'resend_all', '1'
+          Resend to players who have already been emailed
         %button#send-button.btn.generic-button-recommended(type='submit') Send brief email to all players
         %button#close-popup.btn.generic-button(type='button') Close
 

@@ -17,6 +17,16 @@ RSpec.describe 'EventSignupsController' do
   end
 
   describe 'email' do
+    # Builds a signup that is valid to email: its own role with a brief attached.
+    def emailable_signup(name:, email:, brief_emailed_at: nil)
+      role = create(:role, event: event, name: "role for #{name}", team: team)
+      role.brief.attach(io: Rails.root.join('spec/fixtures/files/pdf.pdf').open, filename: 'pdf.pdf',
+                        content_type: 'application/pdf')
+      role.save
+      create(:event_signup, event: event, name: name, email: email, role: role, team: team,
+                            brief_emailed_at: brief_emailed_at)
+    end
+
     it 'redirects with alert for draft event' do
       create(:event_signup, event: draft, name: 'draft signup', email: 'draft@email.com')
 
@@ -35,7 +45,7 @@ RSpec.describe 'EventSignupsController' do
       expect(response.body).to include('There are no signups to email')
     end
 
-    it 'uses background job for >10 signups' do
+    it 'enqueues one brief email job per signup' do
       ActiveJob::Base.queue_adapter = :test
 
       11.times do |i|
@@ -49,7 +59,27 @@ RSpec.describe 'EventSignupsController' do
 
       expect do
         post email_event_event_signups_path(event_id: event.id)
-      end.to have_enqueued_job(SendEmailsJob)
+      end.to have_enqueued_job(SendBriefEmailJob).exactly(11).times
+    end
+
+    it 'only emails players who have not been emailed yet by default' do
+      emailable_signup(name: 'new', email: 'new@email.com')
+      emailable_signup(name: 'already', email: 'already@email.com', brief_emailed_at: 1.day.ago)
+
+      post email_event_event_signups_path(event_id: event.id)
+
+      expect(ActionMailer::Base.deliveries.count).to eq(1)
+      expect(ActionMailer::Base.deliveries.first.To.value).to eq('new@email.com')
+    end
+
+    it 'tells the organiser when everyone has already been emailed' do
+      emailable_signup(name: 'already', email: 'already@email.com', brief_emailed_at: 1.day.ago)
+
+      post email_event_event_signups_path(event_id: event.id)
+
+      expect(response).to redirect_to(event_event_signups_path(event_id: event.id))
+      follow_redirect!
+      expect(response.body).to include('All players have already been emailed')
     end
   end
 

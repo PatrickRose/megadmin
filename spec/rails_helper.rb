@@ -58,6 +58,10 @@ RSpec.configure do |config|
   config.before do
     DatabaseCleaner.strategy = :transaction
     ActionMailer::Base.deliveries.clear
+    # Restore the app's default adapter before every example. Some specs switch
+    # to the :test adapter to assert enqueuing; without this reset that choice
+    # leaks into later examples and stops jobs (e.g. brief emails) running inline.
+    ActiveJob::Base.queue_adapter = :delayed_job
   end
 
   # Can't use transaction strategy with Javascript tests because they are run in

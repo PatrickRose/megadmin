@@ -4,15 +4,16 @@
 #
 # Table name: event_signups
 #
-#  id         :bigint           not null, primary key
-#  email      :string
-#  name       :string
-#  uuid       :string
-#  created_at :datetime         not null
-#  updated_at :datetime         not null
-#  event_id   :bigint
-#  role_id    :bigint
-#  team_id    :bigint
+#  id               :bigint           not null, primary key
+#  brief_emailed_at :datetime
+#  email            :string
+#  name             :string
+#  uuid             :string
+#  created_at       :datetime         not null
+#  updated_at       :datetime         not null
+#  event_id         :bigint
+#  role_id          :bigint
+#  team_id          :bigint
 #
 # Indexes
 #
