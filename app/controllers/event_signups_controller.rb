@@ -296,13 +296,12 @@ class EventSignupsController < ApplicationController
       return
     end
 
-    # Enqueue one job per recipient. A single big job that looped over every
-    # signup would, on any failure, be retried from the top by Delayed Job and
-    # re-send to everyone already emailed. Per-recipient jobs isolate retries to
-    # the recipient that actually failed.
-    recipients.each do |signup|
-      SendBriefEmailJob.perform_later(signup, event, email_note, organiser)
-    end
+    # Enqueue one throttled job per recipient. A single big job that looped over
+    # every signup would, on any failure, be retried from the top by Delayed Job
+    # and re-send to everyone already emailed. Per-recipient jobs isolate retries
+    # to the recipient that actually failed, and batching stays under the email
+    # provider's per-window recipient limit.
+    SendBriefEmailJob.enqueue_all(recipients, event, email_note, organiser)
 
     redirect_to event_event_signups_path(event_id: event.id), notice: 'Emails sent'
   end

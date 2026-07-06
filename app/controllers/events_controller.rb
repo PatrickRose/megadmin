@@ -145,12 +145,10 @@ class EventsController < ApplicationController
       return
     end
 
-    # One job per recipient so a delivery failure only retries that recipient,
-    # rather than Delayed Job re-running one big batch job and re-sending to
-    # everyone already emailed.
-    recipients.each do |signup|
-      SendBriefEmailJob.perform_later(signup, event, email_note, organiser)
-    end
+    # One throttled job per recipient: a delivery failure only retries that
+    # recipient (never re-sending to everyone), and batching keeps us under the
+    # email provider's per-window recipient limit.
+    SendBriefEmailJob.enqueue_all(recipients, event, email_note, organiser)
 
     redirect_to event_path(event_id: event.id), notice: 'Emails sent'
   end
