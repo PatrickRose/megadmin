@@ -34,6 +34,9 @@ jobs:
 
     steps:
       - uses: actions/checkout@v7
+        with:
+          # Full history so sentry-cli can associate commits with the release.
+          fetch-depth: 0
 
       - name: Azure login via OIDC
         uses: azure/login@v3
@@ -63,6 +66,7 @@ jobs:
             --target production \
             ${CACHE_ARGS} \
             --cache-to type=registry,ref=${CACHE_REF},mode=max \
+            --build-arg SENTRY_RELEASE=${{ github.sha }} \
             -t "$IMAGE_TAG" \
             -t "$IMAGE_LATEST" \
             --push \
@@ -157,3 +161,17 @@ jobs:
 
           echo "Health check failed after 5 minutes"
           exit 1
+
+      - name: Create Sentry release
+        # Runs sentry-cli under the hood: creates the release, associates commits
+        # (suspect-commit / regression detection), finalizes it, and records a
+        # production deploy. Only reached once the deploy is confirmed healthy.
+        uses: getsentry/action-release@v3
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
+          SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
+        with:
+          release: ${{ github.sha }}
+          set_commits: auto
+          environment: production

@@ -124,6 +124,11 @@ COPY --from=build /app /app
 
 ENV RAILS_ENV=production
 
+# Git SHA of the deployed build, passed in by CI. Sentry's ReleaseDetector
+# reads SENTRY_RELEASE first, tying every event/trace to this release.
+ARG SENTRY_RELEASE=""
+ENV SENTRY_RELEASE=${SENTRY_RELEASE}
+
 ENTRYPOINT ["bin/docker-entrypoint"]
 
 EXPOSE 3000
