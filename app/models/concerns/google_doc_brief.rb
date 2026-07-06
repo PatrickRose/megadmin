@@ -61,9 +61,23 @@ module GoogleDocBrief
       Automatically generated from <a href="#{safe_url}" style="color:#1155cc;">#{safe_url}</a></p>
     HTML
 
-    html = html.sub(/<head[^>]*>/i) { |head| "#{head}<meta charset=\"utf-8\">" }
+    html = with_charset_meta(html)
     html = html.sub(%r{</head>}i, "<style>#{CLEANUP_CSS}</style></head>")
     html.sub(%r{</body>}i, "#{link}</body>")
+  end
+
+  # Inserts a UTF-8 charset meta as the first thing inside <head>. Uses plain
+  # linear string searches rather than a backtracking regex, so it can't be a
+  # ReDoS vector on the fetched (untrusted) HTML.
+  def with_charset_meta(html)
+    meta = '<meta charset="utf-8">'
+    open_head = (html =~ /<head[\s>]/i)
+    return "#{meta}#{html}" if open_head.nil?
+
+    close = html.index('>', open_head)
+    return html if close.nil?
+
+    html.dup.insert(close + 1, meta)
   end
 
   def validate_brief_url_format
