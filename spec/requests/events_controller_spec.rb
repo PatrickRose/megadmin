@@ -27,6 +27,32 @@ RSpec.describe 'EventsController' do
     end
   end
 
+  describe 'update keeps attachments when file fields are left blank' do
+    it 'keeps the rulebook when the rulebook field is blank' do
+      event.rulebook.attach(io: Rails.root.join('spec/fixtures/files/pdf.pdf').open,
+                            filename: 'rulebook.pdf', content_type: 'application/pdf')
+
+      patch event_path(id: event.id),
+            params: { event: { name: event.name, location: event.location,
+                               date: event.date, google_maps_link: '', rulebook: '' } }
+
+      expect(event.reload.rulebook).to be_attached
+    end
+
+    it 'keeps additional documents when the field is blank' do
+      2.times do |i|
+        event.additional_documents.attach(io: Rails.root.join('spec/fixtures/files/pdf.pdf').open,
+                                           filename: "doc#{i}.pdf", content_type: 'application/pdf')
+      end
+
+      patch event_path(id: event.id),
+            params: { event: { name: event.name, location: event.location,
+                               date: event.date, google_maps_link: '', additional_documents: [''] } }
+
+      expect(event.reload.additional_documents.count).to eq(2)
+    end
+  end
+
   describe 'email' do
     let!(:team) { create(:team, event: event) }
     let!(:role1) { create(:role, event: event, name: 'email role 1', team: team) }
