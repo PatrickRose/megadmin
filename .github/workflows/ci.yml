@@ -29,6 +29,36 @@ jobs:
       - run: bundle exec brakeman -q --no-pager
       - run: bundle exec bundler-audit check --update
 
+  prod-image-smoke:
+    # Builds the real production image and renders a PDF inside it, so a broken
+    # PDF toolchain (missing Node.js, Chromium libraries, launch failure) is
+    # caught at PR time rather than only when a user generates a brief. Runs on
+    # amd64, the same architecture as the Azure Container Apps runtime.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+      - name: Build production image
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          target: production
+          load: true
+          tags: megadmin-prod
+          cache-from: type=gha,scope=prod
+          cache-to: type=gha,mode=max,scope=prod
+      - name: Smoke test PDF rendering (Grover / Node / Chromium)
+        run: >-
+          docker run --rm -w /app megadmin-prod
+          bundle exec ruby -e '
+          require "grover";
+          pdf = Grover.new("<h1>ci smoke test</h1><p>rendered by Grover</p>",
+            launch_args: ["--no-sandbox", "--disable-setuid-sandbox", "--disable-dev-shm-usage"]).to_pdf;
+          raise "Grover produced no PDF" unless pdf && pdf.byteslice(0, 5) == "%PDF-";
+          warn "Grover smoke test OK (#{pdf.bytesize} bytes)"
+          '
+
   test:
     runs-on: ubuntu-latest
     services:
