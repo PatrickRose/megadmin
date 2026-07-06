@@ -10,10 +10,12 @@
             = form.input :name
             %p
             = form.input :brief
+            - if @role.brief.attached?
+              = form.input :remove_brief, as: :boolean, label: 'Remove current brief'
             %p.text-muted.small.mb-0 Or generate the brief from a published Google Doc:
             = form.input :brief_url, label: false, placeholder: 'https://docs.google.com/document/d/e/…/pub',
               hint: 'In Google Docs: File → Share → Publish to web, then paste the link here. This overrides any uploaded file.'
-            %p Note: the brief will be overridden. Please reupload the brief to keep it.
+            %p.text-muted.small Uploading a new file replaces the current brief; leave it blank to keep the current one.
             %p
             = form.association :team, collection: @event.teams, include_blank: false, label: link_to("Team", event_teams_path), error: "Team must be selected"
           .card-footer.d-flex

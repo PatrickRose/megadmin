@@ -27,6 +27,9 @@
 
 # Model for events
 class Event < ApplicationRecord
+  # Virtual flags set from the edit form to delete attachments on save.
+  attr_accessor :remove_rulebook, :remove_additional_document_ids
+
   has_many :organiser_to_events, dependent: :destroy
   has_many :organisers, through: :organiser_to_events
   has_many :event_signups, dependent: :destroy

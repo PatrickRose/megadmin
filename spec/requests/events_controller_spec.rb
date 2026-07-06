@@ -27,6 +27,77 @@ RSpec.describe 'EventsController' do
     end
   end
 
+  describe 'update keeps attachments when file fields are left blank' do
+    it 'keeps the rulebook when the rulebook field is blank' do
+      event.rulebook.attach(io: Rails.root.join('spec/fixtures/files/pdf.pdf').open,
+                            filename: 'rulebook.pdf', content_type: 'application/pdf')
+
+      patch event_path(id: event.id),
+            params: { event: { name: event.name, location: event.location,
+                               date: event.date, google_maps_link: '', rulebook: '' } }
+
+      expect(event.reload.rulebook).to be_attached
+    end
+
+    it 'keeps additional documents when the field is blank' do
+      2.times do |i|
+        event.additional_documents.attach(io: Rails.root.join('spec/fixtures/files/pdf.pdf').open,
+                                          filename: "doc#{i}.pdf", content_type: 'application/pdf')
+      end
+
+      patch event_path(id: event.id),
+            params: { event: { name: event.name, location: event.location,
+                               date: event.date, google_maps_link: '', additional_documents: [''] } }
+
+      expect(event.reload.additional_documents.count).to eq(2)
+    end
+  end
+
+  describe 'edit page' do
+    it 'shows remove controls for existing attachments' do
+      event.rulebook.attach(io: Rails.root.join('spec/fixtures/files/pdf.pdf').open,
+                            filename: 'rulebook.pdf', content_type: 'application/pdf')
+      event.additional_documents.attach(io: Rails.root.join('spec/fixtures/files/pdf.pdf').open,
+                                        filename: 'doc.pdf', content_type: 'application/pdf')
+
+      get edit_event_path(id: event.id)
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include('Remove current rulebook')
+      expect(response.body).to include('remove_additional_document_ids')
+    end
+  end
+
+  describe 'update can remove attachments' do
+    it 'removes the rulebook when remove_rulebook is checked' do
+      event.rulebook.attach(io: Rails.root.join('spec/fixtures/files/pdf.pdf').open,
+                            filename: 'rulebook.pdf', content_type: 'application/pdf')
+
+      patch event_path(id: event.id),
+            params: { event: { name: event.name, location: event.location, date: event.date,
+                               google_maps_link: '', rulebook: '', remove_rulebook: '1' } }
+
+      expect(event.reload.rulebook).not_to be_attached
+    end
+
+    it 'removes only the selected additional document' do
+      2.times do |i|
+        event.additional_documents.attach(io: Rails.root.join('spec/fixtures/files/pdf.pdf').open,
+                                          filename: "doc#{i}.pdf", content_type: 'application/pdf')
+      end
+      target = event.additional_documents.first
+
+      patch event_path(id: event.id),
+            params: { event: { name: event.name, location: event.location, date: event.date,
+                               google_maps_link: '', additional_documents: [''],
+                               remove_additional_document_ids: [target.id] } }
+
+      event.reload
+      expect(event.additional_documents.count).to eq(1)
+      expect(event.additional_documents.map(&:id)).not_to include(target.id)
+    end
+  end
+
   describe 'email' do
     let!(:team) { create(:team, event: event) }
     let!(:role1) { create(:role, event: event, name: 'email role 1', team: team) }

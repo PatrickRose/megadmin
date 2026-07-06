@@ -76,6 +76,8 @@ class EventsController < ApplicationController
       redirect_to edit_event_path(id: @event.id), alert: 'Invalid input for Google Maps Iframe.', status: :see_other
       nil
     elsif @event.update(event_params)
+      purge_marked_attachments(@event, :rulebook)
+      purge_additional_documents(@event)
       redirect_to event_path(id: @event.id), notice: 'Event was successfully updated.', status: :see_other
       nil
     else
@@ -151,8 +153,17 @@ class EventsController < ApplicationController
   private
 
   def event_params
-    params.expect(event: [:name, :description, :location, :google_maps_link, :date, :timetable,
-                          :additional_info, :organiser_id, :rulebook,
-                          :draft, { additional_documents: [] }])
+    permitted = params.expect(event: [:name, :description, :location, :google_maps_link, :date, :timetable,
+                                      :additional_info, :organiser_id, :rulebook, :remove_rulebook,
+                                      :draft, { additional_documents: [], remove_additional_document_ids: [] }])
+    keep_existing_files(permitted, :rulebook, :additional_documents)
+  end
+
+  # Purges the additional documents whose attachment ids were ticked for removal.
+  def purge_additional_documents(event)
+    ids = Array(event.remove_additional_document_ids).compact_blank.map(&:to_i)
+    return if ids.empty?
+
+    event.additional_documents.select { |doc| ids.include?(doc.id) }.each(&:purge)
   end
 end

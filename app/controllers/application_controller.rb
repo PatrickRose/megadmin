@@ -35,6 +35,34 @@ class ApplicationController < ActionController::Base
 
   private
 
+  # Drops blank file-upload params so leaving a file field empty keeps the
+  # current attachment instead of purging it (Active Storage treats "" and
+  # [""] as "remove"). Handles both has_one (scalar) and has_many (array)
+  # attachments. A real upload is an UploadedFile, which is never blank, so it
+  # passes through untouched.
+  def keep_existing_files(permitted, *keys)
+    keys.each do |key|
+      value = permitted[key]
+      if value.is_a?(Array)
+        cleaned = value.compact_blank
+        cleaned.empty? ? permitted.delete(key) : (permitted[key] = cleaned)
+      elsif value.blank?
+        permitted.delete(key)
+      end
+    end
+    permitted
+  end
+
+  # Purges the named has_one attachments whose `remove_<name>` virtual flag is
+  # truthy (set from a "Remove" checkbox on the edit form).
+  def purge_marked_attachments(record, *names)
+    names.each do |name|
+      next unless ActiveModel::Type::Boolean.new.cast(record.public_send(:"remove_#{name}"))
+
+      record.public_send(name).purge
+    end
+  end
+
   def update_headers_to_disable_caching
     response.headers['Cache-Control'] = 'no-cache, no-cache="set-cookie", no-store, private, proxy-revalidate'
     response.headers['Pragma'] = 'no-cache'

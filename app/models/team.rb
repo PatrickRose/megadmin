@@ -19,6 +19,9 @@
 class Team < ApplicationRecord
   include GoogleDocBrief
 
+  # Virtual flags set from the edit form to delete an attachment on save.
+  attr_accessor :remove_image, :remove_brief
+
   # Associations
   belongs_to :event
   has_many :event_signups, dependent: nil
