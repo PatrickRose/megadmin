@@ -61,8 +61,13 @@ gem 'whenever'
 gem 'sanitize'
 gem 'sanitize_email'
 
+# stackprof must load before the Sentry SDK for profiling to hook in, so the
+# ordering here is deliberate rather than alphabetical.
+# rubocop:disable Bundler/OrderedGems
+gem 'stackprof'
 gem 'sentry-rails'
 gem 'sentry-ruby'
+# rubocop:enable Bundler/OrderedGems
 
 gem 'csv'
 
