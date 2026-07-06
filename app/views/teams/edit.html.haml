@@ -14,7 +14,7 @@
             %p.text-muted.small.mb-0 Or generate the brief from a published Google Doc:
             = form.input :brief_url, label: false, placeholder: 'https://docs.google.com/document/d/e/…/pub',
               hint: 'In Google Docs: File → Share → Publish to web, then paste the link here. This overrides any uploaded file.'
-            %p Note: the brief and image will be overridden. Please reupload them to keep them.
+            %p.text-muted.small Uploading a new file replaces the current one; leave a field blank to keep it.
           .card-footer.d-flex
             = form.button :submit, "Save", class: 'btn generic-button-success', method: :get
     - else

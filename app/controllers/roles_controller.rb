@@ -82,6 +82,6 @@ class RolesController < ApplicationController
   end
 
   def role_params
-    params.expect(role: %i[name brief team_id brief_url])
+    keep_existing_files(params.expect(role: %i[name brief team_id brief_url]), :brief)
   end
 end

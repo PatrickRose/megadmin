@@ -93,6 +93,6 @@ class TeamsController < ApplicationController
   end
 
   def team_params
-    params.expect(team: %i[name image brief brief_url])
+    keep_existing_files(params.expect(team: %i[name image brief brief_url]), :image, :brief)
   end
 end
