@@ -134,18 +134,21 @@ class EventsController < ApplicationController
       return
     end
 
-    if signups.count <= 10
-      signups.each do |i|
-        SignupMailer.brief_email(i, event, email_note, organiser).deliver
-      end
-    else
-      string_signups = signups.map { |signup| signup.to_global_id.to_s }
-      event_string = event.to_global_id.to_s
-      organiser_string = organiser.to_global_id.to_s
+    # Default to only players who haven't been emailed yet; ticking "resend to
+    # all" emails everyone regardless.
+    recipients = params[:resend_all] == '1' ? signups : signups.where(brief_emailed_at: nil)
 
-      # Uses background job to prevent page from freezing
-      SendEmailsJob.perform_later(string_signups, event_string, email_note, organiser_string)
+    if recipients.none?
+      redirect_to event_event_signups_path(event_id: event.id),
+                  alert: 'All players have already been emailed. Tick "Resend to players ' \
+                         'who have already been emailed" to send to them again.'
+      return
     end
+
+    # One throttled job per recipient: a delivery failure only retries that
+    # recipient (never re-sending to everyone), and batching keeps us under the
+    # email provider's per-window recipient limit.
+    SendBriefEmailJob.enqueue_all(recipients, event, email_note, organiser)
 
     redirect_to event_path(event_id: event.id), notice: 'Emails sent'
   end
