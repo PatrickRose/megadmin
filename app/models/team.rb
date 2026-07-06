@@ -17,6 +17,8 @@
 
 # Model for player teams
 class Team < ApplicationRecord
+  include GoogleDocBrief
+
   # Associations
   belongs_to :event
   has_many :event_signups, dependent: nil

@@ -45,6 +45,7 @@ class TeamsController < ApplicationController
     @team = Team.new(team_params)
     @team.event = @event
     if @team.save
+      apply_google_doc_brief(@team)
       redirect_to url_for([@event, @team])
     else
       render :new, status: :unprocessable_content
@@ -55,6 +56,7 @@ class TeamsController < ApplicationController
     @event = Event.find(params.expect(:event_id))
     @team = Team.find(params.expect(:id))
     if @team.update(team_params)
+      apply_google_doc_brief(@team)
       redirect_to url_for([@event, @team])
     else
       render :edit, status: :unprocessable_content
@@ -79,7 +81,18 @@ class TeamsController < ApplicationController
   # Private methods
   private
 
+  # Generates the brief PDF from a pasted Google Doc link, if one was given.
+  # URL format is validated on the model; only fetch/render failures land here.
+  def apply_google_doc_brief(team)
+    return if team.brief_url.blank?
+
+    team.brief_from_google_doc(team.brief_url)
+  rescue StandardError => e
+    Rails.logger.error("Google Doc brief generation failed: #{e.class}: #{e.message}")
+    flash[:alert] = "The brief could not be generated from that Google Doc link: #{e.message}"
+  end
+
   def team_params
-    params.expect(team: %i[name image brief])
+    params.expect(team: %i[name image brief brief_url])
   end
 end

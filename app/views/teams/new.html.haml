@@ -11,6 +11,9 @@
           = form.input :image, label: "Icon", error: "The file must be an image"
         .my-2
           = form.input :brief
+          %p.text-muted.small.mb-0 Or generate the brief from a published Google Doc:
+          = form.input :brief_url, label: false, placeholder: 'https://docs.google.com/document/d/e/…/pub',
+            hint: 'In Google Docs: File → Share → Publish to web, then paste the link here. This overrides any uploaded file.'
 
         .form-actions
           = form.button :submit, class: 'btn generic-button-success'

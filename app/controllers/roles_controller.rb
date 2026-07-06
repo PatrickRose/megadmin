@@ -34,6 +34,7 @@ class RolesController < ApplicationController
     @role.team = Team.find_by(id: role_params[:team_id], event_id: params[:event_id])
     @role.event = @event
     if @role.save
+      apply_google_doc_brief(@role)
       redirect_to url_for([@event, @role])
     else
       render :new, status: :unprocessable_content
@@ -44,6 +45,7 @@ class RolesController < ApplicationController
     @event = Event.find(params.expect(:event_id))
     @role = Role.find(params.expect(:id))
     if @role.update(role_params)
+      apply_google_doc_brief(@role)
       redirect_to url_for([@event, @role])
     else
       render :edit, status: :unprocessable_content
@@ -68,7 +70,18 @@ class RolesController < ApplicationController
   # Private methods
   private
 
+  # Generates the brief PDF from a pasted Google Doc link, if one was given.
+  # URL format is validated on the model; only fetch/render failures land here.
+  def apply_google_doc_brief(role)
+    return if role.brief_url.blank?
+
+    role.brief_from_google_doc(role.brief_url)
+  rescue StandardError => e
+    Rails.logger.error("Google Doc brief generation failed: #{e.class}: #{e.message}")
+    flash[:alert] = "The brief could not be generated from that Google Doc link: #{e.message}"
+  end
+
   def role_params
-    params.expect(role: %i[name brief team_id])
+    params.expect(role: %i[name brief team_id brief_url])
   end
 end

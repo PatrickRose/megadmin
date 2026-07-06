@@ -22,6 +22,8 @@
 
 # Model for player roles
 class Role < ApplicationRecord
+  include GoogleDocBrief
+
   # Associations
   belongs_to :event
   belongs_to :team
