@@ -23,4 +23,13 @@ RSpec.describe 'RolesController' do
       expect(role.reload.brief).to be_attached
     end
   end
+
+  describe 'update can remove the brief' do
+    it 'removes the brief when remove_brief is checked' do
+      patch event_role_path(event_id: event.id, id: role.id),
+            params: { role: { name: role.name, brief: '', team_id: team.id, remove_brief: '1' } }
+
+      expect(role.reload.brief).not_to be_attached
+    end
+  end
 end

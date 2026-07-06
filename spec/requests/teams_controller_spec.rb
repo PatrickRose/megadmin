@@ -31,4 +31,22 @@ RSpec.describe 'TeamsController' do
       expect(team.reload.brief).to be_attached
     end
   end
+
+  describe 'update can remove an attachment' do
+    it 'removes the icon when remove_image is checked, keeping the brief' do
+      patch event_team_path(event_id: event.id, id: team.id),
+            params: { team: { name: team.name, image: '', brief: '', remove_image: '1' } }
+
+      team.reload
+      expect(team.image).not_to be_attached
+      expect(team.brief).to be_attached
+    end
+
+    it 'removes the brief when remove_brief is checked' do
+      patch event_team_path(event_id: event.id, id: team.id),
+            params: { team: { name: team.name, image: '', brief: '', remove_brief: '1' } }
+
+      expect(team.reload.brief).not_to be_attached
+    end
+  end
 end
