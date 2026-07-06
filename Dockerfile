@@ -77,9 +77,12 @@ EXPOSE 3000
 CMD ["bin/rails", "server", "-b", "0.0.0.0"]
 
 # =============================================================================
-# Production stage — runtime only, no build tools or Node.js
+# Production stage — runtime only, no build tools.
+# Uses the full (non-slim) bookworm image so Chromium has all the shared
+# libraries it needs at render time. Node.js is required at runtime: Grover
+# drives Puppeteer through a Node bridge to render PDFs (briefs and cast lists).
 # =============================================================================
-FROM ruby:4.0.5-slim-bookworm AS production
+FROM ruby:4.0.5-bookworm AS production
 
 RUN apt-get update -qq && \
     apt-get install -y --no-install-recommends \
@@ -92,8 +95,14 @@ RUN apt-get update -qq && \
       lmodern \
       chromium \
       chromium-driver \
+      fonts-liberation \
       curl \
     && rm -rf /var/lib/apt/lists/*
+
+# Node.js runtime — required by Grover (Puppeteer bridge) for PDF generation
+RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - && \
+    apt-get install -y --no-install-recommends nodejs && \
+    rm -rf /var/lib/apt/lists/*
 
 ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
 
