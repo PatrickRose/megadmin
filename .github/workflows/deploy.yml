@@ -26,6 +26,11 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     if: ${{ github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    # Records a GitHub Deployment so it shows in the repo's "Environments" panel
+    # (Code tab sidebar) and on PRs/commits, with a link to the live app.
+    environment:
+      name: production
+      url: https://megagameadmin.co.uk
 
     steps:
       - uses: actions/checkout@v7
