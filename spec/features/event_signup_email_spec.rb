@@ -190,6 +190,32 @@ RSpec.feature 'EventSignupEmails' do
     expect(page).to have_text 'Email sent'
   end
 
+  specify 'the single-player checklist reports missing team and role briefs' do
+    @signup1.update!(role: @role1, team: @team)
+
+    visit edit_event_event_signup_path(event_id: @event.id, id: @signup1.id)
+    Capybara.ignore_hidden_elements = false
+
+    within('.email-checklist') do
+      expect(page).to have_text '✓ This player has a team and role assigned'
+      expect(page).to have_text '✗ Their team has a briefing file'
+      expect(page).to have_text '✗ Their role has a briefing file'
+    end
+  end
+
+  specify 'the single-player brief checks are hidden when brief validation is off' do
+    @event.update!(skip_brief_validation: true)
+    @signup1.update!(role: @role1, team: @team)
+
+    visit edit_event_event_signup_path(event_id: @event.id, id: @signup1.id)
+    Capybara.ignore_hidden_elements = false
+
+    within('.email-checklist') do
+      expect(page).to have_text 'This player has a team and role assigned'
+      expect(page).to have_no_text 'briefing file'
+    end
+  end
+
   specify 'I cannot send individual emails for draft events' do
     visit edit_event_event_signup_path(event_id: @draft.id, id: @signup2.id)
 
