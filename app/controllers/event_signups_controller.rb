@@ -44,7 +44,7 @@ class EventSignupsController < ApplicationController
     team = Team.find_by(id: event_signup_params[:team_id], event_id: params[:event_id])
     role = Role.find_by(id: event_signup_params[:role_id], event_id: params[:event_id])
 
-    unless team.roles.include? role
+    unless team && role && team.roles.include?(role)
       redirect_to event_event_signups_path(event_id: params[:event_id]), notice: 'Invalid combination of team and role'
       return
     end

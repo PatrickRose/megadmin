@@ -16,6 +16,44 @@ RSpec.describe 'EventSignupsController' do
     login_as organiser
   end
 
+  describe 'create' do
+    let!(:role) { create(:role, event: event, name: 'a role', team: team) }
+
+    it 'creates the player for a valid team and role' do
+      expect do
+        post event_event_signups_path(event_id: event.id),
+             params: { event_signup: { name: 'Valid', email: 'valid@email.com',
+                                       team_id: team.id, role_id: role.id } }
+      end.to change(EventSignup, :count).by(1)
+
+      expect(response).to redirect_to(event_event_signups_path(event_id: event.id))
+    end
+
+    it 'redirects instead of erroring when no team is selected' do
+      expect do
+        post event_event_signups_path(event_id: event.id),
+             params: { event_signup: { name: 'No Team', email: 'noteam@email.com',
+                                       team_id: '', role_id: role.id } }
+      end.not_to change(EventSignup, :count)
+
+      expect(response).to redirect_to(event_event_signups_path(event_id: event.id))
+      follow_redirect!
+      expect(response.body).to include('Invalid combination of team and role')
+    end
+
+    it 'redirects instead of erroring when no role is selected' do
+      expect do
+        post event_event_signups_path(event_id: event.id),
+             params: { event_signup: { name: 'No Role', email: 'norole@email.com',
+                                       team_id: team.id, role_id: '' } }
+      end.not_to change(EventSignup, :count)
+
+      expect(response).to redirect_to(event_event_signups_path(event_id: event.id))
+      follow_redirect!
+      expect(response.body).to include('Invalid combination of team and role')
+    end
+  end
+
   describe 'email' do
     before do
       # Stub the Grover (Chromium) render used when caching the cast list.
