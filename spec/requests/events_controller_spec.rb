@@ -60,7 +60,7 @@ RSpec.describe 'EventsController' do
       get event_path(id: event.id)
 
       expect(response).to have_http_status(:ok)
-      expect(response.body).to include('✗ All roles assigned')
+      expect(response.body).to include('✗ Some players are missing a team or role')
     end
 
     it 'flags missing team and role briefs separately on the checklist' do
@@ -70,8 +70,8 @@ RSpec.describe 'EventsController' do
       get event_path(id: event.id)
 
       expect(response).to have_http_status(:ok)
-      expect(response.body).to include('✗ All teams have briefing files')
-      expect(response.body).to include('✗ All roles have briefing files')
+      expect(response.body).to include('✗ Some teams are missing briefing files')
+      expect(response.body).to include('✗ Some roles are missing briefing files')
     end
   end
 

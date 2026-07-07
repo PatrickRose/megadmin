@@ -9,7 +9,7 @@
       %span.text-success ✓ All roles assigned
     - else
       %details
-        %summary.text-danger ✗ All roles assigned
+        %summary.text-danger ✗ Some players are missing a team or role
         %ul
           - unassigned.each do |signup|
             %li= [signup.name, signup.email].compact.join(' - ')
@@ -21,7 +21,7 @@
         %span.text-success ✓ All teams have briefing files
       - else
         %details
-          %summary.text-warning ✗ All teams have briefing files
+          %summary.text-warning ✗ Some teams are missing briefing files
           %ul
             - teams_without_briefs.each do |team|
               %li= team.name
@@ -30,7 +30,7 @@
         %span.text-success ✓ All roles have briefing files
       - else
         %details
-          %summary.text-warning ✗ All roles have briefing files
+          %summary.text-warning ✗ Some roles are missing briefing files
           %ul
             - roles_without_briefs.each do |role|
               %li= "#{role.team.name} - #{role.name}"

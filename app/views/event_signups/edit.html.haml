@@ -8,7 +8,7 @@
       %ul.list-unstyled.email-checklist
         %li.my-1
           - if @event_signup.team.blank? || @event_signup.role.blank?
-            %span.text-danger ✗ This player has a team and role assigned
+            %span.text-danger ✗ This player is missing a team or role
           - else
             %span.text-success ✓ This player has a team and role assigned
         - unless @event.skip_brief_validation?
@@ -18,7 +18,7 @@
                 %span.text-success ✓ Their team has a briefing file
               - else
                 %details
-                  %summary.text-warning ✗ Their team has a briefing file
+                  %summary.text-warning ✗ Their team is missing a briefing file
                   %ul
                     %li= @event_signup.team.name
           - if @event_signup.role.present?
@@ -27,7 +27,7 @@
                 %span.text-success ✓ Their role has a briefing file
               - else
                 %details
-                  %summary.text-warning ✗ Their role has a briefing file
+                  %summary.text-warning ✗ Their role is missing a briefing file
                   %ul
                     %li= @event_signup.role.name
   .card.my-2
