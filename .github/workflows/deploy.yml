@@ -53,7 +53,14 @@ jobs:
 
       - name: Build and push Docker image
         run: |
-          IMAGE_TAG="${{ env.ACR_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:${{ github.sha }}"
+          # Tag with <timestamp>-<sha>: a unique, human-readable reference per
+          # build. The weekly no-cache rebuild reuses the same commit SHA, so a
+          # plain :<sha> tag would be a no-op on deploy (Container Apps only rolls
+          # out a new revision when the image reference changes). The UTC
+          # timestamp makes every build a distinct tag — including a same-day
+          # redeploy of the same commit — so it always deploys, shipping any
+          # base-image drift the rebuild picked up.
+          IMAGE_REF="${{ env.ACR_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:$(date -u +%Y%m%d-%H%M%S)-${{ github.sha }}"
           IMAGE_LATEST="${{ env.ACR_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:latest"
           CACHE_REF="${{ env.ACR_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:cache"
 
@@ -67,19 +74,24 @@ jobs:
             ${CACHE_ARGS} \
             --cache-to type=registry,ref=${CACHE_REF},mode=max \
             --build-arg SENTRY_RELEASE=${{ github.sha }} \
-            -t "$IMAGE_TAG" \
+            -t "$IMAGE_REF" \
             -t "$IMAGE_LATEST" \
             --push \
             .
 
+          echo "IMAGE_REF=${IMAGE_REF}" >> "$GITHUB_ENV"
+
       - name: Smoke test PDF rendering (real published Google Doc)
+        # Only on the weekly no-cache rebuild. Normal deploys run after CI, and
+        # CI's prod-image-smoke job already renders a PDF in the production
+        # image, so re-running it here just made every release wait twice. The
+        # scheduled rebuild has no CI gate, so this stays as a toolchain-drift
+        # canary (missing Node, Chromium launch failure, base-image version drift).
+        if: ${{ github.event_name == 'schedule' }}
         # Renders a real published Google Doc to PDF inside the just-built
-        # production image, so a broken PDF toolchain (missing Node, Chromium
-        # launch failure, version drift) fails the deploy here instead of only
-        # surfacing when a user generates a brief.
+        # production image.
         run: |
-          IMAGE_TAG="${{ env.ACR_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:${{ github.sha }}"
-          docker run --rm -w /app "$IMAGE_TAG" \
+          docker run --rm -w /app "${{ env.IMAGE_REF }}" \
             bundle exec ruby -e '
               require "grover"
               url = "https://docs.google.com/document/d/e/2PACX-1vRga67T_20rnTp9JtgEuprfiSnTlFohxlHiwj2jF4u97n8TNMXF7wWax2nzNgJbYW-e0jYhTNK3mqVK/pub"
@@ -93,12 +105,10 @@ jobs:
 
       - name: Update migration job image and run migrations
         run: |
-          IMAGE_TAG="${{ env.ACR_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:${{ github.sha }}"
-
           az containerapp job update \
             --name ${{ env.MIGRATE_JOB_NAME }} \
             --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
-            --image "$IMAGE_TAG"
+            --image "${{ env.IMAGE_REF }}"
 
           az containerapp job start \
             --name ${{ env.MIGRATE_JOB_NAME }} \
@@ -128,19 +138,17 @@ jobs:
 
       - name: Update web container app
         run: |
-          IMAGE_TAG="${{ env.ACR_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:${{ github.sha }}"
           az containerapp update \
             --name ${{ env.WEB_APP_NAME }} \
             --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
-            --image "$IMAGE_TAG"
+            --image "${{ env.IMAGE_REF }}"
 
       - name: Update worker container app
         run: |
-          IMAGE_TAG="${{ env.ACR_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:${{ github.sha }}"
           az containerapp update \
             --name ${{ env.WORKER_APP_NAME }} \
             --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
-            --image "$IMAGE_TAG"
+            --image "${{ env.IMAGE_REF }}"
 
       - name: Health check
         run: |
