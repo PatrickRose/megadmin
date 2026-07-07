@@ -30,21 +30,21 @@ class DownloadController < ApplicationController
         # Role brief
         if !player.role.nil? && player.role.brief.attached?
           name = team_name + "role brief#{player.role.brief.filename.extension_with_delimiter}"
-          zip.add(name, ActiveStorage::Blob.service.path_for(player.role.brief.key))
+          zip.get_output_stream(name) { |entry| entry.write(player.role.brief.download) }
         end
         # Team brief
         if !player.team.nil? && player.team.brief.attached?
           name = team_name + "team brief#{player.team.brief.filename.extension_with_delimiter}"
-          zip.add(name, ActiveStorage::Blob.service.path_for(player.team.brief.key))
+          zip.get_output_stream(name) { |entry| entry.write(player.team.brief.download) }
         end
         # Rulebook
         if player.event.rulebook.attached?
           name = team_name + "rulebook#{player.event.rulebook.filename.extension_with_delimiter}"
-          zip.add(name, ActiveStorage::Blob.service.path_for(player.event.rulebook.key))
+          zip.get_output_stream(name) { |entry| entry.write(player.event.rulebook.download) }
         end
         # Additional documents
         player.event.additional_documents.each do |doc|
-          zip.add(team_name + doc.filename.to_s, ActiveStorage::Blob.service.path_for(doc.key))
+          zip.get_output_stream(team_name + doc.filename.to_s) { |entry| entry.write(doc.download) }
         end
         # Cast list
         zip.add("#{team_name}cast.pdf", File.join(cast_temp.path))
