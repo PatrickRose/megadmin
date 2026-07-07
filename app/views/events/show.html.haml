@@ -8,7 +8,7 @@
   .modal-content
   - missing = []
   - missingBrief = []
-  - @event.event_signups.each do |signup|
+  - @event_signups.each do |signup|
     - if (signup.team.blank? || signup.role.blank?)
       - missing << signup.name
     - elsif (!signup.role.brief.attached? || !signup.role.team.brief.attached?)

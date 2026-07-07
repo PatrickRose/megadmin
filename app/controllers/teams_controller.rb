@@ -18,7 +18,11 @@ class TeamsController < ApplicationController
     raise CanCan::AccessDenied.new('Not authorized to access this page', :read, EventSignup) unless can? :read, @event
 
     @organiser = organiser.read_only
+    # Eager-load roles and both team and role brief attachments so the index
+    # doesn't fire a query per team (roles) and per team/role (brief) — N+1.
     @teams = @event.teams
+                   .includes(roles: { brief_attachment: :blob })
+                   .with_attached_brief
   end
 
   def show
