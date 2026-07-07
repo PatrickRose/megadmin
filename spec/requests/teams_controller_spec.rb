@@ -16,6 +16,36 @@ RSpec.describe 'TeamsController' do
                       filename: 'pdf.pdf', content_type: 'application/pdf')
   end
 
+  describe 'index' do
+    def attach_brief(record)
+      record.brief.attach(io: Rails.root.join('spec/fixtures/files/pdf.pdf').open,
+                          filename: 'pdf.pdf', content_type: 'application/pdf')
+      record.save
+    end
+
+    it 'lists teams with their roles and brief status' do
+      # team already has a brief attached (see the before block); give it a
+      # role that also has a brief.
+      briefed_role = create(:role, event: event, team: team, name: 'Briefed role')
+      attach_brief(briefed_role)
+
+      # A second team with no brief and a role with no brief.
+      other_team = create(:team, event: event, name: 'Team two')
+      create(:role, event: event, team: other_team, name: 'Briefless role')
+
+      get event_teams_path(event_id: event.id)
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include(team.name)
+      expect(response.body).to include('Team two')
+      expect(response.body).to include('Briefed role')
+      # Roles without a brief render the name_brief "[NO BRIEF]" marker.
+      expect(response.body).to include('Briefless role [NO BRIEF]')
+      # other_team has no brief attached, so its warning is shown.
+      expect(response.body).to include('No brief attached.')
+    end
+  end
+
   describe 'update keeps attachments when file fields are left blank' do
     it 'keeps the icon when the image field is blank' do
       patch event_team_path(event_id: event.id, id: team.id),

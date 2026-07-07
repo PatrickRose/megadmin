@@ -25,8 +25,12 @@ module CastList
   def html_cast_list(view, event)
     @event = event
 
-    # Group signups on teams, sort by signup name
-    @grouped_event_signups = EventSignup.where(event_id: @event.id).group_by(&:team).map do |team, signups|
+    # Group signups on teams, sort by signup name. Eager-load team and role so
+    # grouping by team and rendering each signup's role doesn't fire a query per
+    # signup (N+1).
+    @grouped_event_signups = EventSignup.where(event_id: @event.id)
+                                        .includes(:team, :role)
+                                        .group_by(&:team).map do |team, signups|
       [team, signups.sort_by(&:name)]
     end
 
