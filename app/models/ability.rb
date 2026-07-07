@@ -13,7 +13,8 @@ class Ability
     end
 
     # Allow organisers to add new signups to their events
-    can [:create, :player_csv, :generate_template, :organiser_cast_list, :email, :email_single], EventSignup do
+    can [:create, :player_csv, :generate_template, :organiser_cast_list, :email, :email_single,
+         :regenerate_cast_list], EventSignup do
       # Check if the user can manage the Event associated with the EventSignup
       event = Event.find(params[:event_id])
       can?(:manage, event)

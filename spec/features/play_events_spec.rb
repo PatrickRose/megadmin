@@ -126,7 +126,9 @@ context 'Viewing the player page' do
   end
 
   scenario 'download_cast_list called correctly with correct params' do
-    visit "play/#{@event_signup1.uuid}/player_cast_list"
+    # First download lazily generates and caches the player cast list PDF.
+    expect { visit "play/#{@event_signup1.uuid}/player_cast_list" }
+      .to change { @event_signup1.event.reload.player_cast_list_pdf.attached? }.from(false).to(true)
     expect(page.response_headers['Content-Disposition']).to include('attachment')
   end
 end

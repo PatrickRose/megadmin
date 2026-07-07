@@ -32,6 +32,7 @@ Rails.application.routes.draw do
         collection { post 'email'}
         collection { get 'email_single' }
         collection { post 'email_single' }
+        collection { post 'regenerate_cast_list' }
       end
     end
   end

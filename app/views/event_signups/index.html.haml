@@ -118,6 +118,7 @@
       .btn-row-centered
         = link_to 'New Player',  new_event_event_signup_path(event_id: @event.id), class: 'btn generic-button-recommended'
         = link_to 'Download cast list', organiser_cast_list_event_event_signups_path(event_id: @event.id), class: 'btn generic-button-recommended'
+        = button_to 'Regenerate cast list', regenerate_cast_list_event_event_signups_path(event_id: @event.id), class: 'btn generic-button-recommended'
         - if @event.draft
           %button#open-popup.btn.generic-button-recommended.disabled Create email for all signups
           %br

@@ -17,6 +17,11 @@ RSpec.describe 'EventSignupsController' do
   end
 
   describe 'email' do
+    before do
+      # Stub the Grover (Chromium) render used when caching the cast list.
+      allow(Grover).to receive(:new).and_return(instance_double(Grover, to_pdf: 'FAKE-PDF-BYTES'))
+    end
+
     # Builds a signup that is valid to email: its own role with a brief attached.
     def emailable_signup(name:, email:, brief_emailed_at: nil)
       role = create(:role, event: event, name: "role for #{name}", team: team)
@@ -25,6 +30,13 @@ RSpec.describe 'EventSignupsController' do
       role.save
       create(:event_signup, event: event, name: name, email: email, role: role, team: team,
                             brief_emailed_at: brief_emailed_at)
+    end
+
+    it 'regenerates the cached cast list when emailing all signups' do
+      emailable_signup(name: 'roster', email: 'roster@email.com')
+
+      expect { post email_event_event_signups_path(event_id: event.id) }
+        .to change { event.reload.player_cast_list_pdf.attached? }.from(false).to(true)
     end
 
     it 'redirects with alert for draft event' do
@@ -92,6 +104,21 @@ RSpec.describe 'EventSignupsController' do
       expect(response).to redirect_to(event_event_signups_path(event_id: draft.id))
       follow_redirect!
       expect(response.body).to include('Event needs to be published to send emails')
+    end
+  end
+
+  describe 'regenerate_cast_list' do
+    before do
+      allow(Grover).to receive(:new).and_return(instance_double(Grover, to_pdf: 'FAKE-PDF-BYTES'))
+    end
+
+    it 'regenerates and caches the player cast list PDF' do
+      expect { post regenerate_cast_list_event_event_signups_path(event_id: event.id) }
+        .to change { event.reload.player_cast_list_pdf.attached? }.from(false).to(true)
+
+      expect(response).to redirect_to(event_event_signups_path(event_id: event.id))
+      follow_redirect!
+      expect(response.body).to include('Cast list regenerated')
     end
   end
 end

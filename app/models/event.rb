@@ -39,6 +39,11 @@ class Event < ApplicationRecord
   has_one_attached :rulebook
   has_many_attached :additional_documents
 
+  # Cached cast-list PDF (player variant). Generated once at email-send time and
+  # reused by every player download so we don't launch a headless Chromium per
+  # request. Refreshed by CastList#regenerate_player_cast_list!.
+  has_one_attached :player_cast_list_pdf
+
   has_rich_text :timetable
   has_rich_text :description
 
