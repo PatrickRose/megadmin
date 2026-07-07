@@ -73,10 +73,14 @@ jobs:
             .
 
       - name: Smoke test PDF rendering (real published Google Doc)
+        # Only on the weekly no-cache rebuild. Normal deploys run after CI, and
+        # CI's prod-image-smoke job already renders a PDF in the production
+        # image, so re-running it here just made every release wait twice. The
+        # scheduled rebuild has no CI gate, so this stays as a toolchain-drift
+        # canary (missing Node, Chromium launch failure, base-image version drift).
+        if: ${{ github.event_name == 'schedule' }}
         # Renders a real published Google Doc to PDF inside the just-built
-        # production image, so a broken PDF toolchain (missing Node, Chromium
-        # launch failure, version drift) fails the deploy here instead of only
-        # surfacing when a user generates a brief.
+        # production image.
         run: |
           IMAGE_TAG="${{ env.ACR_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:${{ github.sha }}"
           docker run --rm -w /app "$IMAGE_TAG" \
