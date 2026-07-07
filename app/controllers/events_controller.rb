@@ -158,7 +158,7 @@ class EventsController < ApplicationController
   def event_params
     permitted = params.expect(event: [:name, :description, :location, :google_maps_link, :date, :timetable,
                                       :additional_info, :organiser_id, :rulebook, :remove_rulebook,
-                                      :draft, :skip_brief_validation,
+                                      :draft, :skip_team_brief_validation, :skip_role_brief_validation,
                                       { additional_documents: [], remove_additional_document_ids: [] }])
     keep_existing_files(permitted, :rulebook, :additional_documents)
   end

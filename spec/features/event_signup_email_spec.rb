@@ -95,8 +95,8 @@ RSpec.feature 'EventSignupEmails' do
     end
   end
 
-  specify 'the brief checks are hidden when brief validation is turned off for the event' do
-    @event.update!(skip_brief_validation: true)
+  specify 'the team brief check is hidden when team brief validation is off' do
+    @event.update!(skip_team_brief_validation: true)
     @signup1.update!(role: @role1, team: @team)
     @signup2.update!(role: @role2, team: @team)
 
@@ -104,9 +104,24 @@ RSpec.feature 'EventSignupEmails' do
     Capybara.ignore_hidden_elements = false
 
     within('.email-checklist') do
-      expect(page).to have_text 'All roles assigned'
-      expect(page).to have_no_text 'All teams have briefing files'
-      expect(page).to have_no_text 'All roles have briefing files'
+      expect(page).to have_no_text 'Some teams are missing briefing files'
+      # The role brief check still runs.
+      expect(page).to have_text '✗ Some roles are missing briefing files'
+    end
+  end
+
+  specify 'the role brief check is hidden when role brief validation is off' do
+    @event.update!(skip_role_brief_validation: true)
+    @signup1.update!(role: @role1, team: @team)
+    @signup2.update!(role: @role2, team: @team)
+
+    visit event_event_signups_path(event_id: @event.id)
+    Capybara.ignore_hidden_elements = false
+
+    within('.email-checklist') do
+      expect(page).to have_no_text 'Some roles are missing briefing files'
+      # The team brief check still runs.
+      expect(page).to have_text '✗ Some teams are missing briefing files'
     end
   end
 
@@ -215,7 +230,7 @@ RSpec.feature 'EventSignupEmails' do
   end
 
   specify 'the single-player brief checks are hidden when brief validation is off' do
-    @event.update!(skip_brief_validation: true)
+    @event.update!(skip_team_brief_validation: true, skip_role_brief_validation: true)
     @signup1.update!(role: @role1, team: @team)
 
     visit edit_event_event_signup_path(event_id: @event.id, id: @signup1.id)

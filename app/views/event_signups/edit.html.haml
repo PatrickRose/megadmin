@@ -11,7 +11,7 @@
             %span.text-danger ✗ This player is missing a team or role
           - else
             %span.text-success ✓ This player has a team and role assigned
-        - unless @event.skip_brief_validation?
+        - unless @event.skip_team_brief_validation?
           - if @event_signup.team.present?
             %li.my-1
               - if @event_signup.team.brief.attached?
@@ -21,6 +21,7 @@
                   %summary.text-warning ✗ Their team is missing a briefing file
                   %ul
                     %li= link_to @event_signup.team.name, edit_event_team_path(event_id: @event.id, id: @event_signup.team.id)
+        - unless @event.skip_role_brief_validation?
           - if @event_signup.role.present?
             %li.my-1
               - if @event_signup.role.brief.attached?

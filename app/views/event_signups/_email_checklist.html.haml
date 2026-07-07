@@ -13,9 +13,8 @@
         %ul
           - unassigned.each do |signup|
             %li= [signup.name, signup.email].compact.join(' - ')
-  - unless event.skip_brief_validation?
+  - unless event.skip_team_brief_validation?
     - teams_without_briefs = event.teams_missing_briefs
-    - roles_without_briefs = event.roles_missing_briefs
     %li.my-1
       - if teams_without_briefs.empty?
         %span.text-success ✓ All teams have briefing files
@@ -25,6 +24,8 @@
           %ul
             - teams_without_briefs.each do |team|
               %li= link_to team.name, edit_event_team_path(event_id: event.id, id: team.id)
+  - unless event.skip_role_brief_validation?
+    - roles_without_briefs = event.roles_missing_briefs
     %li.my-1
       - if roles_without_briefs.empty?
         %span.text-success ✓ All roles have briefing files

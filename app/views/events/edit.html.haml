@@ -22,7 +22,8 @@
           = form.label :timetable
           = form.rich_text_area :timetable
         = form.input :additional_info, label: 'Additional Information:'
-        = form.input :skip_brief_validation, as: :boolean, label: 'Skip the team and role briefing-file checks when sending emails'
+        = form.input :skip_team_brief_validation, as: :boolean, label: 'Skip the team briefing-file check when sending emails'
+        = form.input :skip_role_brief_validation, as: :boolean, label: 'Skip the role briefing-file check when sending emails'
         .form-group
           = form.input :additional_documents, label: 'Additional Documents:', input_html: { multiple: true }
           %p.text-muted.small Leave empty to keep the current documents; uploading replaces the whole set.

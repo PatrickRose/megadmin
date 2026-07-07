@@ -104,38 +104,34 @@ RSpec.describe 'EventsController' do
     end
   end
 
-  describe 'brief validation setting' do
-    it 'shows the toggle on the edit page' do
+  describe 'brief validation settings' do
+    it 'shows both toggles on the edit page' do
       get edit_event_path(id: event.id)
 
       expect(response).to have_http_status(:ok)
-      expect(response.body).to include('skip_brief_validation')
+      expect(response.body).to include('skip_team_brief_validation')
+      expect(response.body).to include('skip_role_brief_validation')
     end
 
-    it 'persists the setting when the event is updated' do
+    it 'persists both settings when the event is updated' do
       patch event_path(id: event.id),
-            params: { event: { name: event.name, location: event.location,
-                               date: event.date, google_maps_link: '', skip_brief_validation: '1' } }
+            params: { event: { name: event.name, location: event.location, date: event.date,
+                               google_maps_link: '', skip_team_brief_validation: '1',
+                               skip_role_brief_validation: '1' } }
 
-      expect(event.reload.skip_brief_validation).to be true
+      event.reload
+      expect(event.skip_team_brief_validation).to be true
+      expect(event.skip_role_brief_validation).to be true
     end
 
-    it 'checks the toggle when the event skips brief validation' do
-      event.update!(skip_brief_validation: true)
+    it 'renders each toggle to match its saved value' do
+      event.update!(skip_team_brief_validation: true, skip_role_brief_validation: false)
 
       get edit_event_path(id: event.id)
 
-      expect(Capybara.string(response.body))
-        .to have_checked_field('event[skip_brief_validation]')
-    end
-
-    it 'leaves the toggle unchecked when brief validation is enforced' do
-      event.update!(skip_brief_validation: false)
-
-      get edit_event_path(id: event.id)
-
-      expect(Capybara.string(response.body))
-        .to have_unchecked_field('event[skip_brief_validation]')
+      html = Capybara.string(response.body)
+      expect(html).to have_checked_field('event[skip_team_brief_validation]')
+      expect(html).to have_unchecked_field('event[skip_role_brief_validation]')
     end
   end
 

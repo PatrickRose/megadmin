@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_07_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_07_130000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -92,7 +92,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_07_120000) do
     t.string "location"
     t.string "name"
     t.bigint "organiser_id"
-    t.boolean "skip_brief_validation", default: false, null: false
+    t.boolean "skip_role_brief_validation", default: false, null: false
+    t.boolean "skip_team_brief_validation", default: false, null: false
     t.datetime "updated_at", null: false
     t.index ["organiser_id"], name: "index_events_on_organiser_id"
   end
