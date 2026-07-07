@@ -16,12 +16,11 @@ class EventSignupsController < ApplicationController
     raise CanCan::AccessDenied.new('Not authorized to access this page', :read, EventSignup) if @ct.nil?
     raise CanCan::AccessDenied.new('Not authorized to access this page', :read, EventSignup) unless can? :read, @event
 
-    # Eager-load the associations the index view walks per signup (team, role,
-    # the role's team, and both role and team brief attachments) to avoid N+1s.
+    # Eager-load the team and role the index table links to, avoiding an N+1
+    # across signups. The brief-email checklist loads its own associations
+    # separately (see Event#checklist_signups).
     @event_signups = EventSignup.where({ event_id: @event.id })
-                                .includes(:team,
-                                          role: [{ brief_attachment: :blob },
-                                                 { team: { brief_attachment: :blob } }])
+                                .includes(:team, :role)
   end
 
   def new

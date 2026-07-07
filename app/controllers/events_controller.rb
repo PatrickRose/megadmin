@@ -27,14 +27,6 @@ class EventsController < ApplicationController
     @control_team = OrganiserToEvent.where(organiser_id: current_organiser.id,
                                            event_id: @event.id).pick(:read_only)
 
-    # Eager-load the associations the "send emails" popup walks per signup
-    # (team, role, the role's team, and both role and team brief attachments)
-    # to avoid N+1s.
-    @event_signups = @event.event_signups
-                           .includes(:team,
-                                     role: [{ brief_attachment: :blob },
-                                            { team: { brief_attachment: :blob } }])
-
     return if @event.google_maps_link.nil?
 
     @first_index = @event.google_maps_link.index('"')
@@ -166,7 +158,8 @@ class EventsController < ApplicationController
   def event_params
     permitted = params.expect(event: [:name, :description, :location, :google_maps_link, :date, :timetable,
                                       :additional_info, :organiser_id, :rulebook, :remove_rulebook,
-                                      :draft, { additional_documents: [], remove_additional_document_ids: [] }])
+                                      :draft, :skip_team_brief_validation, :skip_role_brief_validation,
+                                      { additional_documents: [], remove_additional_document_ids: [] }])
     keep_existing_files(permitted, :rulebook, :additional_documents)
   end
 

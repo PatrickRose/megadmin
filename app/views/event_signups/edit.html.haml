@@ -1,10 +1,36 @@
 #dark-screen
 #popup-modal{ style: "display:none;" }
   .modal-content
-  - if @event_signup.team.blank? || @event_signup.role.blank?
-    .alert.alert-danger This player is missing a team or role
-  - elsif !@event_signup.role.brief.attached? || !@event_signup.role.team.brief.attached?
-    .alert.alert-warning This player is missing a team or role brief, are you sure you want to continue?
+  .card.mb-2
+    .card-header
+      %h2 Before you send
+    .card-body
+      %ul.list-unstyled.email-checklist
+        %li.my-1
+          - if @event_signup.team.blank? || @event_signup.role.blank?
+            %span.text-danger ✗ This player is missing a team or role
+          - else
+            %span.text-success ✓ This player has a team and role assigned
+        - unless @event.skip_team_brief_validation?
+          - if @event_signup.team.present?
+            %li.my-1
+              - if @event_signup.team.brief.attached?
+                %span.text-success ✓ Their team has a brief
+              - else
+                %details.alert.alert-warning
+                  %summary.alert-heading ✗ Their team doesn't have a brief
+                  %ul
+                    %li= link_to @event_signup.team.name, edit_event_team_path(event_id: @event.id, id: @event_signup.team.id), target: '_blank', rel: 'noopener'
+        - unless @event.skip_role_brief_validation?
+          - if @event_signup.role.present?
+            %li.my-1
+              - if @event_signup.role.brief.attached?
+                %span.text-success ✓ Their role has a brief
+              - else
+                %details.alert.alert-warning
+                  %summary.alert-heading ✗ Their role doesn't have a brief
+                  %ul
+                    %li= link_to @event_signup.role.name, edit_event_role_path(event_id: @event.id, id: @event_signup.role.id), target: '_blank', rel: 'noopener'
   .card.my-2
     .card-header
       %h2 Add additional email note

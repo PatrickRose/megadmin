@@ -48,27 +48,43 @@ RSpec.describe 'EventsController' do
       expect(response).to have_http_status(:ok)
       expect(response.body).to include(event.name)
       expect(response.body).to include('Send emails to all players')
-      # Signup has a team, role, and both briefs, so no warnings are shown.
-      expect(response.body).not_to include('missing a team or role')
+      # Signup has a team, role, and both briefs, so every checklist item passes.
+      expect(response.body).to include('✓ All players have a team and role')
+      expect(response.body).to include('✓ All teams have a brief')
+      expect(response.body).to include('✓ All roles have a brief')
     end
 
-    it 'warns when a signup has no role assigned' do
-      create(:event_signup, event: event, name: 'Roleless player', email: 'roleless@email.com')
+    it 'flags players with no role assigned on the checklist' do
+      signup = create(:event_signup, event: event, name: 'Roleless player', email: 'roleless@email.com')
 
       get event_path(id: event.id)
 
       expect(response).to have_http_status(:ok)
-      expect(response.body).to include('missing a team or role')
+      expect(response.body).to include('✗ 1 player without a team or role')
+      # The unassigned player links to their edit page so they can be assigned.
+      href = edit_event_event_signup_path(event_id: event.id, id: signup.id)
+      link = Capybara.string(response.body).find_link(href: href, visible: :all)
+      expect(link[:target]).to eq('_blank')
     end
 
-    it "warns when a signup's role or team is missing a brief" do
+    it 'flags missing team and role briefs separately on the checklist' do
       create(:event_signup, event: event, name: 'Briefless player', email: 'briefless@email.com',
                             team: team, role: role)
 
       get event_path(id: event.id)
 
       expect(response).to have_http_status(:ok)
-      expect(response.body).to include('missing a team or role brief')
+      expect(response.body).to include('✗ 1 team without a brief')
+      expect(response.body).to include('✗ 1 role without a brief')
+      # Each flagged team/role links to its edit page so it can be fixed inline.
+      expect(response.body).to include(edit_event_team_path(event_id: event.id, id: team.id))
+      expect(response.body).to include(edit_event_role_path(event_id: event.id, id: role.id))
+      # The edit links open in a new tab so the checklist stays put.
+      html = Capybara.string(response.body)
+      team_link = html.find_link(href: edit_event_team_path(event_id: event.id, id: team.id), visible: :all)
+      role_link = html.find_link(href: edit_event_role_path(event_id: event.id, id: role.id), visible: :all)
+      expect(team_link[:target]).to eq('_blank')
+      expect(role_link[:target]).to eq('_blank')
     end
   end
 
@@ -95,6 +111,37 @@ RSpec.describe 'EventsController' do
                                date: event.date, google_maps_link: '', additional_documents: [''] } }
 
       expect(event.reload.additional_documents.count).to eq(2)
+    end
+  end
+
+  describe 'brief validation settings' do
+    it 'shows both toggles on the edit page' do
+      get edit_event_path(id: event.id)
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include('skip_team_brief_validation')
+      expect(response.body).to include('skip_role_brief_validation')
+    end
+
+    it 'persists both settings when the event is updated' do
+      patch event_path(id: event.id),
+            params: { event: { name: event.name, location: event.location, date: event.date,
+                               google_maps_link: '', skip_team_brief_validation: '1',
+                               skip_role_brief_validation: '1' } }
+
+      event.reload
+      expect(event.skip_team_brief_validation).to be true
+      expect(event.skip_role_brief_validation).to be true
+    end
+
+    it 'renders each toggle to match its saved value' do
+      event.update!(skip_team_brief_validation: true, skip_role_brief_validation: false)
+
+      get edit_event_path(id: event.id)
+
+      html = Capybara.string(response.body)
+      expect(html).to have_checked_field('event[skip_team_brief_validation]')
+      expect(html).to have_unchecked_field('event[skip_role_brief_validation]')
     end
   end
 

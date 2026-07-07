@@ -4,17 +4,19 @@
 #
 # Table name: events
 #
-#  id               :bigint           not null, primary key
-#  additional_info  :text
-#  date             :datetime
-#  description      :text
-#  draft            :boolean
-#  google_maps_link :string
-#  location         :string
-#  name             :string
-#  created_at       :datetime         not null
-#  updated_at       :datetime         not null
-#  organiser_id     :bigint
+#  id                         :bigint           not null, primary key
+#  additional_info            :text
+#  date                       :datetime
+#  description                :text
+#  draft                      :boolean
+#  google_maps_link           :string
+#  location                   :string
+#  name                       :string
+#  skip_role_brief_validation :boolean          default(FALSE), not null
+#  skip_team_brief_validation :boolean          default(FALSE), not null
+#  created_at                 :datetime         not null
+#  updated_at                 :datetime         not null
+#  organiser_id               :bigint
 #
 # Indexes
 #

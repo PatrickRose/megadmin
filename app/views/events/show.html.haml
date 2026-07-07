@@ -6,22 +6,12 @@
     %button#close-publish-popup.btn.btn-secondary(type='button') Cancel
 #popup-modal{ style: "display:none;" }
   .modal-content
-  - missing = []
-  - missingBrief = []
-  - @event_signups.each do |signup|
-    - if (signup.team.blank? || signup.role.blank?)
-      - missing << signup.name
-    - elsif (!signup.role.brief.attached? || !signup.role.team.brief.attached?)
-      - missingBrief << signup.name
-  - if missing.size == 1
-    .alert.alert-danger Player "#{missing.join(', ')}" is missing a team or role
-  - elsif missing.size > 1
-    .alert.alert-danger Players "#{missing.join(', ')}" are missing teams or roles
-  - elsif missing.empty?
-    - if missingBrief.size == 1
-      .alert.alert-warning Player "#{missingBrief.join(', ')}" is missing a team or role brief, are you sure you want to continue?
-    - elsif missingBrief.size > 1
-      .alert.alert-warning Players "#{missingBrief.join(', ')}" are missing team or role briefs, are you sure you want to continue?
+  - all_assigned = @event.signups_missing_assignment.empty?
+  .card.mb-2
+    .card-header
+      %h2 Before you send
+    .card-body
+      = render 'event_signups/email_checklist', event: @event
   .card.my-2
     .card-header
       %h2 Add additional email note
@@ -29,7 +19,7 @@
       = form_tag(email_event_path(id: @event.id), method: :post, id: 'email-note-form') do
         %textarea#optional-text{name: 'email_note', rows: 4, cols: 40, placeholder: "Add an optional note in the email to players here" }
         %br/
-        - if missing.size == 0
+        - if all_assigned
           %label.d-block.my-2
             = check_box_tag 'resend_all', '1'
             Resend to players who have already been emailed

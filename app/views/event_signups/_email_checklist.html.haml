@@ -1,0 +1,37 @@
+-# Pre-send checklist for brief emails. Each item is green when satisfied;
+-# otherwise it becomes an accordion (a <details> element) listing what is
+-# still outstanding.
+- unassigned = event.signups_missing_assignment
+
+%ul.list-unstyled.email-checklist
+  %li.my-1
+    - if unassigned.empty?
+      %span.text-success ✓ All players have a team and role
+    - else
+      %details.alert.alert-danger
+        %summary.alert-heading ✗ #{pluralize(unassigned.size, 'player')} without a team or role
+        %ul
+          - unassigned.each do |signup|
+            %li= link_to [signup.name, signup.email].compact.join(' - '), edit_event_event_signup_path(event_id: event.id, id: signup.id), target: '_blank', rel: 'noopener'
+  - unless event.skip_team_brief_validation?
+    - teams_without_briefs = event.teams_missing_briefs
+    %li.my-1
+      - if teams_without_briefs.empty?
+        %span.text-success ✓ All teams have a brief
+      - else
+        %details.alert.alert-warning
+          %summary.alert-heading ✗ #{pluralize(teams_without_briefs.size, 'team')} without a brief
+          %ul
+            - teams_without_briefs.each do |team|
+              %li= link_to team.name, edit_event_team_path(event_id: event.id, id: team.id), target: '_blank', rel: 'noopener'
+  - unless event.skip_role_brief_validation?
+    - roles_without_briefs = event.roles_missing_briefs
+    %li.my-1
+      - if roles_without_briefs.empty?
+        %span.text-success ✓ All roles have a brief
+      - else
+        %details.alert.alert-warning
+          %summary.alert-heading ✗ #{pluralize(roles_without_briefs.size, 'role')} without a brief
+          %ul
+            - roles_without_briefs.each do |role|
+              %li= link_to "#{role.team.name} - #{role.name}", edit_event_role_path(event_id: event.id, id: role.id), target: '_blank', rel: 'noopener'
