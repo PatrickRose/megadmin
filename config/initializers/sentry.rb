@@ -14,6 +14,7 @@ Sentry.init do |config|
     'ActionDispatch::Http::MimeNegotiation::InvalidType',
     'CanCan::AccessDenied',
     'Mime::Type::InvalidMimeType',
+    'Rack::Multipart::BoundaryTooLongError',
     'Rack::QueryParser::InvalidParameterError',
     'Rack::QueryParser::ParameterTypeError',
     'SystemExit',
