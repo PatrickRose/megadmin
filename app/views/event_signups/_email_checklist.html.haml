@@ -8,8 +8,8 @@
     - if unassigned.empty?
       %span.text-success ✓ All roles assigned
     - else
-      %details
-        %summary.text-danger ✗ Some players are missing a team or role
+      %details.alert.alert-danger
+        %summary.alert-heading ✗ Some players are missing a team or role
         %ul
           - unassigned.each do |signup|
             %li= [signup.name, signup.email].compact.join(' - ')
@@ -19,8 +19,8 @@
       - if teams_without_briefs.empty?
         %span.text-success ✓ All teams have briefing files
       - else
-        %details
-          %summary.text-warning ✗ Some teams are missing briefing files
+        %details.alert.alert-warning
+          %summary.alert-heading ✗ Some teams are missing briefing files
           %ul
             - teams_without_briefs.each do |team|
               %li= link_to team.name, edit_event_team_path(event_id: event.id, id: team.id)
@@ -30,8 +30,8 @@
       - if roles_without_briefs.empty?
         %span.text-success ✓ All roles have briefing files
       - else
-        %details
-          %summary.text-warning ✗ Some roles are missing briefing files
+        %details.alert.alert-warning
+          %summary.alert-heading ✗ Some roles are missing briefing files
           %ul
             - roles_without_briefs.each do |role|
               %li= link_to "#{role.team.name} - #{role.name}", edit_event_role_path(event_id: event.id, id: role.id)
