@@ -113,3 +113,59 @@ jobs:
         with:
           name: coverage-report
           path: coverage/
+
+  schema-and-annotations:
+    # Guards against db/schema.rb or model annotations drifting from what the
+    # current migrations + annotaterb produce. Regenerates them inside the same
+    # development image as the test job (Ruby 4.0.5), so the result matches a
+    # developer's local `bin/rails db:migrate` rather than the runner's system
+    # Ruby, then fails if anything differs from what's checked in.
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - uses: actions/checkout@v7
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+      - name: Build development image
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          target: development
+          load: true
+          tags: megadmin-dev
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+      - name: Regenerate schema.rb and annotations from migrations
+        run: >-
+          docker run --name schemagen --network host
+          -e RAILS_ENV=development
+          -e POSTGRES_HOST=localhost
+          -e POSTGRES_USER=postgres
+          -e POSTGRES_PASSWORD=postgres
+          megadmin-dev
+          bash -c "bin/rails db:create db:migrate && bundle exec annotaterb models"
+      - name: Copy generated files out of the container
+        run: |
+          docker cp schemagen:/app/db/schema.rb db/schema.rb
+          docker cp schemagen:/app/app/models/. app/models/
+          docker cp schemagen:/app/spec/models/. spec/models/
+          docker cp schemagen:/app/spec/factories/. spec/factories/
+          docker rm schemagen
+      - name: Fail if schema.rb or annotations are out of date
+        run: |
+          if ! git diff --exit-code db/schema.rb app/models spec/models spec/factories; then
+            echo "::error::db/schema.rb or model annotations are out of date. Run 'bin/rails db:migrate && bundle exec annotaterb models' locally and commit the result." >&2
+            exit 1
+          fi
