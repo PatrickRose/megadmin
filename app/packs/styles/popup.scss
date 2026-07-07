@@ -81,3 +81,11 @@ $lightBG: #fdf8f2;
     padding: 10px 0 10px 0;
     width: 100px;
 }
+
+/* Keep the brief-email checklist accordions from overflowing the modal:
+   cap their height and let long lists scroll. */
+.email-checklist details > ul {
+    max-height: 200px;
+    overflow-y: auto;
+    margin-bottom: 0;
+}
