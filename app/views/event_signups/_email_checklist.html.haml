@@ -12,7 +12,7 @@
         %summary.alert-heading ✗ #{pluralize(unassigned.size, 'player')} without a team or role
         %ul
           - unassigned.each do |signup|
-            %li= [signup.name, signup.email].compact.join(' - ')
+            %li= link_to [signup.name, signup.email].compact.join(' - '), edit_event_event_signup_path(event_id: event.id, id: signup.id), target: '_blank', rel: 'noopener'
   - unless event.skip_team_brief_validation?
     - teams_without_briefs = event.teams_missing_briefs
     %li.my-1

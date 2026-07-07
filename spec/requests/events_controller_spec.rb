@@ -55,12 +55,16 @@ RSpec.describe 'EventsController' do
     end
 
     it 'flags players with no role assigned on the checklist' do
-      create(:event_signup, event: event, name: 'Roleless player', email: 'roleless@email.com')
+      signup = create(:event_signup, event: event, name: 'Roleless player', email: 'roleless@email.com')
 
       get event_path(id: event.id)
 
       expect(response).to have_http_status(:ok)
       expect(response.body).to include('✗ 1 player without a team or role')
+      # The unassigned player links to their edit page so they can be assigned.
+      href = edit_event_event_signup_path(event_id: event.id, id: signup.id)
+      link = Capybara.string(response.body).find_link(href: href, visible: :all)
+      expect(link[:target]).to eq('_blank')
     end
 
     it 'flags missing team and role briefs separately on the checklist' do
