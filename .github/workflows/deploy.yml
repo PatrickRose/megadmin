@@ -53,14 +53,16 @@ jobs:
 
       - name: Build and push Docker image
         run: |
-          # Tag with <timestamp>-<sha>: a unique, human-readable reference per
-          # build. The weekly no-cache rebuild reuses the same commit SHA, so a
-          # plain :<sha> tag would be a no-op on deploy (Container Apps only rolls
-          # out a new revision when the image reference changes). The UTC
-          # timestamp makes every build a distinct tag — including a same-day
-          # redeploy of the same commit — so it always deploys, shipping any
-          # base-image drift the rebuild picked up.
-          IMAGE_REF="${{ env.ACR_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:$(date -u +%Y%m%d-%H%M%S)-${{ github.sha }}"
+          # <timestamp>-<sha> identifies each build uniquely and is reused for
+          # BOTH the image tag and the Sentry release. The weekly no-cache
+          # rebuild reuses the same commit SHA, so a plain :<sha> would be a
+          # no-op on deploy (Container Apps only rolls out a new revision when
+          # the image reference changes) AND would look like the same Sentry
+          # release. The UTC timestamp makes every build a distinct tag and
+          # release — so the rebuild always deploys and Sentry registers it as a
+          # new release, surfacing any base-image drift it picked up.
+          RELEASE_VERSION="$(date -u +%Y%m%d-%H%M%S)-${{ github.sha }}"
+          IMAGE_REF="${{ env.ACR_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:${RELEASE_VERSION}"
           IMAGE_LATEST="${{ env.ACR_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:latest"
           CACHE_REF="${{ env.ACR_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:cache"
 
@@ -73,13 +75,14 @@ jobs:
             --target production \
             ${CACHE_ARGS} \
             --cache-to type=registry,ref=${CACHE_REF},mode=max \
-            --build-arg SENTRY_RELEASE=${{ github.sha }} \
+            --build-arg SENTRY_RELEASE=${RELEASE_VERSION} \
             -t "$IMAGE_REF" \
             -t "$IMAGE_LATEST" \
             --push \
             .
 
           echo "IMAGE_REF=${IMAGE_REF}" >> "$GITHUB_ENV"
+          echo "RELEASE_VERSION=${RELEASE_VERSION}" >> "$GITHUB_ENV"
 
       - name: Smoke test PDF rendering (real published Google Doc)
         # Only on the weekly no-cache rebuild. Normal deploys run after CI, and
@@ -180,6 +183,11 @@ jobs:
           SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
           SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
         with:
-          release: ${{ github.sha }}
+          # Same <timestamp>-<sha> as the deployed image, so the release Sentry
+          # creates matches the release baked into the running app (SENTRY_RELEASE)
+          # and each rebuild is a distinct release. set_commits auto still derives
+          # the commit range from git (HEAD + previous release), independent of the
+          # release name, so Fixes/suspect-commit association keeps working.
+          release: ${{ env.RELEASE_VERSION }}
           set_commits: auto
           environment: production
