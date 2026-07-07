@@ -301,6 +301,10 @@ class EventSignupsController < ApplicationController
       return
     end
 
+    # Refresh the cached player cast list now the roster is being communicated,
+    # so every player downloads the current version without re-rendering it.
+    regenerate_player_cast_list!(event)
+
     # Enqueue one throttled job per recipient. A single big job that looped over
     # every signup would, on any failure, be retried from the top by Delayed Job
     # and re-send to everyone already emailed. Per-recipient jobs isolate retries
@@ -331,9 +335,21 @@ class EventSignupsController < ApplicationController
       return
     end
 
+    # Make sure a cached cast list exists for the player to download, without
+    # forcing a re-render on every individual email.
+    player_cast_list_pdf_bytes(event)
+
     SendBriefEmailJob.perform_later(signup, event, email_note, organiser)
 
     redirect_to edit_event_event_signup_path(event_id: event.id, id: signup.id), notice: 'Email sent'
+  end
+
+  # Re-renders and caches the player cast list PDF on the event.
+  def regenerate_cast_list
+    event = Event.find(params.expect(:event_id))
+    regenerate_player_cast_list!(event)
+
+    redirect_to event_event_signups_path(event_id: event.id), notice: 'Cast list regenerated'
   end
 
   private
