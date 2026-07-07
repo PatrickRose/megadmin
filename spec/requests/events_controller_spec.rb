@@ -49,7 +49,9 @@ RSpec.describe 'EventsController' do
       expect(response.body).to include(event.name)
       expect(response.body).to include('Send emails to all players')
       # Signup has a team, role, and both briefs, so every checklist item passes.
-      expect(response.body).not_to include('✗')
+      expect(response.body).to include('✓ All roles assigned')
+      expect(response.body).to include('✓ All teams have briefing files')
+      expect(response.body).to include('✓ All roles have briefing files')
     end
 
     it 'flags players with no role assigned on the checklist' do
