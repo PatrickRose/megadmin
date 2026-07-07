@@ -119,6 +119,24 @@ RSpec.describe 'EventsController' do
 
       expect(event.reload.skip_brief_validation).to be true
     end
+
+    it 'checks the toggle when the event skips brief validation' do
+      event.update!(skip_brief_validation: true)
+
+      get edit_event_path(id: event.id)
+
+      expect(Capybara.string(response.body))
+        .to have_checked_field('event[skip_brief_validation]')
+    end
+
+    it 'leaves the toggle unchecked when brief validation is enforced' do
+      event.update!(skip_brief_validation: false)
+
+      get edit_event_path(id: event.id)
+
+      expect(Capybara.string(response.body))
+        .to have_unchecked_field('event[skip_brief_validation]')
+    end
   end
 
   describe 'edit page' do
