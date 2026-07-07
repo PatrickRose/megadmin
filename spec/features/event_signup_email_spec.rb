@@ -52,26 +52,61 @@ RSpec.feature 'EventSignupEmails' do
     expect(page).to have_text 'a signup is missing a role'
   end
 
-  specify 'emails cannot be sent if not all roles and teams have briefs' do
-    @signup1.role = @role1
-    @signup2.role = @role2
-    @signup1.save
-    @signup2.save
+  specify 'the checklist flags players who have not been assigned a role' do
+    visit event_event_signups_path(event_id: @event.id)
+    Capybara.ignore_hidden_elements = false
+
+    expect(page).to have_text 'All roles assigned'
+    # The unassigned players are listed inside the checklist accordion.
+    within('.email-checklist') do
+      expect(page).to have_text 'signup 1'
+      expect(page).to have_text 'signup 2'
+    end
+  end
+
+  specify 'the checklist reports missing team and role briefs separately' do
+    @signup1.update!(role: @role1, team: @team)
+    @signup2.update!(role: @role2, team: @team)
+    # Give the team a brief but leave the roles without one. The role briefs are
+    # still missing, and the checklist must say so without conflating the two.
+    @team.brief.attach(io: Rails.root.join('spec/fixtures/files/pdf.pdf').open, filename: 'pdf.pdf',
+                       content_type: 'application/pdf')
+    @team.save
 
     visit event_event_signups_path(event_id: @event.id)
-
-    expect(page).to have_text 'signup 1'
-    expect(page).to have_text 'email1@email.com'
-    expect(page).to have_text 'role 1'
-    expect(page).to have_text 'signup 2'
-    expect(page).to have_text 'email2@email.com'
-    expect(page).to have_text 'role 2'
-
-    click_button('open-popup')
     Capybara.ignore_hidden_elements = false
-    click_button('send-button')
 
-    expect(page).to have_text(/is missing a team or role|are missing teams or roles/)
+    within('.email-checklist') do
+      # Assignment and team-brief checks pass; only the role-brief check fails.
+      expect(page).to have_text 'All roles assigned'
+      expect(page).to have_text 'All teams have briefing files'
+      expect(page).to have_text 'All roles have briefing files'
+      expect(page).to have_text 'role 1'
+      expect(page).to have_text 'role 2'
+    end
+  end
+
+  specify 'the checklist passes when everything is assigned and briefed' do
+    @role1.brief.attach(io: Rails.root.join('spec/fixtures/files/pdf.pdf').open, filename: 'pdf.pdf',
+                        content_type: 'application/pdf')
+    @role2.brief.attach(io: Rails.root.join('spec/fixtures/files/pdf.pdf').open, filename: 'pdf.pdf',
+                        content_type: 'application/pdf')
+    @team.brief.attach(io: Rails.root.join('spec/fixtures/files/pdf.pdf').open, filename: 'pdf.pdf',
+                       content_type: 'application/pdf')
+    @role1.save
+    @role2.save
+    @team.save
+    @signup1.update!(role: @role1, team: @team)
+    @signup2.update!(role: @role2, team: @team)
+
+    visit event_event_signups_path(event_id: @event.id)
+    Capybara.ignore_hidden_elements = false
+
+    within('.email-checklist') do
+      expect(page).to have_text 'All roles assigned'
+      expect(page).to have_text 'All teams have briefing files'
+      expect(page).to have_text 'All roles have briefing files'
+    end
   end
 
   specify 'emails can be sent to all signups with roles with briefs' do

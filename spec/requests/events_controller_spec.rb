@@ -48,27 +48,28 @@ RSpec.describe 'EventsController' do
       expect(response).to have_http_status(:ok)
       expect(response.body).to include(event.name)
       expect(response.body).to include('Send emails to all players')
-      # Signup has a team, role, and both briefs, so no warnings are shown.
-      expect(response.body).not_to include('missing a team or role')
+      # Signup has a team, role, and both briefs, so every checklist item passes.
+      expect(response.body).not_to include('✗')
     end
 
-    it 'warns when a signup has no role assigned' do
+    it 'flags players with no role assigned on the checklist' do
       create(:event_signup, event: event, name: 'Roleless player', email: 'roleless@email.com')
 
       get event_path(id: event.id)
 
       expect(response).to have_http_status(:ok)
-      expect(response.body).to include('missing a team or role')
+      expect(response.body).to include('✗ All roles assigned')
     end
 
-    it "warns when a signup's role or team is missing a brief" do
+    it 'flags missing team and role briefs separately on the checklist' do
       create(:event_signup, event: event, name: 'Briefless player', email: 'briefless@email.com',
                             team: team, role: role)
 
       get event_path(id: event.id)
 
       expect(response).to have_http_status(:ok)
-      expect(response.body).to include('missing a team or role brief')
+      expect(response.body).to include('✗ All teams have briefing files')
+      expect(response.body).to include('✗ All roles have briefing files')
     end
   end
 

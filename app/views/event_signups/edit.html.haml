@@ -1,10 +1,34 @@
 #dark-screen
 #popup-modal{ style: "display:none;" }
   .modal-content
-  - if @event_signup.team.blank? || @event_signup.role.blank?
-    .alert.alert-danger This player is missing a team or role
-  - elsif !@event_signup.role.brief.attached? || !@event_signup.role.team.brief.attached?
-    .alert.alert-warning This player is missing a team or role brief, are you sure you want to continue?
+  .card.mb-2
+    .card-header
+      %h2 Before you send
+    .card-body
+      %ul.list-unstyled.email-checklist
+        %li.my-1
+          - if @event_signup.team.blank? || @event_signup.role.blank?
+            %span.text-danger ✗ This player has a team and role assigned
+          - else
+            %span.text-success ✓ This player has a team and role assigned
+        - if @event_signup.team.present?
+          %li.my-1
+            - if @event_signup.team.brief.attached?
+              %span.text-success ✓ Their team has a briefing file
+            - else
+              %details
+                %summary.text-warning ✗ Their team has a briefing file
+                %ul
+                  %li= @event_signup.team.name
+        - if @event_signup.role.present?
+          %li.my-1
+            - if @event_signup.role.brief.attached?
+              %span.text-success ✓ Their role has a briefing file
+            - else
+              %details
+                %summary.text-warning ✗ Their role has a briefing file
+                %ul
+                  %li= @event_signup.role.name
   .card.my-2
     .card-header
       %h2 Add additional email note

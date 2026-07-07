@@ -8,38 +8,11 @@
     %button#cancel-button.btn.btn-secondary(type='button')Cancel
 #popup-modal{ style: "display:none;" }
   .modal-content
-  - missing = []
-  - missingBrief = []
-  - @event_signups.each do |signup|
-    - if (signup.team.blank? || signup.role.blank?)
-      - missing << signup.name
-    - elsif (!signup.role.brief.attached? || !signup.role.team.brief.attached?)
-      - missingBrief << signup.name
-  - if missing.size == 1
-    .alert.alert-danger Player "#{missing.join(', ')}" is missing a team or role
-  - elsif missing.size > 1
-    .alert.alert-danger Players "#{missing.join(', ')}" are missing teams or roles
-  - elsif missing.empty?
-    - if missingBrief.size > 0
-      .alert.alert-warning
-        The following elements are missing briefs:
-        - missingRoleBrief = []
-        - missingTeamBrief = []
-        - @event_signups.each do |signup|
-          - if !signup.role.blank?
-            - if !signup.role.brief.attached?
-              - missingRoleBrief << signup
-          - if !signup.team.blank?
-            - if !signup.role.team.brief.attached?
-              - missingTeamBrief << signup.role.team
-        - missingRoleBrief.uniq.each do |missing|
-          %li
-            = missing.role.team.name + ' - ' + missing.role.name + ' - ' + missing.email
-        - missingTeamBrief.uniq.each do |missing|
-          %li
-            = missing.name
-
-
+  .card.mb-2
+    .card-header
+      %h2 Before you send
+    .card-body
+      = render 'email_checklist', event: @event
 
   .card.my-2
     .card-header
