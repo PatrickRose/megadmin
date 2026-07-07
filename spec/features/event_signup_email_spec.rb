@@ -36,6 +36,15 @@ RSpec.feature 'EventSignupEmails' do
     login_as @organiser
   end
 
+  # Several examples flip Capybara.ignore_hidden_elements to reach the hidden
+  # popup content; restore it afterwards so the change can't leak into other
+  # (randomly ordered) feature specs.
+  around do |example|
+    original = Capybara.ignore_hidden_elements
+    example.run
+    Capybara.ignore_hidden_elements = original
+  end
+
   specify 'emails cannot be sent if not all signups have roles' do
     visit event_event_signups_path(event_id: @event.id)
 
