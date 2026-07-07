@@ -59,6 +59,21 @@ class Event < ApplicationRecord
     name || "Event #{id}"
   end
 
+  # Signups that haven't been fully assigned both a team and a role.
+  def signups_missing_assignment
+    event_signups.select { |signup| signup.team.blank? || signup.role.blank? }
+  end
+
+  # Distinct teams assigned to signups that don't have a briefing file attached.
+  def teams_missing_briefs
+    event_signups.filter_map(&:team).uniq.reject { |team| team.brief.attached? }
+  end
+
+  # Distinct roles assigned to signups that don't have a briefing file attached.
+  def roles_missing_briefs
+    event_signups.filter_map(&:role).uniq.reject { |role| role.brief.attached? }
+  end
+
   def to_pdf
     # Rulebook
     if rulebook.attached? && rulebook.content_type == 'application/vnd.openxmlformats-officedocument.' \
