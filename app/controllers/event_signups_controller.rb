@@ -44,7 +44,10 @@ class EventSignupsController < ApplicationController
     team = Team.find_by(id: event_signup_params[:team_id], event_id: params[:event_id])
     role = Role.find_by(id: event_signup_params[:role_id], event_id: params[:event_id])
 
-    unless team && role && team.roles.include?(role)
+    # A player can be created without a team or role and assigned later; the
+    # send-email checklist flags anyone still unassigned. Only reject a genuine
+    # mismatch where the chosen role belongs to a different team.
+    if team && role && team.roles.exclude?(role)
       redirect_to event_event_signups_path(event_id: params[:event_id]), notice: 'Invalid combination of team and role'
       return
     end
