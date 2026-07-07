@@ -11,24 +11,25 @@
             %span.text-danger ✗ This player has a team and role assigned
           - else
             %span.text-success ✓ This player has a team and role assigned
-        - if @event_signup.team.present?
-          %li.my-1
-            - if @event_signup.team.brief.attached?
-              %span.text-success ✓ Their team has a briefing file
-            - else
-              %details
-                %summary.text-warning ✗ Their team has a briefing file
-                %ul
-                  %li= @event_signup.team.name
-        - if @event_signup.role.present?
-          %li.my-1
-            - if @event_signup.role.brief.attached?
-              %span.text-success ✓ Their role has a briefing file
-            - else
-              %details
-                %summary.text-warning ✗ Their role has a briefing file
-                %ul
-                  %li= @event_signup.role.name
+        - unless @event.skip_brief_validation?
+          - if @event_signup.team.present?
+            %li.my-1
+              - if @event_signup.team.brief.attached?
+                %span.text-success ✓ Their team has a briefing file
+              - else
+                %details
+                  %summary.text-warning ✗ Their team has a briefing file
+                  %ul
+                    %li= @event_signup.team.name
+          - if @event_signup.role.present?
+            %li.my-1
+              - if @event_signup.role.brief.attached?
+                %span.text-success ✓ Their role has a briefing file
+              - else
+                %details
+                  %summary.text-warning ✗ Their role has a briefing file
+                  %ul
+                    %li= @event_signup.role.name
   .card.my-2
     .card-header
       %h2 Add additional email note

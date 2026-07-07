@@ -99,6 +99,23 @@ RSpec.describe 'EventsController' do
     end
   end
 
+  describe 'brief validation setting' do
+    it 'shows the toggle on the edit page' do
+      get edit_event_path(id: event.id)
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include('skip_brief_validation')
+    end
+
+    it 'persists the setting when the event is updated' do
+      patch event_path(id: event.id),
+            params: { event: { name: event.name, location: event.location,
+                               date: event.date, google_maps_link: '', skip_brief_validation: '1' } }
+
+      expect(event.reload.skip_brief_validation).to be true
+    end
+  end
+
   describe 'edit page' do
     it 'shows remove controls for existing attachments' do
       event.rulebook.attach(io: Rails.root.join('spec/fixtures/files/pdf.pdf').open,

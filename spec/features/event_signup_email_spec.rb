@@ -86,6 +86,21 @@ RSpec.feature 'EventSignupEmails' do
     end
   end
 
+  specify 'the brief checks are hidden when brief validation is turned off for the event' do
+    @event.update!(skip_brief_validation: true)
+    @signup1.update!(role: @role1, team: @team)
+    @signup2.update!(role: @role2, team: @team)
+
+    visit event_event_signups_path(event_id: @event.id)
+    Capybara.ignore_hidden_elements = false
+
+    within('.email-checklist') do
+      expect(page).to have_text 'All roles assigned'
+      expect(page).to have_no_text 'All teams have briefing files'
+      expect(page).to have_no_text 'All roles have briefing files'
+    end
+  end
+
   specify 'the checklist passes when everything is assigned and briefed' do
     @role1.brief.attach(io: Rails.root.join('spec/fixtures/files/pdf.pdf').open, filename: 'pdf.pdf',
                         content_type: 'application/pdf')

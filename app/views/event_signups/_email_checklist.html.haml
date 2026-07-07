@@ -2,8 +2,6 @@
 -# otherwise it becomes an accordion (a <details> element) listing what is
 -# still outstanding.
 - unassigned = event.signups_missing_assignment
-- teams_without_briefs = event.teams_missing_briefs
-- roles_without_briefs = event.roles_missing_briefs
 
 %ul.list-unstyled.email-checklist
   %li.my-1
@@ -15,21 +13,24 @@
         %ul
           - unassigned.each do |signup|
             %li= [signup.name, signup.email].compact.join(' - ')
-  %li.my-1
-    - if teams_without_briefs.empty?
-      %span.text-success ✓ All teams have briefing files
-    - else
-      %details
-        %summary.text-warning ✗ All teams have briefing files
-        %ul
-          - teams_without_briefs.each do |team|
-            %li= team.name
-  %li.my-1
-    - if roles_without_briefs.empty?
-      %span.text-success ✓ All roles have briefing files
-    - else
-      %details
-        %summary.text-warning ✗ All roles have briefing files
-        %ul
-          - roles_without_briefs.each do |role|
-            %li= "#{role.team.name} - #{role.name}"
+  - unless event.skip_brief_validation?
+    - teams_without_briefs = event.teams_missing_briefs
+    - roles_without_briefs = event.roles_missing_briefs
+    %li.my-1
+      - if teams_without_briefs.empty?
+        %span.text-success ✓ All teams have briefing files
+      - else
+        %details
+          %summary.text-warning ✗ All teams have briefing files
+          %ul
+            - teams_without_briefs.each do |team|
+              %li= team.name
+    %li.my-1
+      - if roles_without_briefs.empty?
+        %span.text-success ✓ All roles have briefing files
+      - else
+        %details
+          %summary.text-warning ✗ All roles have briefing files
+          %ul
+            - roles_without_briefs.each do |role|
+              %li= "#{role.team.name} - #{role.name}"
