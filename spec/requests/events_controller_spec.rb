@@ -75,6 +75,12 @@ RSpec.describe 'EventsController' do
       # Each flagged team/role links to its edit page so it can be fixed inline.
       expect(response.body).to include(edit_event_team_path(event_id: event.id, id: team.id))
       expect(response.body).to include(edit_event_role_path(event_id: event.id, id: role.id))
+      # The edit links open in a new tab so the checklist stays put.
+      html = Capybara.string(response.body)
+      team_link = html.find_link(href: edit_event_team_path(event_id: event.id, id: team.id), visible: :all)
+      role_link = html.find_link(href: edit_event_role_path(event_id: event.id, id: role.id), visible: :all)
+      expect(team_link[:target]).to eq('_blank')
+      expect(role_link[:target]).to eq('_blank')
     end
   end
 

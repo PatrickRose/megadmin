@@ -20,7 +20,7 @@
                 %details.alert.alert-warning
                   %summary.alert-heading ✗ Their team is missing a briefing file
                   %ul
-                    %li= link_to @event_signup.team.name, edit_event_team_path(event_id: @event.id, id: @event_signup.team.id)
+                    %li= link_to @event_signup.team.name, edit_event_team_path(event_id: @event.id, id: @event_signup.team.id), target: '_blank', rel: 'noopener'
         - unless @event.skip_role_brief_validation?
           - if @event_signup.role.present?
             %li.my-1
@@ -30,7 +30,7 @@
                 %details.alert.alert-warning
                   %summary.alert-heading ✗ Their role is missing a briefing file
                   %ul
-                    %li= link_to @event_signup.role.name, edit_event_role_path(event_id: @event.id, id: @event_signup.role.id)
+                    %li= link_to @event_signup.role.name, edit_event_role_path(event_id: @event.id, id: @event_signup.role.id), target: '_blank', rel: 'noopener'
   .card.my-2
     .card-header
       %h2 Add additional email note

@@ -23,7 +23,7 @@
           %summary.alert-heading ✗ Some teams are missing briefing files
           %ul
             - teams_without_briefs.each do |team|
-              %li= link_to team.name, edit_event_team_path(event_id: event.id, id: team.id)
+              %li= link_to team.name, edit_event_team_path(event_id: event.id, id: team.id), target: '_blank', rel: 'noopener'
   - unless event.skip_role_brief_validation?
     - roles_without_briefs = event.roles_missing_briefs
     %li.my-1
@@ -34,4 +34,4 @@
           %summary.alert-heading ✗ Some roles are missing briefing files
           %ul
             - roles_without_briefs.each do |role|
-              %li= link_to "#{role.team.name} - #{role.name}", edit_event_role_path(event_id: event.id, id: role.id)
+              %li= link_to "#{role.team.name} - #{role.name}", edit_event_role_path(event_id: event.id, id: role.id), target: '_blank', rel: 'noopener'
