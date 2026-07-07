@@ -72,6 +72,9 @@ RSpec.describe 'EventsController' do
       expect(response).to have_http_status(:ok)
       expect(response.body).to include('✗ Some teams are missing briefing files')
       expect(response.body).to include('✗ Some roles are missing briefing files')
+      # Each flagged team/role links to its edit page so it can be fixed inline.
+      expect(response.body).to include(edit_event_team_path(event_id: event.id, id: team.id))
+      expect(response.body).to include(edit_event_role_path(event_id: event.id, id: role.id))
     end
   end
 

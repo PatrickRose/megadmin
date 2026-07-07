@@ -24,7 +24,7 @@
           %summary.text-warning ✗ Some teams are missing briefing files
           %ul
             - teams_without_briefs.each do |team|
-              %li= team.name
+              %li= link_to team.name, edit_event_team_path(event_id: event.id, id: team.id)
     %li.my-1
       - if roles_without_briefs.empty?
         %span.text-success ✓ All roles have briefing files
@@ -33,4 +33,4 @@
           %summary.text-warning ✗ Some roles are missing briefing files
           %ul
             - roles_without_briefs.each do |role|
-              %li= "#{role.team.name} - #{role.name}"
+              %li= link_to "#{role.team.name} - #{role.name}", edit_event_role_path(event_id: event.id, id: role.id)

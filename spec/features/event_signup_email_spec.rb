@@ -209,6 +209,8 @@ RSpec.feature 'EventSignupEmails' do
       expect(page).to have_text '✓ This player has a team and role assigned'
       expect(page).to have_text '✗ Their team is missing a briefing file'
       expect(page).to have_text '✗ Their role is missing a briefing file'
+      expect(page).to have_link(href: edit_event_team_path(event_id: @event.id, id: @team.id))
+      expect(page).to have_link(href: edit_event_role_path(event_id: @event.id, id: @role1.id))
     end
   end
 
