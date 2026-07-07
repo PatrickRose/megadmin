@@ -49,9 +49,9 @@ RSpec.describe 'EventsController' do
       expect(response.body).to include(event.name)
       expect(response.body).to include('Send emails to all players')
       # Signup has a team, role, and both briefs, so every checklist item passes.
-      expect(response.body).to include('✓ All roles assigned')
-      expect(response.body).to include('✓ All teams have briefing files')
-      expect(response.body).to include('✓ All roles have briefing files')
+      expect(response.body).to include('✓ All players have a team and role')
+      expect(response.body).to include('✓ All teams have a brief')
+      expect(response.body).to include('✓ All roles have a brief')
     end
 
     it 'flags players with no role assigned on the checklist' do
@@ -60,7 +60,7 @@ RSpec.describe 'EventsController' do
       get event_path(id: event.id)
 
       expect(response).to have_http_status(:ok)
-      expect(response.body).to include('✗ Some players are missing a team or role')
+      expect(response.body).to include('✗ 1 player without a team or role')
     end
 
     it 'flags missing team and role briefs separately on the checklist' do
@@ -70,8 +70,8 @@ RSpec.describe 'EventsController' do
       get event_path(id: event.id)
 
       expect(response).to have_http_status(:ok)
-      expect(response.body).to include('✗ Some teams are missing briefing files')
-      expect(response.body).to include('✗ Some roles are missing briefing files')
+      expect(response.body).to include('✗ 1 team without a brief')
+      expect(response.body).to include('✗ 1 role without a brief')
       # Each flagged team/role links to its edit page so it can be fixed inline.
       expect(response.body).to include(edit_event_team_path(event_id: event.id, id: team.id))
       expect(response.body).to include(edit_event_role_path(event_id: event.id, id: role.id))

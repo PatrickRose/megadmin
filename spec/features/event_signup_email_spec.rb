@@ -66,7 +66,7 @@ RSpec.feature 'EventSignupEmails' do
     Capybara.ignore_hidden_elements = false
 
     within('.email-checklist') do
-      expect(page).to have_text '✗ Some players are missing a team or role'
+      expect(page).to have_text '✗ 2 players without a team or role'
       # The unassigned players are listed inside the checklist accordion.
       expect(page).to have_text 'signup 1'
       expect(page).to have_text 'signup 2'
@@ -87,9 +87,9 @@ RSpec.feature 'EventSignupEmails' do
 
     within('.email-checklist') do
       # Assignment and team-brief checks pass; only the role-brief check fails.
-      expect(page).to have_text '✓ All roles assigned'
-      expect(page).to have_text '✓ All teams have briefing files'
-      expect(page).to have_text '✗ Some roles are missing briefing files'
+      expect(page).to have_text '✓ All players have a team and role'
+      expect(page).to have_text '✓ All teams have a brief'
+      expect(page).to have_text '✗ 2 roles without a brief'
       expect(page).to have_text 'role 1'
       expect(page).to have_text 'role 2'
     end
@@ -104,9 +104,9 @@ RSpec.feature 'EventSignupEmails' do
     Capybara.ignore_hidden_elements = false
 
     within('.email-checklist') do
-      expect(page).to have_no_text 'Some teams are missing briefing files'
+      expect(page).to have_no_text 'team without a brief'
       # The role brief check still runs.
-      expect(page).to have_text '✗ Some roles are missing briefing files'
+      expect(page).to have_text '✗ 2 roles without a brief'
     end
   end
 
@@ -119,9 +119,9 @@ RSpec.feature 'EventSignupEmails' do
     Capybara.ignore_hidden_elements = false
 
     within('.email-checklist') do
-      expect(page).to have_no_text 'Some roles are missing briefing files'
+      expect(page).to have_no_text 'roles without a brief'
       # The team brief check still runs.
-      expect(page).to have_text '✗ Some teams are missing briefing files'
+      expect(page).to have_text '✗ 1 team without a brief'
     end
   end
 
@@ -142,9 +142,9 @@ RSpec.feature 'EventSignupEmails' do
     Capybara.ignore_hidden_elements = false
 
     within('.email-checklist') do
-      expect(page).to have_text '✓ All roles assigned'
-      expect(page).to have_text '✓ All teams have briefing files'
-      expect(page).to have_text '✓ All roles have briefing files'
+      expect(page).to have_text '✓ All players have a team and role'
+      expect(page).to have_text '✓ All teams have a brief'
+      expect(page).to have_text '✓ All roles have a brief'
       expect(page).to have_no_text '✗'
     end
   end
@@ -222,8 +222,8 @@ RSpec.feature 'EventSignupEmails' do
 
     within('.email-checklist') do
       expect(page).to have_text '✓ This player has a team and role assigned'
-      expect(page).to have_text '✗ Their team is missing a briefing file'
-      expect(page).to have_text '✗ Their role is missing a briefing file'
+      expect(page).to have_text "✗ Their team doesn't have a brief"
+      expect(page).to have_text "✗ Their role doesn't have a brief"
       expect(page).to have_link(href: edit_event_team_path(event_id: @event.id, id: @team.id))
       expect(page).to have_link(href: edit_event_role_path(event_id: @event.id, id: @role1.id))
     end
@@ -238,7 +238,7 @@ RSpec.feature 'EventSignupEmails' do
 
     within('.email-checklist') do
       expect(page).to have_text 'This player has a team and role assigned'
-      expect(page).to have_no_text 'briefing file'
+      expect(page).to have_no_text 'brief'
     end
   end
 

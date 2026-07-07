@@ -15,20 +15,20 @@
           - if @event_signup.team.present?
             %li.my-1
               - if @event_signup.team.brief.attached?
-                %span.text-success ✓ Their team has a briefing file
+                %span.text-success ✓ Their team has a brief
               - else
                 %details.alert.alert-warning
-                  %summary.alert-heading ✗ Their team is missing a briefing file
+                  %summary.alert-heading ✗ Their team doesn't have a brief
                   %ul
                     %li= link_to @event_signup.team.name, edit_event_team_path(event_id: @event.id, id: @event_signup.team.id), target: '_blank', rel: 'noopener'
         - unless @event.skip_role_brief_validation?
           - if @event_signup.role.present?
             %li.my-1
               - if @event_signup.role.brief.attached?
-                %span.text-success ✓ Their role has a briefing file
+                %span.text-success ✓ Their role has a brief
               - else
                 %details.alert.alert-warning
-                  %summary.alert-heading ✗ Their role is missing a briefing file
+                  %summary.alert-heading ✗ Their role doesn't have a brief
                   %ul
                     %li= link_to @event_signup.role.name, edit_event_role_path(event_id: @event.id, id: @event_signup.role.id), target: '_blank', rel: 'noopener'
   .card.my-2
