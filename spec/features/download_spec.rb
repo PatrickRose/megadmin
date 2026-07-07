@@ -90,4 +90,41 @@ RSpec.describe 'Downloading a zip file for a player' do
       expect(page.response_headers['Content-Type']).to eq 'application/zip'
     end
   end
+
+  context 'cast list caching' do
+    before do
+      organiser = Organiser.create!(email: 'organiser3@email.com', password: 'password123',
+                                    password_confirmation: 'password123', name: 'organiser')
+
+      @event = Event.create!(name: 'Test event', description: 'desc', location: 'location',
+                             additional_info: 'info', date: DateTime.new(2026, 3, 15, 15, 0, 0),
+                             organiser_id: organiser.id)
+
+      @event_signup = EventSignup.create!(name: 'player', email: 'player3@email.com',
+                                          uuid: SecureRandom.uuid, event_id: @event.id)
+    end
+
+    scenario 'generates and caches the player cast list on first download' do
+      # Stub the Grover (Chromium) render so the test doesn't launch a browser.
+      allow(Grover).to receive(:new).and_return(instance_double(Grover, to_pdf: 'FAKE-PDF-BYTES'))
+
+      expect { visit download_path(@event_signup) }
+        .to change { @event.reload.player_cast_list_pdf.attached? }.from(false).to(true)
+
+      expect(Grover).to have_received(:new).once
+    end
+
+    scenario 'reuses the cached cast list without launching Chromium again' do
+      @event.player_cast_list_pdf.attach(io: Rails.root.join('spec/fixtures/files/pdf.pdf').open,
+                                         filename: 'cast_list.pdf', content_type: 'application/pdf')
+      @event.save
+
+      allow(Grover).to receive(:new)
+
+      visit download_path(@event_signup)
+
+      expect(page.response_headers['Content-Type']).to eq 'application/zip'
+      expect(Grover).not_to have_received(:new)
+    end
+  end
 end
