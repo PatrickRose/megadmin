@@ -27,14 +27,6 @@ class EventsController < ApplicationController
     @control_team = OrganiserToEvent.where(organiser_id: current_organiser.id,
                                            event_id: @event.id).pick(:read_only)
 
-    # Eager-load the associations the "send emails" popup walks per signup
-    # (team, role, the role's team, and both role and team brief attachments)
-    # to avoid N+1s.
-    @event_signups = @event.event_signups
-                           .includes(:team,
-                                     role: [{ brief_attachment: :blob },
-                                            { team: { brief_attachment: :blob } }])
-
     return if @event.google_maps_link.nil?
 
     @first_index = @event.google_maps_link.index('"')

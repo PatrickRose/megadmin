@@ -61,17 +61,19 @@ class Event < ApplicationRecord
 
   # Signups that haven't been fully assigned both a team and a role.
   def signups_missing_assignment
-    event_signups.select { |signup| signup.team.blank? || signup.role.blank? }
+    checklist_signups.select { |signup| signup.team.blank? || signup.role.blank? }
   end
 
   # Distinct teams assigned to signups that don't have a briefing file attached.
+  # We check signup.team (the directly-assigned team) rather than the role's
+  # team because that is the brief the player is shown on their play page.
   def teams_missing_briefs
-    event_signups.filter_map(&:team).uniq.reject { |team| team.brief.attached? }
+    checklist_signups.filter_map(&:team).uniq.reject { |team| team.brief.attached? }
   end
 
   # Distinct roles assigned to signups that don't have a briefing file attached.
   def roles_missing_briefs
-    event_signups.filter_map(&:role).uniq.reject { |role| role.brief.attached? }
+    checklist_signups.filter_map(&:role).uniq.reject { |role| role.brief.attached? }
   end
 
   def to_pdf
@@ -99,5 +101,15 @@ class Event < ApplicationRecord
       doc_pdf.unlink
     end
     save
+  end
+
+  private
+
+  # Signups with the associations the checklist walks eager-loaded once (team,
+  # role, the role's team, and both brief attachments), so building the checklist
+  # never triggers an N+1. Memoised so the three checklist methods share one load.
+  def checklist_signups
+    @checklist_signups ||= event_signups.includes(team: { brief_attachment: :blob },
+                                                  role: [{ brief_attachment: :blob }, :team]).to_a
   end
 end
