@@ -19,7 +19,7 @@ class DownloadController < ApplicationController
     # Create cast list tempfile
     cast_temp = Tempfile.new("#{team_name}castlist.pdf")
     cast_temp.binmode
-    cast_temp.write(pdf_cast_list('event_signups/player_cast_list', player.event))
+    cast_temp.write(player_cast_list_pdf_bytes(player.event))
     cast_temp.close
 
     begin

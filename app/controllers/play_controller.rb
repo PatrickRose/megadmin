@@ -57,6 +57,6 @@ class PlayController < ApplicationController
 
     event = event_signup.event
 
-    download_cast_list('event_signups/player_cast_list', event)
+    send_player_cast_list(event)
   end
 end

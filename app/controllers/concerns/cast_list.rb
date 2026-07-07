@@ -12,6 +12,34 @@ module CastList
                    disposition: :attachment
   end
 
+  # Streams the player cast list to the browser, reusing the cached PDF when
+  # present (see #player_cast_list_pdf_bytes).
+  def send_player_cast_list(event)
+    send_data player_cast_list_pdf_bytes(event),
+              filename: "#{event.formatted_name} Cast List.pdf",
+              type: 'application/pdf',
+              disposition: :attachment
+  end
+
+  # Returns the player cast list PDF bytes, generating and caching them on the
+  # event on first use so we only launch Chromium once per event rather than
+  # once per player download.
+  def player_cast_list_pdf_bytes(event)
+    return event.player_cast_list_pdf.download if event.player_cast_list_pdf.attached?
+
+    regenerate_player_cast_list!(event)
+  end
+
+  # Re-renders the player cast list and (re)attaches it to the event, returning
+  # the fresh PDF bytes. Called at email-send time and by the organiser's
+  # "Regenerate cast list" button.
+  def regenerate_player_cast_list!(event)
+    pdf = pdf_cast_list('event_signups/player_cast_list', event)
+    event.player_cast_list_pdf.attach(io: StringIO.new(pdf), filename: 'cast_list.pdf',
+                                      content_type: 'application/pdf')
+    pdf
+  end
+
   def pdf_cast_list(view, event)
     html = html_cast_list(view, event)
 
