@@ -29,23 +29,38 @@ RSpec.describe 'EventSignupsController' do
       expect(response).to redirect_to(event_event_signups_path(event_id: event.id))
     end
 
-    it 'redirects instead of erroring when no team is selected' do
+    it 'creates a player left without a team or role' do
       expect do
         post event_event_signups_path(event_id: event.id),
-             params: { event_signup: { name: 'No Team', email: 'noteam@email.com',
-                                       team_id: '', role_id: role.id } }
-      end.not_to change(EventSignup, :count)
+             params: { event_signup: { name: 'Unassigned', email: 'unassigned@email.com',
+                                       team_id: '', role_id: '' } }
+      end.to change(EventSignup, :count).by(1)
 
       expect(response).to redirect_to(event_event_signups_path(event_id: event.id))
-      follow_redirect!
-      expect(response.body).to include('Invalid combination of team and role')
+      signup = EventSignup.last
+      expect(signup.team).to be_nil
+      expect(signup.role).to be_nil
     end
 
-    it 'redirects instead of erroring when no role is selected' do
+    it 'creates a player with a team but no role yet' do
       expect do
         post event_event_signups_path(event_id: event.id),
-             params: { event_signup: { name: 'No Role', email: 'norole@email.com',
+             params: { event_signup: { name: 'Team only', email: 'teamonly@email.com',
                                        team_id: team.id, role_id: '' } }
+      end.to change(EventSignup, :count).by(1)
+
+      expect(response).to redirect_to(event_event_signups_path(event_id: event.id))
+      expect(EventSignup.last.role).to be_nil
+    end
+
+    it 'reports an invalid combination when the role belongs to another team' do
+      other_team = create(:team, event: event, name: 'Other team')
+      other_role = create(:role, event: event, name: 'other role', team: other_team)
+
+      expect do
+        post event_event_signups_path(event_id: event.id),
+             params: { event_signup: { name: 'Mismatch', email: 'mismatch@email.com',
+                                       team_id: team.id, role_id: other_role.id } }
       end.not_to change(EventSignup, :count)
 
       expect(response).to redirect_to(event_event_signups_path(event_id: event.id))
