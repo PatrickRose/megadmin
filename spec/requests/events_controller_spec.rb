@@ -27,6 +27,51 @@ RSpec.describe 'EventsController' do
     end
   end
 
+  describe 'show' do
+    let!(:team) { create(:team, event: event) }
+    let!(:role) { create(:role, event: event, team: team) }
+
+    def attach_brief(record)
+      record.brief.attach(io: Rails.root.join('spec/fixtures/files/pdf.pdf').open,
+                          filename: 'pdf.pdf', content_type: 'application/pdf')
+      record.save
+    end
+
+    it 'renders the event and its signups' do
+      attach_brief(team)
+      attach_brief(role)
+      create(:event_signup, event: event, name: 'Ready player', email: 'ready@email.com',
+                            team: team, role: role)
+
+      get event_path(id: event.id)
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include(event.name)
+      expect(response.body).to include('Send emails to all players')
+      # Signup has a team, role, and both briefs, so no warnings are shown.
+      expect(response.body).not_to include('missing a team or role')
+    end
+
+    it 'warns when a signup has no role assigned' do
+      create(:event_signup, event: event, name: 'Roleless player', email: 'roleless@email.com')
+
+      get event_path(id: event.id)
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include('missing a team or role')
+    end
+
+    it "warns when a signup's role or team is missing a brief" do
+      create(:event_signup, event: event, name: 'Briefless player', email: 'briefless@email.com',
+                            team: team, role: role)
+
+      get event_path(id: event.id)
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include('missing a team or role brief')
+    end
+  end
+
   describe 'update keeps attachments when file fields are left blank' do
     it 'keeps the rulebook when the rulebook field is blank' do
       event.rulebook.attach(io: Rails.root.join('spec/fixtures/files/pdf.pdf').open,
