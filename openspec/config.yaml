@@ -1,0 +1,24 @@
+schema: spec-driven
+
+context: |
+  megadmin is a Ruby on Rails 8.1 app (Docker, PostgreSQL) that Pennine Megagames
+  organisers use to run events: define teams & roles, sign players up, and email
+  each their brief. Rich text via Trix / Action Text; PDF briefs & cast lists via
+  Grover/Puppeteer (Node is required at runtime). Views are HAML (hamlit). Deployed
+  to Azure Container Apps via GitHub Actions; infrastructure lives in terraform/.
+
+  Conventions:
+  - TDD (red/green/refactor); each commit leaves the test suite green.
+  - Small, targeted commits — one logical concern each.
+  - Run tests/lint in Docker:
+    `docker compose exec -e RAILS_ENV=test web bundle exec rspec`
+    `docker compose exec web bundle exec rubocop`
+  - British English in code and domain language (organiser, colour).
+
+  This OpenSpec project tracks the modernisation initiative: a modern Rails asset
+  pipeline (Propshaft + importmap + tailwindcss-rails + Hotwire), a Tailwind
+  redesign built from the Pennine Megagames design system (Gold & Plum palette,
+  Fredoka + Hanken Grotesk, Font Awesome Free icons, ViewComponent), and an
+  isolated staging environment. GitHub epic: #296.
+
+# Per-artifact rules (optional) — see commented examples in the OpenSpec docs.
