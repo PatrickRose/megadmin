@@ -11,6 +11,11 @@
 # Subclasses tailor the per-player table (see PlayerCastListPdf and
 # OrganiserCastListPdf) by overriding the signup column hooks.
 class CastListPdf
+  # Minimum vertical space (points) needed to start a team block without
+  # orphaning its heading: enough for the heading plus the table's header row and
+  # first player row. If less remains, we break to a new page first.
+  MIN_TEAM_BLOCK_HEIGHT = 80
+
   # No cell borders, alternating row shading, comfortable padding.
   TABLE_OPTIONS = {
     width: 523,
@@ -94,6 +99,7 @@ class CastListPdf
     end
 
     grouped.each do |team, signups|
+      document.start_new_page if document.cursor < MIN_TEAM_BLOCK_HEIGHT
       heading(document, team&.name || 'Unassigned Team', size: 16)
       signup_table(document, signups.sort_by(&:name))
     end

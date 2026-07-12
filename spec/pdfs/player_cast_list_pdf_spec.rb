@@ -52,4 +52,25 @@ RSpec.describe PlayerCastListPdf do
 
     expect(text).to include('There are no players in this event.')
   end
+
+  it 'never orphans a team heading from its players across page breaks' do
+    30.times do |i|
+      team = create(:team, name: "Team #{format('%02d', i)}", event: event)
+      3.times do |j|
+        role = create(:role, name: "Role #{format('%02d', i)}-#{j}", team: team, event: event)
+        create(:event_signup, name: "Player #{format('%02d', i)}-#{j}", email: "p#{i}-#{j}@example.com",
+                              uuid: SecureRandom.uuid, event: event, team: team, role: role)
+      end
+    end
+
+    pages = PDF::Reader.new(StringIO.new(described_class.new(event).render)).pages.map(&:text)
+
+    30.times do |i|
+      heading = "Team #{format('%02d', i)}"
+      page = pages.find { |text| text.include?(heading) }
+
+      expect(page).to include("Player #{format('%02d', i)}-0"),
+                      "'#{heading}' heading is orphaned onto a page without its players"
+    end
+  end
 end
