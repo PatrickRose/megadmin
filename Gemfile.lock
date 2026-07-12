@@ -532,6 +532,7 @@ DEPENDENCIES
   image_processing
   launchy
   letter_opener
+  matrix
   mutex_m
   pandoc-ruby
   pdf-reader

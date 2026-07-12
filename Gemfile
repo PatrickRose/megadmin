@@ -113,6 +113,10 @@ end
 gem 'grover', '~> 1.2'
 gem 'prawn'
 gem 'prawn-table'
+# Prawn 2.4 does a bare `require 'matrix'`; matrix is no longer a default gem on
+# Ruby 3.4+, so it must be declared explicitly or the frozen production bundle
+# fails to load Prawn (dev bundles resolve it ambiently and hide this).
+gem 'matrix'
 
 gem 'rubocop', '~> 1.88'
 gem 'rubocop-capybara'
