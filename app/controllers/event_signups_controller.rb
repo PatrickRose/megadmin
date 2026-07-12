@@ -262,7 +262,7 @@ class EventSignupsController < ApplicationController
       return
     end
 
-    download_cast_list('event_signups/organiser_cast_list', @event)
+    download_organiser_cast_list(@event)
   end
 
   # Sends emails to all signups
