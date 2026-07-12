@@ -101,12 +101,18 @@ group :test do
   gem 'capybara'
   gem 'database_cleaner'
   gem 'launchy'
+  gem 'pdf-reader'
   gem 'selenium-webdriver'
   gem 'shoulda-matchers'
   gem 'simplecov'
 end
 
+# Grover (headless Chromium) renders the Google Docs -> PDF briefs, where we need
+# a full browser to lay out arbitrary published-doc HTML. The cast list, being
+# plain tabular data we control, is rendered by Prawn instead (no browser).
 gem 'grover', '~> 1.2'
+gem 'prawn'
+gem 'prawn-table'
 
 gem 'rubocop', '~> 1.88'
 gem 'rubocop-capybara'
