@@ -4,12 +4,13 @@
 module CastList
   extend ActiveSupport::Concern
 
-  def download_cast_list(view, event)
-    pdf = pdf_cast_list(view, event)
-
-    send_data pdf, filename: "#{event.formatted_name} Cast List.pdf",
-                   type: 'application/pdf',
-                   disposition: :attachment
+  # Organiser-facing cast list (adds a tickable "Present" column). Downloaded on
+  # demand, so rendered fresh each time rather than cached.
+  def download_organiser_cast_list(event)
+    send_data OrganiserCastListPdf.new(event).render,
+              filename: "#{event.formatted_name} Cast List.pdf",
+              type: 'application/pdf',
+              disposition: :attachment
   end
 
   # Streams the player cast list to the browser, reusing the cached PDF when
@@ -34,22 +35,15 @@ module CastList
   # the fresh PDF bytes. Called at email-send time and by the organiser's
   # "Regenerate cast list" button.
   def regenerate_player_cast_list!(event)
-    pdf = pdf_cast_list('event_signups/player_cast_list', event)
+    pdf = PlayerCastListPdf.new(event).render
     event.player_cast_list_pdf.attach(io: StringIO.new(pdf), filename: 'cast_list.pdf',
                                       content_type: 'application/pdf')
     pdf
   end
 
-  def pdf_cast_list(view, event)
-    html = html_cast_list(view, event)
-
-    # https://github.com/Studiosity/grover?tab=readme-ov-file#relative-paths
-    protocol = request.ssl? ? 'https' : 'http'
-    absolute_html = Grover::HTMLPreprocessor.process(html, "#{protocol}://#{request.host_with_port}/", protocol)
-
-    Grover.new(absolute_html, format: 'A4').to_pdf
-  end
-
+  # Renders a cast list view to an HTML fragment for embedding in a web page
+  # (the player's play page). PDF cast lists are rendered by CastListPdf, not
+  # this method.
   def html_cast_list(view, event)
     @event = event
 
