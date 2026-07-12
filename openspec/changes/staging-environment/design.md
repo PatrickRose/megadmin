@@ -1,8 +1,9 @@
 ## Context
 
 Production runs on Azure Container Apps, deployed by GitHub Actions and defined by
-a single-environment Terraform module (`terraform/`) whose resources are keyed by
-`var.environment` (default `production`). Running that module with
+a single-environment Terraform module (originally at `terraform/`, relocated to
+`terraform/environments/production/` alongside staging) whose resources are keyed
+by `var.environment` (default `production`). Running that module with
 `environment = staging` would stamp out an entirely parallel platform — a new
 Postgres server, a new Container Apps environment, a new VNet — which the project
 owner does not want to pay for. The goal is an isolated staging deploy that reuses

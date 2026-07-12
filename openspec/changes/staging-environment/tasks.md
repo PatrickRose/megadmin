@@ -3,6 +3,7 @@
 - [x] 1.1 Add a staging Terraform configuration with a separate state key, referencing the shared CAE, Postgres server, storage account, ACR, Key Vault, user-assigned identity, and VNet/subnets via `data` sources
 - [x] 1.2 Create the staging resources: `ca-megadmin-staging-web`, `-worker`, `caj-megadmin-staging-migrate`, the `megadmin_staging` database, the `activestorage-staging` container, and the `secret-key-base-staging` Key Vault secret
 - [ ] 1.3 Confirm `terraform plan` shows only new `-staging` resources and leaves the production plan unchanged
+- [x] 1.4 Relocate the production config into `terraform/environments/production/` so both environments are siblings (pure move; production state unchanged, re-`init` required)
 
 ## 2. Mailpit mail-catcher (#276)
 

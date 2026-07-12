@@ -27,7 +27,7 @@ environment.
 
 ## Prerequisites
 
-- The production platform (`terraform/`) is already applied.
+- The production platform (`terraform/environments/production/`) is already applied.
 - The identity running `terraform apply` needs **Key Vault Secrets Officer** on
   the shared `kv-megadmin-production` (production's Terraform already grants this
   to the deploying client) and directory permission to create an app registration.
