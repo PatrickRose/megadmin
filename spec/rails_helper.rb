@@ -3,8 +3,8 @@
 # This file is copied to spec/ when you run 'rails generate rspec:install'
 require 'simplecov'
 SimpleCov.start 'rails' do
-  add_filter 'app/decorators/'
-  add_filter 'app/controllers/poo_controller.rb'
+  skip 'app/decorators/'
+  skip 'app/controllers/poo_controller.rb'
 end
 
 require 'spec_helper'
