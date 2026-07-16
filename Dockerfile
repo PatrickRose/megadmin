@@ -1,7 +1,7 @@
 # =============================================================================
 # Base stage — shared toolchain (Ruby, Node.js, Yarn), no app code
 # =============================================================================
-FROM ruby:4.0.5-bookworm AS base
+FROM ruby:4.0.6-bookworm AS base
 
 RUN apt-get update -qq && \
     apt-get install -y --no-install-recommends \
@@ -86,7 +86,7 @@ CMD ["bin/rails", "server", "-b", "0.0.0.0"]
 # libraries it needs at render time. Node.js is required at runtime: Grover
 # drives Puppeteer through a Node bridge to render PDFs (briefs and cast lists).
 # =============================================================================
-FROM ruby:4.0.5-bookworm AS production
+FROM ruby:4.0.6-bookworm AS production
 
 RUN apt-get update -qq && \
     apt-get install -y --no-install-recommends \
