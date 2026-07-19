@@ -455,7 +455,7 @@ GEM
     simple_form (5.4.1)
       actionpack (>= 7.0)
       activemodel (>= 7.0)
-    simplecov (1.0.0)
+    simplecov (1.0.1)
     stackprof (0.2.28)
     tempfile (0.3.1)
     temple (0.10.4)
