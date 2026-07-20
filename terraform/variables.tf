@@ -144,6 +144,38 @@ variable "worker_memory" {
   default     = "0.5Gi"
 }
 
+variable "worker_min_replicas" {
+  description = <<-EOT
+    Minimum number of worker replicas. Defaults to 0 so the delayed_job worker
+    scales to zero when the queue is empty (cost optimisation). A KEDA PostgreSQL
+    scale rule wakes it when jobs are due. Set to 1 to keep it always-on.
+  EOT
+  type        = number
+  default     = 0
+}
+
+variable "worker_max_replicas" {
+  description = "Maximum number of worker replicas"
+  type        = number
+  default     = 1
+}
+
+# Observability
+variable "log_analytics_retention_days" {
+  description = "Log Analytics retention in days (up to 31 days is included at no extra cost)"
+  type        = number
+  default     = 30
+}
+
+variable "log_analytics_daily_quota_gb" {
+  description = <<-EOT
+    Daily ingestion cap (GB) for the Log Analytics workspace, bounding logging
+    spend. Use -1 for unlimited. 1 GB/day is generous headroom for this app.
+  EOT
+  type        = number
+  default     = 1
+}
+
 # GitHub OIDC
 variable "github_repository" {
   description = "GitHub repository in format owner/repo"
