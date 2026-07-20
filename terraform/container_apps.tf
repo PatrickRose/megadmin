@@ -130,10 +130,15 @@ resource "azurerm_container_app" "web" {
         port      = 3000
       }
 
+      # Generous thresholds so a cold Rails boot (after scaling from zero) has
+      # time to come up before the platform marks the replica unhealthy:
+      # up to ~150s (30 failures x 5s) before giving up.
       startup_probe {
-        transport = "HTTP"
-        path      = "/up"
-        port      = 3000
+        transport               = "HTTP"
+        path                    = "/up"
+        port                    = 3000
+        interval_seconds        = 5
+        failure_count_threshold = 30
       }
     }
   }

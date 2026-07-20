@@ -98,7 +98,7 @@ The workflow:
 |---|---|---|
 | Resource Group | rg-megadmin-production | |
 | PostgreSQL Flexible Server | psql-megadmin-production | B_Standard_B1ms, 32GB, private network only |
-| Container App (web) | ca-megadmin-web | 0.25 vCPU, 0.5GB |
+| Container App (web) | ca-megadmin-web | 0.25 vCPU, 0.5GB, scales to zero when idle |
 | Container App (worker) | ca-megadmin-worker | 0.25 vCPU, 0.5GB, scales to zero when the queue is empty |
 | Container App Job (migrate) | caj-megadmin-migrate | Manual trigger |
 | Container Registry | acrmegadminproduction | Basic SKU |
@@ -139,18 +139,22 @@ start + Rails boot, ~tens of seconds) before the first queued job runs. This is
 fine for email-style background work. To keep the worker always-on instead, set
 `worker_min_replicas = 1`.
 
+### Web scales to zero
+
+The web app also defaults to `web_min_replicas = 0`. When idle it scales to zero
+and the HTTP ingress buffers the first incoming request while a replica
+cold-starts (Rails boot, ~tens of seconds) before serving it — subsequent
+requests are normal speed. The web container's startup probe uses a generous
+failure threshold so a cold boot isn't killed mid-start. For a low-traffic admin
+tool this trades a slow first page load after idle for near-zero idle compute.
+Set `web_min_replicas = 1` to keep it always-warm.
+
 ### Logging cost cap
 
 The Log Analytics workspace has a configurable daily ingestion cap
 (`log_analytics_daily_quota_gb`, default 1 GB) to bound logging spend, and
 retention stays at 30 days (Azure includes up to 31 days at no extra cost). Set
 the quota to `-1` for unlimited.
-
-### Further levers (not enabled by default)
-
-- **Web scale-to-zero** — `web_min_replicas` can be set to `0` to let the web
-  app scale to zero when idle, at the cost of a cold start on the first request
-  after an idle period. Left at `1` by default so the admin UI stays responsive.
 
 ## Useful commands
 

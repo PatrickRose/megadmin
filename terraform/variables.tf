@@ -109,9 +109,13 @@ variable "sentry_dsn" {
 
 # Container Apps
 variable "web_min_replicas" {
-  description = "Minimum number of web replicas"
+  description = <<-EOT
+    Minimum number of web replicas. Defaults to 0 so the web app scales to zero
+    when idle (cost optimisation). The HTTP ingress buffers the first request
+    while a replica cold-starts. Set to 1 to keep it always-warm.
+  EOT
   type        = number
-  default     = 1
+  default     = 0
 }
 
 variable "web_max_replicas" {
