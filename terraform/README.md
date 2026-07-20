@@ -156,6 +156,21 @@ The Log Analytics workspace has a configurable daily ingestion cap
 retention stays at 30 days (Azure includes up to 31 days at no extra cost). Set
 the quota to `-1` for unlimited.
 
+### Registry image pruning
+
+Basic-tier ACR has no retention policy, so the deploy workflow prunes old
+`<timestamp>-<sha>` release tags (older than 30 days) and untagged manifests
+after each healthy deploy, keeping storage within the included 10 GB.
+
+### Further lever: drop the VNet (~£16/mo)
+
+The largest remaining cost is the Container App Environment's load balancer +
+public IP, which exist because the environment runs in a custom VNet (that's also
+what keeps Postgres private). Moving Postgres to a public endpoint and dropping
+the VNet would remove ~£16/mo but weakens network isolation and requires a DB
+migration. See [postgres-public-migration.md](postgres-public-migration.md) for
+the full trade-off analysis and cutover runbook. Not applied.
+
 ## Useful commands
 
 ```bash
