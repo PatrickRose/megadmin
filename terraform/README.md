@@ -99,13 +99,58 @@ The workflow:
 | Resource Group | rg-megadmin-production | |
 | PostgreSQL Flexible Server | psql-megadmin-production | B_Standard_B1ms, 32GB, private network only |
 | Container App (web) | ca-megadmin-web | 0.25 vCPU, 0.5GB |
-| Container App (worker) | ca-megadmin-worker | 0.25 vCPU, 0.5GB |
+| Container App (worker) | ca-megadmin-worker | 0.25 vCPU, 0.5GB, scales to zero when the queue is empty |
 | Container App Job (migrate) | caj-megadmin-migrate | Manual trigger |
 | Container Registry | acrmegadminproduction | Basic SKU |
 | Storage Account | stmegadminproduction | Standard LRS, for Active Storage uploads |
 | Key Vault | kv-megadmin-production | Postgres password, SECRET_KEY_BASE, storage key, SMTP password |
 | Log Analytics Workspace | log-megadmin-production | 30-day retention |
 | Virtual Network | vnet-megadmin-production | 2 subnets (container apps, postgres) |
+
+## Cost optimisation
+
+This is a low-traffic application, so the infrastructure is deliberately sized
+small. The main levers already in place:
+
+- **PostgreSQL** — `B_Standard_B1ms` (smallest burstable tier), 32 GB storage
+  (the minimum), no high-availability, no geo-redundant backups, 7-day backup
+  retention (included at no extra cost).
+- **Container Registry** — `Basic` SKU.
+- **Storage** — `Standard` tier, `LRS` (cheapest) replication.
+- **Container Apps** — Consumption plan; small CPU/memory allocations.
+
+### Worker scales to zero
+
+The background worker runs `delayed_job`, which is backed by the `delayed_jobs`
+Postgres table and only processes occasional work (mostly event emails). Rather
+than pay for an always-on replica, the worker has a KEDA PostgreSQL scale rule
+and defaults to `min_replicas = 0`:
+
+- When the queue is empty the worker sits at **zero replicas** and bills no
+  compute.
+- When a job becomes due, KEDA sees the queue depth (it polls the
+  `delayed_jobs` table) and scales the worker up to process it, then back down.
+- The scale query is `SELECT COUNT(*) FROM delayed_jobs WHERE failed_at IS NULL
+  AND run_at <= NOW()`, so future-scheduled retries and dead jobs never hold the
+  worker awake and cost money.
+
+Trade-off: after an idle period there's a short cold-start delay (container
+start + Rails boot, ~tens of seconds) before the first queued job runs. This is
+fine for email-style background work. To keep the worker always-on instead, set
+`worker_min_replicas = 1`.
+
+### Logging cost cap
+
+The Log Analytics workspace has a configurable daily ingestion cap
+(`log_analytics_daily_quota_gb`, default 1 GB) to bound logging spend, and
+retention stays at 30 days (Azure includes up to 31 days at no extra cost). Set
+the quota to `-1` for unlimited.
+
+### Further levers (not enabled by default)
+
+- **Web scale-to-zero** — `web_min_replicas` can be set to `0` to let the web
+  app scale to zero when idle, at the cost of a cold start on the first request
+  after an idle period. Left at `1` by default so the admin UI stays responsive.
 
 ## Useful commands
 
