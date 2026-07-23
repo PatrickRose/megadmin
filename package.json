@@ -15,7 +15,7 @@
     "improved-yarn-audit": "^3.0.4",
     "mini-css-extract-plugin": "^2.10.2",
     "puppeteer": "^25.3.0",
-    "sass": "^1.101.3",
+    "sass": "^1.101.6",
     "sass-loader": "^17.0.0",
     "shakapacker": "^10.3.0",
     "style-loader": "^4.0.0",
