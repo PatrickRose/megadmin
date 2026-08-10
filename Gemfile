@@ -118,7 +118,7 @@ gem 'prawn-table'
 # fails to load Prawn (dev bundles resolve it ambiently and hide this).
 gem 'matrix'
 
-gem 'rubocop', '~> 1.88'
+gem 'rubocop', '~> 1.89'
 gem 'rubocop-capybara'
 gem 'rubocop-factory_bot'
 gem 'rubocop-haml'
