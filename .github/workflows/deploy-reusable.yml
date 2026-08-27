@@ -1,0 +1,212 @@
+name: Deploy (reusable)
+
+# Parametrised deploy used by both production (deploy.yml) and staging
+# (deploy-staging.yml). Extracted verbatim from the original production deploy so
+# prod behaviour is unchanged; only the resource names, environment, and a few
+# flags are now inputs.
+on:
+  workflow_call:
+    inputs:
+      resource_group:
+        required: true
+        type: string
+      acr_name:
+        required: true
+        type: string
+      image_name:
+        required: false
+        type: string
+        default: megadmin
+      web_app_name:
+        required: true
+        type: string
+      worker_app_name:
+        required: true
+        type: string
+      migrate_job_name:
+        required: true
+        type: string
+      environment_name:
+        description: GitHub Environment to record the deployment under
+        required: true
+        type: string
+      app_url:
+        description: URL shown on the GitHub Environment (cosmetic; health check derives the FQDN itself)
+        required: false
+        type: string
+        default: ""
+      sentry_environment:
+        required: false
+        type: string
+        default: ""
+      use_cache:
+        description: Use the registry build cache (production's weekly rebuild sets this false)
+        required: false
+        type: boolean
+        default: true
+      run_smoke_test:
+        description: Run the PDF smoke test (production's weekly rebuild only)
+        required: false
+        type: boolean
+        default: false
+      create_sentry_release:
+        required: false
+        type: boolean
+        default: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    environment:
+      name: ${{ inputs.environment_name }}
+      url: ${{ inputs.app_url }}
+    env:
+      AZURE_RESOURCE_GROUP: ${{ inputs.resource_group }}
+      ACR_NAME: ${{ inputs.acr_name }}
+      WEB_APP_NAME: ${{ inputs.web_app_name }}
+      WORKER_APP_NAME: ${{ inputs.worker_app_name }}
+      MIGRATE_JOB_NAME: ${{ inputs.migrate_job_name }}
+      IMAGE_NAME: ${{ inputs.image_name }}
+
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          # Full history so sentry-cli can associate commits with the release.
+          fetch-depth: 0
+
+      - name: Azure login via OIDC
+        uses: azure/login@v3
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Login to ACR
+        run: az acr login --name ${{ env.ACR_NAME }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Build and push Docker image
+        run: |
+          # <timestamp>-<sha> identifies each build uniquely and is reused for
+          # BOTH the image tag and the Sentry release.
+          RELEASE_VERSION="$(date -u +%Y%m%d-%H%M%S)-${{ github.sha }}"
+          IMAGE_REF="${{ env.ACR_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:${RELEASE_VERSION}"
+          IMAGE_LATEST="${{ env.ACR_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:latest"
+          CACHE_REF="${{ env.ACR_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:cache"
+
+          CACHE_ARGS=""
+          if [ "${{ inputs.use_cache }}" = "true" ]; then
+            CACHE_ARGS="--cache-from type=registry,ref=${CACHE_REF}"
+          fi
+
+          docker buildx build \
+            --target production \
+            ${CACHE_ARGS} \
+            --cache-to type=registry,ref=${CACHE_REF},mode=max \
+            --build-arg SENTRY_RELEASE=${RELEASE_VERSION} \
+            -t "$IMAGE_REF" \
+            -t "$IMAGE_LATEST" \
+            --push \
+            .
+
+          echo "IMAGE_REF=${IMAGE_REF}" >> "$GITHUB_ENV"
+          echo "RELEASE_VERSION=${RELEASE_VERSION}" >> "$GITHUB_ENV"
+
+      - name: Smoke test PDF rendering (real published Google Doc)
+        if: ${{ inputs.run_smoke_test }}
+        run: |
+          docker run --rm -w /app "${{ env.IMAGE_REF }}" \
+            bundle exec ruby -e '
+              require "grover"
+              url = "https://docs.google.com/document/d/e/2PACX-1vRga67T_20rnTp9JtgEuprfiSnTlFohxlHiwj2jF4u97n8TNMXF7wWax2nzNgJbYW-e0jYhTNK3mqVK/pub"
+              pdf = Grover.new(
+                url, format: "A4", wait_until: "networkidle0",
+                launch_args: ["--no-sandbox", "--disable-setuid-sandbox", "--disable-dev-shm-usage"]
+              ).to_pdf
+              raise "Grover produced no PDF" unless pdf && pdf.byteslice(0, 5) == "%PDF-"
+              warn "Grover smoke test OK (#{pdf.bytesize} bytes)"
+            '
+
+      - name: Update migration job image and run migrations
+        run: |
+          az containerapp job update \
+            --name ${{ env.MIGRATE_JOB_NAME }} \
+            --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
+            --image "${{ env.IMAGE_REF }}"
+
+          az containerapp job start \
+            --name ${{ env.MIGRATE_JOB_NAME }} \
+            --resource-group ${{ env.AZURE_RESOURCE_GROUP }}
+
+          # Wait for migration job to complete
+          for i in $(seq 1 60); do
+            STATUS=$(az containerapp job execution list \
+              --name ${{ env.MIGRATE_JOB_NAME }} \
+              --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
+              --query "[0].properties.status" -o tsv)
+            if [ "$STATUS" = "Succeeded" ]; then
+              echo "Migration completed successfully"
+              break
+            elif [ "$STATUS" = "Failed" ]; then
+              echo "Migration failed!"
+              exit 1
+            fi
+            echo "Waiting for migration to complete... (attempt $i/60)"
+            sleep 10
+          done
+
+          if [ "$STATUS" != "Succeeded" ]; then
+            echo "Migration timed out"
+            exit 1
+          fi
+
+      - name: Update web container app
+        run: |
+          az containerapp update \
+            --name ${{ env.WEB_APP_NAME }} \
+            --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
+            --image "${{ env.IMAGE_REF }}"
+
+      - name: Update worker container app
+        run: |
+          az containerapp update \
+            --name ${{ env.WORKER_APP_NAME }} \
+            --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
+            --image "${{ env.IMAGE_REF }}"
+
+      - name: Health check
+        run: |
+          WEB_FQDN=$(az containerapp show \
+            --name ${{ env.WEB_APP_NAME }} \
+            --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
+            --query "properties.configuration.ingress.fqdn" -o tsv)
+
+          for i in $(seq 1 30); do
+            HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "https://$WEB_FQDN/up" || true)
+            if [ "$HTTP_STATUS" = "200" ]; then
+              echo "Health check passed!"
+              exit 0
+            fi
+            echo "Waiting for app to become healthy... (attempt $i/30, status: $HTTP_STATUS)"
+            sleep 10
+          done
+
+          echo "Health check failed after 5 minutes"
+          exit 1
+
+      - name: Create Sentry release
+        if: ${{ inputs.create_sentry_release }}
+        uses: getsentry/action-release@v3
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
+          SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
+        with:
+          release: ${{ env.RELEASE_VERSION }}
+          set_commits: auto
+          environment: ${{ inputs.sentry_environment }}

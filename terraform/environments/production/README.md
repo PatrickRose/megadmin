@@ -48,7 +48,7 @@ and stored in Azure Key Vault.
 ### 3. Initialise and apply Terraform
 
 ```bash
-cd terraform
+cd terraform/environments/production
 terraform init
 terraform plan    # review what will be created
 terraform apply   # create the resources
