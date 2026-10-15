@@ -29,9 +29,9 @@ class EventSignup < ApplicationRecord
   # It needs to be nil so that code like `event_signup.name || 'No name'` works.
   before_validation :normalize_fields
 
-  belongs_to  :role, optional: true
-  belongs_to  :team, optional: true
-  belongs_to  :event
+  belongs_to :role, optional: true
+  belongs_to :team, optional: true
+  belongs_to :event
 
   validates :email, format: { with: URI::MailTo::EMAIL_REGEXP }, allow_nil: false, presence: true
   validate :email_not_in_use
