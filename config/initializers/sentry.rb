@@ -6,7 +6,7 @@ Sentry.init do |config|
   config.breadcrumbs_logger = %i[active_support_logger http_logger]
   config.traces_sample_rate = 1.0
   config.profiles_sample_rate = 1.0
-  config.enable_logs = true
+  config.rails.structured_logging.enabled = true
   config.excluded_exceptions += [
     'ActionController::BadRequest',
     'ActionController::UnknownFormat',
