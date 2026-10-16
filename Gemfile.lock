@@ -99,7 +99,7 @@ GEM
       activerecord (>= 6.0.0)
       activesupport (>= 6.0.0)
     ast (2.4.3)
-    azure-blob (0.8.0)
+    azure-blob (0.9.0)
       cgi
       rexml
     base64 (0.3.0)
