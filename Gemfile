@@ -120,7 +120,7 @@ gem 'matrix'
 # json 3.x changed JSON.parse's signature, which breaks ActiveStorage 8.1's
 # Blob#custom_metadata. RuboCop >= 1.92 no longer caps json below 3, so pin it
 # here until Rails supports json 3.
-gem 'json', '~> 2.21'
+gem 'json', '~> 3.1'
 
 gem 'rubocop', '~> 1.92'
 gem 'rubocop-capybara'
