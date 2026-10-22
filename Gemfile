@@ -117,6 +117,7 @@ gem 'prawn-table'
 # Ruby 3.4+, so it must be declared explicitly or the frozen production bundle
 # fails to load Prawn (dev bundles resolve it ambiently and hide this).
 gem 'matrix'
+
 gem 'json', '~> 3.1'
 
 gem 'rubocop', '~> 1.92'
