@@ -1,6 +1,6 @@
 require.context('../images', true);
 
-import 'bootstrap-icons/font/bootstrap-icons';
+import 'bootstrap-icons/font/bootstrap-icons.css';
 import '../styles/twitter_bootstrap';
 import '../styles/layout';  
 import '../styles/forms';
