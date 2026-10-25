@@ -98,14 +98,78 @@ The workflow:
 |---|---|---|
 | Resource Group | rg-megadmin-production | |
 | PostgreSQL Flexible Server | psql-megadmin-production | B_Standard_B1ms, 32GB, private network only |
-| Container App (web) | ca-megadmin-web | 0.25 vCPU, 0.5GB |
-| Container App (worker) | ca-megadmin-worker | 0.25 vCPU, 0.5GB |
+| Container App (web) | ca-megadmin-web | 0.25 vCPU, 0.5GB, scales to zero when idle |
+| Container App (worker) | ca-megadmin-worker | 0.25 vCPU, 0.5GB, scales to zero when the queue is empty |
 | Container App Job (migrate) | caj-megadmin-migrate | Manual trigger |
 | Container Registry | acrmegadminproduction | Basic SKU |
 | Storage Account | stmegadminproduction | Standard LRS, for Active Storage uploads |
 | Key Vault | kv-megadmin-production | Postgres password, SECRET_KEY_BASE, storage key, SMTP password |
 | Log Analytics Workspace | log-megadmin-production | 30-day retention |
 | Virtual Network | vnet-megadmin-production | 2 subnets (container apps, postgres) |
+
+## Cost optimisation
+
+This is a low-traffic application, so the infrastructure is deliberately sized
+small. The main levers already in place:
+
+- **PostgreSQL** — `B_Standard_B1ms` (smallest burstable tier), 32 GB storage
+  (the minimum), no high-availability, no geo-redundant backups, 7-day backup
+  retention (included at no extra cost).
+- **Container Registry** — `Basic` SKU.
+- **Storage** — `Standard` tier, `LRS` (cheapest) replication.
+- **Container Apps** — Consumption plan; small CPU/memory allocations.
+
+### Worker scales to zero
+
+The background worker runs `delayed_job`, which is backed by the `delayed_jobs`
+Postgres table and only processes occasional work (mostly event emails). Rather
+than pay for an always-on replica, the worker has a KEDA PostgreSQL scale rule
+and defaults to `min_replicas = 0`:
+
+- When the queue is empty the worker sits at **zero replicas** and bills no
+  compute.
+- When a job becomes due, KEDA sees the queue depth (it polls the
+  `delayed_jobs` table) and scales the worker up to process it, then back down.
+- The scale query is `SELECT COUNT(*) FROM delayed_jobs WHERE failed_at IS NULL
+  AND run_at <= NOW()`, so future-scheduled retries and dead jobs never hold the
+  worker awake and cost money.
+
+Trade-off: after an idle period there's a short cold-start delay (container
+start + Rails boot, ~tens of seconds) before the first queued job runs. This is
+fine for email-style background work. To keep the worker always-on instead, set
+`worker_min_replicas = 1`.
+
+### Web scales to zero
+
+The web app also defaults to `web_min_replicas = 0`. When idle it scales to zero
+and the HTTP ingress buffers the first incoming request while a replica
+cold-starts (Rails boot, ~tens of seconds) before serving it — subsequent
+requests are normal speed. The web container's startup probe uses a generous
+failure threshold so a cold boot isn't killed mid-start. For a low-traffic admin
+tool this trades a slow first page load after idle for near-zero idle compute.
+Set `web_min_replicas = 1` to keep it always-warm.
+
+### Logging cost cap
+
+The Log Analytics workspace has a configurable daily ingestion cap
+(`log_analytics_daily_quota_gb`, default 1 GB) to bound logging spend, and
+retention stays at 30 days (Azure includes up to 31 days at no extra cost). Set
+the quota to `-1` for unlimited.
+
+### Registry image pruning
+
+Basic-tier ACR has no retention policy, so the deploy workflow prunes old
+`<timestamp>-<sha>` release tags (older than 30 days) and untagged manifests
+after each healthy deploy, keeping storage within the included 10 GB.
+
+### Further lever: drop the VNet (~£16/mo)
+
+The largest remaining cost is the Container App Environment's load balancer +
+public IP, which exist because the environment runs in a custom VNet (that's also
+what keeps Postgres private). Moving Postgres to a public endpoint and dropping
+the VNet would remove ~£16/mo but weakens network isolation and requires a DB
+migration. See [postgres-public-migration.md](postgres-public-migration.md) for
+the full trade-off analysis and cutover runbook. Not applied.
 
 ## Useful commands
 

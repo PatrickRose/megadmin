@@ -173,6 +173,21 @@ jobs:
           echo "Health check failed after 5 minutes"
           exit 1
 
+      - name: Prune old images from ACR
+        # Basic-tier ACR has no retention policy, so old <timestamp>-<sha> release
+        # tags and orphaned (untagged) manifests pile up and push storage past the
+        # included 10 GB into paid overage. Now that the deploy is confirmed
+        # healthy, delete release tags older than 30 days (recent ones stay for
+        # rollback) plus any untagged manifests. The :latest and :cache tags are
+        # rewritten on every deploy, so they're always fresh and never match the
+        # date-prefixed filter. Runs as an ACR Task (supported on Basic) using the
+        # already-authenticated Azure session; never fails the deploy.
+        continue-on-error: true
+        run: |
+          az acr run --registry ${{ env.ACR_NAME }} \
+            --cmd "acr purge --filter '${{ env.IMAGE_NAME }}:[0-9]{8}-.*' --ago 30d --untagged" \
+            /dev/null
+
       - name: Create Sentry release
         # Runs sentry-cli under the hood: creates the release, associates commits
         # (suspect-commit / regression detection), finalizes it, and records a

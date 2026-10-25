@@ -3,7 +3,8 @@ resource "azurerm_log_analytics_workspace" "main" {
   resource_group_name = azurerm_resource_group.main.name
   location            = azurerm_resource_group.main.location
   sku                 = "PerGB2018"
-  retention_in_days   = 30
+  retention_in_days   = var.log_analytics_retention_days
+  daily_quota_gb      = var.log_analytics_daily_quota_gb
 
   tags = var.tags
 }
@@ -129,10 +130,15 @@ resource "azurerm_container_app" "web" {
         port      = 3000
       }
 
+      # Generous thresholds so a cold Rails boot (after scaling from zero) has
+      # time to come up before the platform marks the replica unhealthy:
+      # up to ~150s (30 failures x 5s) before giving up.
       startup_probe {
-        transport = "HTTP"
-        path      = "/up"
-        port      = 3000
+        transport               = "HTTP"
+        path                    = "/up"
+        port                    = 3000
+        interval_seconds        = 5
+        failure_count_threshold = 30
       }
     }
   }
@@ -173,8 +179,8 @@ resource "azurerm_container_app" "worker" {
   }
 
   template {
-    min_replicas = 1
-    max_replicas = 1
+    min_replicas = var.worker_min_replicas
+    max_replicas = var.worker_max_replicas
 
     container {
       name    = "worker"
@@ -197,6 +203,30 @@ resource "azurerm_container_app" "worker" {
           name        = env.value.name
           secret_name = env.value.secret_name
         }
+      }
+    }
+
+    # Scale the delayed_job worker on the depth of the DB-backed queue so it can
+    # sit at zero replicas while idle and only bill compute when there is work.
+    # The query counts jobs that are due now (run_at in the past) and not failed,
+    # so future-scheduled retries and dead jobs don't hold the worker awake.
+    custom_scale_rule {
+      name             = "delayed-jobs-queue"
+      custom_rule_type = "postgresql"
+
+      metadata = {
+        query            = "SELECT COUNT(*) FROM delayed_jobs WHERE failed_at IS NULL AND run_at <= NOW()"
+        targetQueryValue = "1"
+        host             = azurerm_postgresql_flexible_server.main.fqdn
+        port             = "5432"
+        userName         = var.postgres_admin_username
+        dbName           = var.postgres_database_name
+        sslmode          = "require"
+      }
+
+      authentication {
+        secret_name       = "postgres-password"
+        trigger_parameter = "password"
       }
     }
   }
