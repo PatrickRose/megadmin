@@ -1,0 +1,7 @@
+# Copy to terraform.tfvars (gitignored) and fill in.
+subscription_id = "your-subscription-id"
+
+# Optional overrides:
+# mailer_from = "no-reply@staging.megagameadmin.co.uk"
+# sentry_dsn  = ""                      # leave empty to keep staging out of prod Sentry
+# app_hostname = ""                     # empty = use the auto Container Apps FQDN

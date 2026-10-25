@@ -1,0 +1,35 @@
+name: Deploy (staging)
+
+# Deploys the `staging` branch to the isolated staging environment. Requires the
+# staging Terraform (terraform/environments/staging) to be applied and a GitHub
+# Environment named `staging` whose AZURE_CLIENT_ID secret is the staging deploy
+# identity (`terraform output azure_client_id_staging`).
+on:
+  push:
+    branches: [staging]
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy:
+    uses: ./.github/workflows/deploy-reusable.yml
+    with:
+      resource_group: rg-megadmin-staging
+      acr_name: acrmegadminproduction # shared registry
+      image_name: megadmin
+      web_app_name: ca-megadmin-staging-web
+      worker_app_name: ca-megadmin-staging-worker
+      migrate_job_name: caj-megadmin-staging-migrate
+      environment_name: staging
+      # After the first `terraform apply`, set this to `terraform output web_app_url`
+      # (or the custom staging domain). The health check derives the FQDN itself,
+      # so this only affects the GitHub Environment link.
+      app_url: ""
+      sentry_environment: staging
+      use_cache: true
+      run_smoke_test: false
+      create_sentry_release: false
+    secrets: inherit

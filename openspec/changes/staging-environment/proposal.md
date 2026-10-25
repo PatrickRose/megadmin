@@ -16,6 +16,9 @@ initiative — and every future change.
   sources and creating only the staging-specific resources: `-staging` web/worker
   apps + migrate job, a `megadmin_staging` logical database, an
   `activestorage-staging` container, and a `secret-key-base-staging` secret.
+- Relocate the existing production config into `terraform/environments/production/`
+  so both environments are siblings under `terraform/environments/` (a pure file
+  move — resource addresses and state are unchanged; a re-`init` is required).
 - Add a **Mailpit** mail-catcher container app so staging can **never** send real
   email to players.
 - Parametrise `deploy.yml` into a reusable workflow and add a branch-triggered
@@ -36,7 +39,7 @@ initiative — and every future change.
 
 ## Impact
 
-- `terraform/` (new staging configuration + shared-resource data sources)
+- `terraform/environments/{production,staging}/` (production relocated for symmetry; new staging config data-sources the shared platform)
 - `.github/workflows/deploy.yml` (refactor to reusable) + new `deploy-staging.yml`
 - `config/environments/` (remove `qa.rb`, `demo.rb`)
 - GitHub Environments/secrets (`staging`)
