@@ -2225,7 +2225,7 @@ sass@^1.105.2:
   optionalDependencies:
     "@parcel/watcher" "^2.4.1"
 
-schema-utils@^4.0.0, schema-utils@^4.2.0, schema-utils@^4.3.0, schema-utils@^4.3.3, schema-utils@^4.5.0, schema-utils@^4.6.0:
+schema-utils@^4.0.0, schema-utils@^4.2.0, schema-utils@^4.3.0, schema-utils@^4.3.3, schema-utils@^4.5.0, schema-utils@^4.6.0, schema-utils@^4.8.1:
   version "4.8.1"
   resolved "https://registry.yarnpkg.com/schema-utils/-/schema-utils-4.8.1.tgz#d005632a0ca18522d903d82e1dcccbddcd57e7bb"
   integrity sha512-x39pYlJPyH7Uge5QO64B9XGP9zLDc9WNmiQZc+CE3IzZPvMu3lHOuAMGpYNoPixEL7MSWlGhYTg5UlLSL8G6iw==
@@ -2615,14 +2615,14 @@ webdriver-bidi-protocol@1.0.1:
   resolved "https://registry.yarnpkg.com/webdriver-bidi-protocol/-/webdriver-bidi-protocol-1.0.1.tgz#2cbe4d3e410c849932ced3a495ebba1da972fa8e"
   integrity sha512-WXWs/aXF2a6Al1Z2/V/7Gp2oPZOAAmHjJOTmv4KCXRJ122IMj3tSSMc6a4q3K4QOmhQbse/Ahr+oTVJOU2dUiw==
 
-webpack-assets-manifest@^6.5.4:
-  version "6.5.4"
-  resolved "https://registry.yarnpkg.com/webpack-assets-manifest/-/webpack-assets-manifest-6.5.4.tgz#a8bb730001b0018bc556d238b23868863dad92c3"
-  integrity sha512-gkj2bkHKvUfu8FHqlXiVPCUfX6Fd/CAOZfl3PZFCZVx64xNCTDOxSEkqvmd6HxFcToo+2vpnpVI0ZZGRFGv9Qg==
+webpack-assets-manifest@^6.5.5:
+  version "6.5.5"
+  resolved "https://registry.yarnpkg.com/webpack-assets-manifest/-/webpack-assets-manifest-6.5.5.tgz#ee45df9112182c2969310ec49ed062687616dc2a"
+  integrity sha512-903fXlc3OljGFVwb7+67QvanQChsgVsRoIDDtKw1ioVjRi8C+vprl4lAHDVZ6nKbdO4oPobg0cvPcI8UdDDmHA==
   dependencies:
     deepmerge "^4.3.1"
     proper-lockfile "^4.1.2"
-    schema-utils "^4.5.0"
+    schema-utils "^4.8.1"
     tapable "^2.3.3"
 
 webpack-cli@^7.2.3:
