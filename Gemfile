@@ -110,7 +110,7 @@ end
 # Grover (headless Chromium) renders the Google Docs -> PDF briefs, where we need
 # a full browser to lay out arbitrary published-doc HTML. The cast list, being
 # plain tabular data we control, is rendered by Prawn instead (no browser).
-gem 'grover', '~> 1.2'
+gem 'grover', '~> 2.0'
 gem 'prawn'
 gem 'prawn-table'
 # Prawn 2.4 does a bare `require 'matrix'`; matrix is no longer a default gem on
