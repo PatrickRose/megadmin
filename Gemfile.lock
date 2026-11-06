@@ -421,9 +421,9 @@ GEM
       logger
     ruby2_keywords (0.0.5)
     rubyzip (3.7.0)
-    sanitize (7.0.1)
+    sanitize (7.0.2)
       crass (~> 1.0.8)
-      nokogiri (>= 1.16.8)
+      nokogiri (>= 1.19.7)
     sanitize_email (2.0.16)
       mail (~> 2.0)
       version_gem (~> 1.1, >= 1.1.15)
