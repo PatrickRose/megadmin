@@ -117,7 +117,7 @@ GEM
       thor (~> 1.0)
     byebug (13.0.0)
       reline (>= 0.6.0)
-    cancancan (3.7.0)
+    cancancan (3.7.1)
     capybara (3.40.0)
       addressable
       matrix
@@ -435,16 +435,16 @@ GEM
       mail (~> 2.0)
       version_gem (~> 1.1, >= 1.1.17)
     securerandom (0.4.1)
-    selenium-webdriver (4.52.0)
+    selenium-webdriver (4.53.0)
       base64 (~> 0.2)
       logger (~> 1.4)
       rubyzip (>= 1.2.2, < 4.0)
       websocket (~> 1.0)
     semantic_range (3.1.1)
-    sentry-rails (7.2.0)
+    sentry-rails (7.3.0)
       railties (>= 5.2.0)
-      sentry-ruby (~> 7.2.0)
-    sentry-ruby (7.2.0)
+      sentry-ruby (~> 7.3.0)
+    sentry-ruby (7.3.0)
       bigdecimal
       concurrent-ruby (~> 1.0, >= 1.0.2)
       logger
